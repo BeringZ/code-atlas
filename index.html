@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Code Atlas：以功能为主线的多语言编程百科。" />
+  <title>Code Atlas · 多语言编程百科</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-mark">&lt;/&gt;</div>
+        <div>
+          <strong>Code Atlas</strong>
+          <span>Programming Encyclopedia</span>
+        </div>
+      </div>
+
+      <label class="search-box">
+        <span>⌕</span>
+        <input id="searchInput" type="search" placeholder="搜索功能、概念或章节…" />
+        <kbd>/</kbd>
+      </label>
+
+      <div class="progress-card">
+        <div class="progress-row">
+          <span>学习进度</span>
+          <strong id="progressText">0 / 0</strong>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <nav id="chapterNav" class="chapter-nav" aria-label="章节导航"></nav>
+
+      <a class="learning-entry" href="learning.html">
+        <span class="learning-entry-icon">🚀</span>
+        <span class="learning-entry-text">
+          <strong>进阶学习</strong>
+          <span>6 种语言的高质量进阶教程</span>
+        </span>
+        <span class="learning-entry-arrow">→</span>
+      </a>
+
+      <div class="sidebar-footer">
+        <button class="ghost-button" id="resetProgress">重置进度</button>
+        <span>数据保存在浏览器本地</span>
+      </div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <button class="icon-button mobile-only" id="menuButton" aria-label="打开导航">☰</button>
+
+        <div class="breadcrumb">
+          <span id="chapterGroup">基础</span>
+          <b>/</b>
+          <strong id="chapterIndex">01</strong>
+        </div>
+
+        <div class="topbar-actions">
+          <label class="select-wrap">
+            <span>主语言</span>
+            <select id="languageSelect"></select>
+          </label>
+
+          <button class="ghost-button" id="compareToggle">对比模式</button>
+          <button class="icon-button" id="themeToggle" aria-label="切换主题">◐</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <section class="hero">
+          <div>
+            <div class="eyebrow" id="chapterSubtitle"></div>
+            <h1 id="chapterTitle"></h1>
+            <p id="chapterGoal"></p>
+          </div>
+
+          <button class="complete-button" id="completeButton">
+            <span class="check-circle">✓</span>
+            <span>标记完成</span>
+          </button>
+        </section>
+
+        <section class="overview-grid">
+          <article class="panel">
+            <div class="panel-heading">
+              <span class="panel-number">01</span>
+              <h2>本章概念</h2>
+            </div>
+            <div id="conceptTags" class="tag-list"></div>
+          </article>
+
+          <article class="panel">
+            <div class="panel-heading">
+              <span class="panel-number">02</span>
+              <h2>实现步骤</h2>
+            </div>
+            <ol id="stepsList" class="steps-list"></ol>
+          </article>
+        </section>
+
+        <section class="code-section">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Same task, different language</span>
+              <h2>语言实现</h2>
+            </div>
+            <div class="language-summary" id="languageSummary"></div>
+          </div>
+
+          <div class="compare-controls hidden" id="compareControls">
+            <span>与另一种语言对比</span>
+            <select id="compareLanguageSelect"></select>
+          </div>
+
+          <div class="code-grid" id="codeGrid">
+            <article class="code-card">
+              <div class="code-toolbar">
+                <div class="file-meta">
+                  <span class="traffic red"></span>
+                  <span class="traffic yellow"></span>
+                  <span class="traffic green"></span>
+                  <span id="fileName">main.py</span>
+                </div>
+                <div class="toolbar-actions">
+                  <span class="language-badge" id="languageBadge">Python</span>
+                  <button class="toolbar-button" id="copyButton">复制</button>
+                </div>
+              </div>
+              <pre><code id="codeBlock"></code></pre>
+              <div class="code-note" id="codeNote"></div>
+            </article>
+
+            <article class="code-card compare-card hidden" id="compareCard">
+              <div class="code-toolbar">
+                <div class="file-meta">
+                  <span class="traffic red"></span>
+                  <span class="traffic yellow"></span>
+                  <span class="traffic green"></span>
+                  <span id="compareFileName">main.js</span>
+                </div>
+                <div class="toolbar-actions">
+                  <span class="language-badge" id="compareLanguageBadge">JavaScript</span>
+                  <button class="toolbar-button" id="compareCopyButton">复制</button>
+                </div>
+              </div>
+              <pre><code id="compareCodeBlock"></code></pre>
+              <div class="code-note" id="compareCodeNote"></div>
+            </article>
+          </div>
+
+          <div class="run-row">
+            <button class="run-button" id="runButton">
+              <span>▶</span>
+              运行结果预览
+            </button>
+            <span class="run-hint">示例输出用于理解流程，不在浏览器中编译任意代码。</span>
+          </div>
+
+          <article class="terminal" id="terminal">
+            <div class="terminal-bar">
+              <span>OUTPUT</span>
+              <button id="clearOutput">清空</button>
+            </div>
+            <pre id="outputBlock">点击“运行结果预览”查看示例输出。</pre>
+          </article>
+        </section>
+
+        <section class="language-catalog">
+          <div class="section-heading">
+            <div>
+              <span class="eyebrow">Language catalog</span>
+              <h2>本章语言索引</h2>
+            </div>
+          </div>
+          <div id="languageCards" class="language-cards"></div>
+        </section>
+
+        <footer class="page-footer">
+          <button class="ghost-button" id="previousChapter">← 上一章</button>
+          <span id="footerPosition"></span>
+          <button class="primary-button" id="nextChapter">下一章 →</button>
+        </footer>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+  <div class="scrim" id="scrim"></div>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
