@@ -258,53 +258,46 @@ kbd {
   border-top: 1px solid var(--line);
 }
 
-.learning-entry {
+/* 侧边栏快捷导航（00 下载与运行 / 项目实践 / 进阶学习） */
+.quick-nav {
+  padding: 0 12px 6px;
+}
+
+.quick-nav .nav-group-title {
+  margin-top: 12px;
+}
+
+.nav-item.nav-link {
   display: flex;
+  width: 100%;
   align-items: center;
   gap: 11px;
-  margin: 0 12px 12px;
-  padding: 12px 13px;
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
-  border-radius: 13px;
-  background: color-mix(in srgb, var(--accent) 7%, var(--surface));
-  text-decoration: none;
-  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
-}
-
-.learning-entry:hover {
-  transform: translateY(-1px);
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 12%, var(--surface));
-}
-
-.learning-entry-icon {
-  font-size: 18px;
-}
-
-.learning-entry-text {
-  min-width: 0;
-  flex: 1;
-}
-
-.learning-entry-text strong,
-.learning-entry-text span {
-  display: block;
-}
-
-.learning-entry-text strong {
-  font-size: 13px;
-}
-
-.learning-entry-text span {
-  margin-top: 2px;
+  padding: 10px 11px;
+  border-radius: 10px;
   color: var(--muted);
-  font-size: 10px;
+  text-decoration: none;
+  transition: background 160ms ease, color 160ms ease;
 }
 
-.learning-entry-arrow {
+.nav-item.nav-link:hover {
+  background: var(--surface-soft);
+  color: var(--text);
+}
+
+.nav-item.nav-link .nav-index {
   color: var(--accent);
-  font-size: 14px;
-  font-weight: 800;
+}
+
+.nav-item.nav-link:hover .nav-index {
+  color: var(--accent);
+}
+
+.chapter-nav {
+  border-top: 1px solid var(--line);
+}
+
+.chapter-nav .nav-group-title:first-child {
+  margin-top: 12px;
 }
 
 .sidebar-footer span {

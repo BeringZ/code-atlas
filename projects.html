@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Code Atlas 进阶学习：按编程语言分类的高质量进阶教程，来源权威、链接已验证。" />
-  <title>Code Atlas · 进阶学习</title>
+  <meta name="description" content="Code Atlas 项目实践：6 种语言的综合实战项目，含背景目标、技术要点、分阶段步骤、验收标准与思路提示。" />
+  <title>Code Atlas · 项目实践</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="learning.css" />
+  <link rel="stylesheet" href="projects.css" />
 </head>
 <body>
   <div class="app-shell learning-shell">
@@ -15,7 +16,7 @@
         <a class="learning-home" href="index.html" aria-label="返回主站">
           <span class="brand-mark small">&lt;/&gt;</span>
         </a>
-        <span>进阶学习</span>
+        <span>项目实践</span>
         <b>/</b>
         <strong id="crumbLanguage">Python</strong>
       </div>
@@ -31,30 +32,26 @@
     <main class="content learning-content">
       <section class="hero learning-hero">
         <div>
-          <div class="eyebrow" id="learningEyebrow">Advanced learning paths</div>
-          <h1 id="learningTitle"></h1>
-          <p id="learningSubtitle"></p>
+          <div class="eyebrow" id="projectEyebrow">Hands-on projects</div>
+          <h1 id="projectTitle"></h1>
+          <p id="projectSubtitle"></p>
         </div>
-        <div class="learning-stats" id="learningStats"></div>
+        <div class="project-badges" id="projectBadges"></div>
       </section>
 
-      <section id="categorySections" class="learning-sections"></section>
-
-      <section id="pathSection" class="learning-section-block"></section>
-
-      <section id="coachingSection" class="learning-section-block"></section>
+      <section id="projectBody" class="project-body"></section>
 
       <footer class="page-footer">
-        <a class="ghost-button" href="index.html">← 返回主站</a>
-        <span>教程来自官方文档与权威平台 · 链接已验证</span>
-        <button class="primary-button" id="backToTop">回到顶部 ↑</button>
+        <a class="ghost-button" href="setup.html">← 下载与运行</a>
+        <span>先独立完成，再对照思路提示</span>
+        <a class="primary-button" href="learning.html">继续：进阶学习 →</a>
       </footer>
     </main>
   </div>
 
   <div class="toast" id="toast" role="status"></div>
 
-  <script src="learning-data.js"></script>
-  <script src="learning.js"></script>
+  <script src="projects-data.js"></script>
+  <script src="projects.js"></script>
 </body>
 </html>

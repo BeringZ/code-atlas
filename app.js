@@ -143,7 +143,9 @@
     });
 
     const query = state.query.trim().toLowerCase();
-    elements.chapterNav.innerHTML = [...groups.entries()]
+    elements.chapterNav.innerHTML = `
+      <div class="nav-group-title">功能章节</div>
+      ${[...groups.entries()]
       .map(([group, items]) => {
         const visibleItems = items.filter(({ chapter }) => {
           const haystack = [
@@ -177,7 +179,8 @@
           </div>
         `;
       })
-      .join("");
+      .join("")}
+    `;
 
     elements.chapterNav.querySelectorAll("[data-chapter]").forEach((button) => {
       button.addEventListener("click", () => {

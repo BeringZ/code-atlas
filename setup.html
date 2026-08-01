@@ -3,10 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Code Atlas 进阶学习：按编程语言分类的高质量进阶教程，来源权威、链接已验证。" />
-  <title>Code Atlas · 进阶学习</title>
+  <meta name="description" content="Code Atlas 下载与运行：6 种语言的开发环境安装、路径配置、版本管理与示例运行指南。" />
+  <title>Code Atlas · 下载与运行</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="learning.css" />
+  <link rel="stylesheet" href="setup.css" />
 </head>
 <body>
   <div class="app-shell learning-shell">
@@ -15,7 +16,7 @@
         <a class="learning-home" href="index.html" aria-label="返回主站">
           <span class="brand-mark small">&lt;/&gt;</span>
         </a>
-        <span>进阶学习</span>
+        <span>下载与运行</span>
         <b>/</b>
         <strong id="crumbLanguage">Python</strong>
       </div>
@@ -31,30 +32,28 @@
     <main class="content learning-content">
       <section class="hero learning-hero">
         <div>
-          <div class="eyebrow" id="learningEyebrow">Advanced learning paths</div>
-          <h1 id="learningTitle"></h1>
-          <p id="learningSubtitle"></p>
+          <div class="eyebrow" id="setupEyebrow">Environment setup</div>
+          <h1 id="setupTitle"></h1>
+          <p id="setupSubtitle"></p>
         </div>
-        <div class="learning-stats" id="learningStats"></div>
+        <div class="setup-checks" id="setupChecks"></div>
       </section>
 
-      <section id="categorySections" class="learning-sections"></section>
+      <div class="setup-nav" id="setupNav" aria-label="本页目录"></div>
 
-      <section id="pathSection" class="learning-section-block"></section>
-
-      <section id="coachingSection" class="learning-section-block"></section>
+      <section id="setupSections" class="setup-sections"></section>
 
       <footer class="page-footer">
         <a class="ghost-button" href="index.html">← 返回主站</a>
-        <span>教程来自官方文档与权威平台 · 链接已验证</span>
-        <button class="primary-button" id="backToTop">回到顶部 ↑</button>
+        <span>安装命令来自各语言官方文档 · 请以官方最新版为准</span>
+        <a class="primary-button" href="projects.html">下一步：项目实践 →</a>
       </footer>
     </main>
   </div>
 
   <div class="toast" id="toast" role="status"></div>
 
-  <script src="learning-data.js"></script>
-  <script src="learning.js"></script>
+  <script src="setup-data.js"></script>
+  <script src="setup.js"></script>
 </body>
 </html>
