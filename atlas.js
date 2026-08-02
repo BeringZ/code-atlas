@@ -70,6 +70,13 @@ window.CodeAtlas2 = (() => {
         items.push({ type: "语言进阶", title: `${langName} ${t.no} ${t.title}`, desc: t.core, href: `language.html?t=${t.id}`, keywords: langName + t.title + t.core });
       });
     }
+    // 术语纳入搜索
+    const GLO = window.CODE_ATLAS_GLOSSARY;
+    if (GLO) {
+      (GLO.terms || []).forEach((t) => {
+        items.push({ type: "术语", title: `${t.term} · ${t.en}`, desc: t.def, href: `concept.html?c=${t.concept}`, keywords: t.term + t.en + t.def });
+      });
+    }
     index = items;
     return index;
   }

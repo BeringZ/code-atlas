@@ -625,6 +625,28 @@ a { color: inherit; }
 .enc-quick pre { margin: 0; padding: 12px 14px; overflow-x: auto; }
 .enc-quick code { color: #e8ecef; font: 11.5px/1.6 ui-monospace, Menlo, monospace; white-space: pre; }
 
+/* ===== 术语速查 ===== */
+.glossary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.glossary-item {
+  display: block;
+  padding: 15px 17px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  text-decoration: none;
+  transition: border-color 170ms ease, transform 170ms ease;
+}
+.glossary-item:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); transform: translateY(-2px); }
+.glossary-item .g-term { display: flex; align-items: baseline; gap: 8px; }
+.glossary-item .g-term strong { font-size: 14px; }
+.glossary-item .g-term span { color: var(--accent); font-family: ui-monospace, Menlo, monospace; font-size: 10.5px; font-weight: 700; }
+.glossary-item p { margin: 7px 0 0; color: var(--muted); font-size: 11.5px; line-height: 1.65; }
+
 /* ===== 页脚 ===== */
 .page-footer {
   display: flex;
@@ -659,6 +681,7 @@ a { color: inherit; }
 /* ===== 响应式 ===== */
 @media (max-width: 1080px) {
   .map-grid, .path-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .glossary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .lang-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .concept-layout { grid-template-columns: 1fr; }
   .concept-tree { position: static; max-height: none; }
@@ -670,7 +693,7 @@ a { color: inherit; }
   .search-box { width: auto; flex: 1; }
   .topbar .ghost-button { display: none; }
   .content { width: min(100% - 28px, 1180px); padding-top: 30px; }
-  .map-grid, .path-cards, .lang-strip, .diff-grid, .adv-topic-list, .cross-lang-grid, .enc-cards { grid-template-columns: 1fr; }
+  .map-grid, .path-cards, .lang-strip, .diff-grid, .adv-topic-list, .cross-lang-grid, .enc-cards, .glossary-grid { grid-template-columns: 1fr; }
   .adv-hero { display: block; }
   .lab-layout { grid-template-columns: 1fr; }
   .lab-list { position: static; }

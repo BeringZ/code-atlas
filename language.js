@@ -55,22 +55,37 @@
         <a class="ghost-button" href="language.html#${topic.lang}">← 返回 ${l.name} 专题目录</a>`;
 
     if (detail) {
-      html += `
+      // 要点讲解（必有）
+      if (detail.explanation) {
+        html += `
         <div class="detail-block">
           <h3>📖 要点讲解</h3>
           <p class="coach-explanation">${A.esc(detail.explanation)}</p>
-        </div>
+        </div>`;
+      }
+      // 代码逐行解读（可选：精讲层才有）
+      if (detail.code && detail.code.text) {
+        html += `
         <div class="detail-block">
           <h3>💻 代码示例 · 逐行解读</h3>
           <div class="code-panel"><pre><code>${A.highlight(detail.code.text)}</code></pre></div>
+          ${(detail.code.notes && detail.code.notes.length) ? `
           <ul class="code-notes">
             ${detail.code.notes.map((n) => `<li><span class="note-line">L${n.line}</span>${A.esc(n.note)}</li>`).join("")}
-          </ul>
-        </div>
+          </ul>` : ""}
+        </div>`;
+      }
+      // 常见误区（必有）
+      if (detail.pitfalls && detail.pitfalls.length) {
+        html += `
         <div class="detail-block">
           <h3>⚠️ 常见误区</h3>
           <ul class="pitfall-list">${detail.pitfalls.map((p) => `<li>${A.esc(p)}</li>`).join("")}</ul>
-        </div>
+        </div>`;
+      }
+      // 互动练习（可选：精讲层才有）
+      if (detail.exercise && detail.exercise.options) {
+        html += `
         <div class="detail-block">
           <h3>✏️ 互动练习</h3>
           <div class="exercise-card" data-answer="${detail.exercise.answer}" data-feedback="${A.esc(detail.exercise.feedback)}">
@@ -84,6 +99,7 @@
             <div class="exercise-feedback hidden"></div>
           </div>
         </div>`;
+      }
     } else {
       html += `<div class="detail-block" style="padding:20px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);font-size:13px">该专题的逐行精讲内容正在生产中，可先浏览<a href="concept.html">基础知识点</a>或该语言<a href="encyclopedia.html#${topic.lang}">语言百科</a>。</div>`;
     }

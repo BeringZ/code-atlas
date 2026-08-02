@@ -49,6 +49,18 @@
     })
     .join("");
 
+  // 术语速查
+  const GLO = window.CODE_ATLAS_GLOSSARY;
+  if (GLO) {
+    document.querySelector("#glossaryGrid").innerHTML = GLO.terms
+      .map((t) => `
+        <a class="glossary-item" href="concept.html?c=${t.concept}" title="查看知识点">
+          <div class="g-term"><strong>${A.esc(t.term)}</strong><span>${A.esc(t.en)}</span></div>
+          <p>${A.esc(t.def)}</p>
+        </a>`)
+      .join("");
+  }
+
   // 点击模块卡标记浏览
   document.querySelectorAll(".map-card").forEach((card) => {
     card.addEventListener("click", () => {

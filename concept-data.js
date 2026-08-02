@@ -38,6 +38,7 @@ window.CODE_ATLAS_2 = {
     // ============ 深做样板 1：变量绑定与可变性 ============
     {
       "id": "value.binding",
+      "status": "published",
       "module_id": "B02",
       "title": "变量绑定与可变性",
       "objectives": ["区分「声明变量」与「给变量重新赋值」", "理解可变与不可变绑定的差异及各自适用场景", "能在六种语言中写出等价的绑定与赋值"],
@@ -115,6 +116,7 @@ window.CODE_ATLAS_2 = {
     // ============ 深做样板 2：条件分支 ============
     {
       "id": "control.conditionals",
+      "status": "published",
       "module_id": "B04",
       "title": "条件分支：if 与模式匹配",
       "objectives": ["用条件分支把业务规则写成可读的执行路径", "对比 if/else 与 switch/match 的适用场景", "理解模式匹配比 if 链更强的表达能力"],
@@ -192,6 +194,7 @@ window.CODE_ATLAS_2 = {
     // ============ 深做样板 3：参数传递模型（文档指定样板） ============
     {
       "id": "function.parameter-passing",
+      "status": "published",
       "module_id": "B05",
       "title": "参数传递模型",
       "objectives": ["预测函数内重新绑定和修改对象对调用方的影响", "避免「按值/按引用」的口号化误判", "能对比六种语言的实际传递语义"],
@@ -271,6 +274,7 @@ window.CODE_ATLAS_2 = {
     // ============ 深做样板 4：集合遍历与迭代 ============
     {
       "id": "collection.iteration",
+      "status": "published",
       "module_id": "B07",
       "title": "集合遍历与迭代",
       "objectives": ["区分索引遍历、迭代器遍历与流式遍历", "理解迭代协议在六语言中的对应物", "能按场景选择遍历方式并注意修改集合的风险"],
@@ -348,6 +352,7 @@ window.CODE_ATLAS_2 = {
     // ============ 深做样板 5：异常与错误值 ============
     {
       "id": "error.exception-vs-result",
+      "status": "published",
       "module_id": "B09",
       "title": "异常与错误值",
       "objectives": ["对比异常（throw/try-catch）与错误值（Result/error）两种错误模型", "理解各语言默认的错误处理惯用法", "能设计错误传播与用户友好提示"],
@@ -426,6 +431,7 @@ window.CODE_ATLAS_2 = {
     // ============ 深做样板 6：创建并等待任务 ============
     {
       "id": "concurrency.spawn-await",
+      "status": "published",
       "module_id": "B13",
       "title": "创建并等待任务",
       "objectives": ["理解线程/协程/任务三种并发单元", "能创建并等待多个任务完成", "认识结果收集与错误处理的方式"],
