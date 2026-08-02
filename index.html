@@ -3,208 +3,112 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Code Atlas：以功能为主线的多语言编程百科。" />
-  <title>Code Atlas · 多语言编程百科</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="description" content="Code Atlas 2.0：以知识点为主干的多语言编程知识体系。18 个基础模块 × 6 种语言 × 60 个进阶专题。" />
+  <title>Code Atlas 2.0 · 学习地图</title>
+  <link rel="stylesheet" href="atlas.css" />
 </head>
 <body>
-  <div class="app-shell">
-    <aside class="sidebar" id="sidebar">
-      <div class="brand">
-        <div class="brand-mark">&lt;/&gt;</div>
-        <div>
-          <strong>Code Atlas</strong>
-          <span>Programming Encyclopedia</span>
-        </div>
-      </div>
-
-      <label class="search-box">
-        <span>⌕</span>
-        <input id="searchInput" type="search" placeholder="搜索功能、概念或章节…" />
-        <kbd>/</kbd>
-      </label>
-
-      <div class="progress-card">
-        <div class="progress-row">
-          <span>学习进度</span>
-          <strong id="progressText">0 / 0</strong>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="progressFill"></div>
-        </div>
-      </div>
-
-      <div class="quick-nav">
-        <div class="nav-group-title">起步</div>
-        <a class="nav-item nav-link" href="setup.html" data-external-nav="setup">
-          <span class="nav-index">00</span>
-          <span class="nav-label">下载与运行</span>
-        </a>
-      </div>
-
-      <nav id="chapterNav" class="chapter-nav" aria-label="章节导航"></nav>
-
-      <div class="quick-nav">
-        <div class="nav-group-title">实践与进阶</div>
-        <a class="nav-item nav-link" href="projects.html" data-external-nav="projects">
-          <span class="nav-index">▶</span>
-          <span class="nav-label">项目实践</span>
-        </a>
-        <a class="nav-item nav-link" href="learning.html" data-external-nav="learning">
-          <span class="nav-index">✦</span>
-          <span class="nav-label">进阶学习</span>
-        </a>
-      </div>
-
-      <div class="sidebar-footer">
-        <button class="ghost-button" id="resetProgress">重置进度</button>
-        <span>数据保存在浏览器本地</span>
-      </div>
-    </aside>
-
-    <div class="workspace">
-      <header class="topbar">
-        <button class="icon-button mobile-only" id="menuButton" aria-label="打开导航">☰</button>
-
-        <div class="breadcrumb">
-          <span id="chapterGroup">基础</span>
-          <b>/</b>
-          <strong id="chapterIndex">01</strong>
-        </div>
-
-        <div class="topbar-actions">
-          <label class="select-wrap">
-            <span>主语言</span>
-            <select id="languageSelect"></select>
-          </label>
-
-          <button class="ghost-button" id="compareToggle">对比模式</button>
-          <button class="icon-button" id="themeToggle" aria-label="切换主题">◐</button>
-        </div>
-      </header>
-
-      <main class="content">
-        <section class="hero">
-          <div>
-            <div class="eyebrow" id="chapterSubtitle"></div>
-            <h1 id="chapterTitle"></h1>
-            <p id="chapterGoal"></p>
-          </div>
-
-          <button class="complete-button" id="completeButton">
-            <span class="check-circle">✓</span>
-            <span>标记完成</span>
-          </button>
-        </section>
-
-        <section class="overview-grid">
-          <article class="panel">
-            <div class="panel-heading">
-              <span class="panel-number">01</span>
-              <h2>本章概念</h2>
-            </div>
-            <div id="conceptTags" class="tag-list"></div>
-          </article>
-
-          <article class="panel">
-            <div class="panel-heading">
-              <span class="panel-number">02</span>
-              <h2>实现步骤</h2>
-            </div>
-            <ol id="stepsList" class="steps-list"></ol>
-          </article>
-        </section>
-
-        <section class="code-section">
-          <div class="section-heading">
-            <div>
-              <span class="eyebrow">Same task, different language</span>
-              <h2>语言实现</h2>
-            </div>
-            <div class="language-summary" id="languageSummary"></div>
-          </div>
-
-          <div class="compare-controls hidden" id="compareControls">
-            <span>与另一种语言对比</span>
-            <select id="compareLanguageSelect"></select>
-          </div>
-
-          <div class="code-grid" id="codeGrid">
-            <article class="code-card">
-              <div class="code-toolbar">
-                <div class="file-meta">
-                  <span class="traffic red"></span>
-                  <span class="traffic yellow"></span>
-                  <span class="traffic green"></span>
-                  <span id="fileName">main.py</span>
-                </div>
-                <div class="toolbar-actions">
-                  <span class="language-badge" id="languageBadge">Python</span>
-                  <button class="toolbar-button" id="copyButton">复制</button>
-                </div>
-              </div>
-              <pre><code id="codeBlock"></code></pre>
-              <div class="code-note" id="codeNote"></div>
-            </article>
-
-            <article class="code-card compare-card hidden" id="compareCard">
-              <div class="code-toolbar">
-                <div class="file-meta">
-                  <span class="traffic red"></span>
-                  <span class="traffic yellow"></span>
-                  <span class="traffic green"></span>
-                  <span id="compareFileName">main.js</span>
-                </div>
-                <div class="toolbar-actions">
-                  <span class="language-badge" id="compareLanguageBadge">JavaScript</span>
-                  <button class="toolbar-button" id="compareCopyButton">复制</button>
-                </div>
-              </div>
-              <pre><code id="compareCodeBlock"></code></pre>
-              <div class="code-note" id="compareCodeNote"></div>
-            </article>
-          </div>
-
-          <div class="run-row">
-            <button class="run-button" id="runButton">
-              <span>▶</span>
-              运行结果预览
-            </button>
-            <span class="run-hint">示例输出用于理解流程，不在浏览器中编译任意代码。</span>
-          </div>
-
-          <article class="terminal" id="terminal">
-            <div class="terminal-bar">
-              <span>OUTPUT</span>
-              <button id="clearOutput">清空</button>
-            </div>
-            <pre id="outputBlock">点击“运行结果预览”查看示例输出。</pre>
-          </article>
-        </section>
-
-        <section class="language-catalog">
-          <div class="section-heading">
-            <div>
-              <span class="eyebrow">Language catalog</span>
-              <h2>本章语言索引</h2>
-            </div>
-          </div>
-          <div id="languageCards" class="language-cards"></div>
-        </section>
-
-        <footer class="page-footer">
-          <button class="ghost-button" id="previousChapter">← 上一章</button>
-          <span id="footerPosition"></span>
-          <button class="primary-button" id="nextChapter">下一章 →</button>
-        </footer>
-      </main>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">&lt;/&gt;</span>
+      <span><strong>Code Atlas</strong><span>2.0 · 学习地图</span></span>
+    </a>
+    <label class="search-box">
+      <span class="search-icon">⌕</span>
+      <input id="globalSearch" type="search" placeholder="搜索概念、模块、错误或专题…" />
+      <kbd>/</kbd>
+    </label>
+    <div class="search-results hidden" id="searchResults"></div>
+    <div class="topbar-actions">
+      <button class="ghost-button" onclick="location.href='modules.html'">基础模块</button>
+      <button class="ghost-button" onclick="location.href='lab.html'">功能实验室</button>
+      <button class="ghost-button" onclick="location.href='encyclopedia.html'">语言百科</button>
+      <button class="icon-button" id="themeToggle" aria-label="切换主题">◐</button>
     </div>
-  </div>
+  </header>
 
-  <div class="toast" id="toast" role="status"></div>
-  <div class="scrim" id="scrim"></div>
+  <main class="content">
+    <section class="page-hero">
+      <div class="eyebrow">Knowledge-first · Language-agnostic</div>
+      <h1>以知识点为主干的多语言编程知识体系</h1>
+      <p>先理解「这个知识解决什么问题」，再切换 Python / JavaScript / Java / C++ / Go / Rust 观察表达方式。
+        基础模块由语言无关的知识点构成；语言特有的机制进入各自独立的进阶目录。</p>
+    </section>
 
-  <script src="data.js"></script>
-  <script src="app.js"></script>
+    <section class="section-block" id="mapSection">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">Learning trunk</span>
+          <h2>基础主干 · 18 个模块</h2>
+          <p class="desc">按前置关系组织的语言无关知识模块，点击进入模块目录。</p>
+        </div>
+        <div id="progressSummary" class="progress-summary"></div>
+      </div>
+      <div class="map-grid" id="moduleMap"></div>
+    </section>
+
+    <section class="section-block">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">Language branches</span>
+          <h2>语言进阶 · 6 条独立分支</h2>
+          <p class="desc">每种语言 10 个机制专题：所有权、事件循环、JVM、模板、channel、借用检查器…</p>
+        </div>
+      </div>
+      <div class="lang-strip" id="langStrip"></div>
+    </section>
+
+    <section class="section-block">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">Recommended paths</span>
+          <h2>推荐学习路径</h2>
+          <p class="desc">按目标选择最短路径，不必一次读完整个百科。</p>
+        </div>
+      </div>
+      <div class="path-cards">
+        <article class="path-card">
+          <span class="path-aud">零基础必修</span>
+          <h3>从零建立编程认知</h3>
+          <ol>
+            <li>B00 编程与运行模型 → B01 环境与工具链</li>
+            <li>B02 值变量类型 → B04 控制流 → B05 函数</li>
+            <li>B07 集合 → B09 错误处理 → 功能实验室小项目</li>
+            <li>进入一门语言的进阶分支</li>
+          </ol>
+        </article>
+        <article class="path-card">
+          <span class="path-aud">转语言速通</span>
+          <h3>已有一门语言，快速迁移</h3>
+          <ol>
+            <li>跳过已掌握的概念，做概念诊断</li>
+            <li>重点看知识点的「语言差异」四类说明</li>
+            <li>直达目标语言进阶专题（this / 所有权 / 通道…）</li>
+          </ol>
+        </article>
+        <article class="path-card">
+          <span class="path-aud">算法与面试强化</span>
+          <h3>面向课程与面试</h3>
+          <ol>
+            <li>B02/B05/B07 → B16 数据结构与算法</li>
+            <li>B12 泛型 → B15 测试调试</li>
+            <li>用 B16 知识点在多语言间切换练习</li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <footer class="page-footer">
+      <span>Code Atlas 2.0 · 依据《产品策划与内容架构执行文档 V1.0》重构</span>
+      <span>概念先于语法 · 差异必须可解释</span>
+    </footer>
+  </main>
+
+  <div class="toast" role="status"></div>
+
+  <script src="concept-data.js"></script>
+  <script src="advanced-data.js"></script>
+  <script src="atlas.js"></script>
+  <script src="index.js"></script>
 </body>
 </html>

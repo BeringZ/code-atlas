@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Code Atlas 2.0 基础模块目录：18 个语言无关知识模块。" />
+  <title>Code Atlas 2.0 · 基础模块</title>
+  <link rel="stylesheet" href="atlas.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">&lt;/&gt;</span>
+      <span><strong>Code Atlas</strong><span>2.0 · 基础模块</span></span>
+    </a>
+    <label class="search-box">
+      <span class="search-icon">⌕</span>
+      <input id="globalSearch" type="search" placeholder="搜索概念、模块…" />
+      <kbd>/</kbd>
+    </label>
+    <div class="search-results hidden" id="searchResults"></div>
+    <div class="topbar-actions">
+      <button class="ghost-button" onclick="location.href='index.html'">学习地图</button>
+      <button class="ghost-button" onclick="location.href='lab.html'">功能实验室</button>
+      <button class="icon-button" id="themeToggle" aria-label="切换主题">◐</button>
+    </div>
+  </header>
+
+  <main class="content">
+    <section class="page-hero">
+      <div class="eyebrow">Knowledge modules</div>
+      <h1>基础模块目录</h1>
+      <p>所有语言共享的编程知识，按模块组织、不以语言组织。每个模块给出学习目标、知识点清单与前置关系；已发布知识点可点击进入详情。</p>
+    </section>
+
+    <div class="module-layout" id="moduleGrid"></div>
+
+    <footer class="page-footer">
+      <span>基础模块 · B00–B17</span>
+      <span>概念先于语法</span>
+    </footer>
+  </main>
+
+  <div class="toast" role="status"></div>
+
+  <script src="concept-data.js"></script>
+  <script src="advanced-data.js"></script>
+  <script src="atlas.js"></script>
+  <script src="modules.js"></script>
+</body>
+</html>

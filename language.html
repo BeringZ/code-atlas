@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Code Atlas 2.0 语言进阶：Python/JS/Java/C++/Go/Rust 各自独立的知识树与机制专题。" />
+  <title>Code Atlas 2.0 · 语言进阶</title>
+  <link rel="stylesheet" href="atlas.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">&lt;/&gt;</span>
+      <span><strong>Code Atlas</strong><span>2.0 · 语言进阶</span></span>
+    </a>
+    <label class="search-box">
+      <span class="search-icon">⌕</span>
+      <input id="globalSearch" type="search" placeholder="搜索专题、机制、工程能力…" />
+      <kbd>/</kbd>
+    </label>
+    <div class="search-results hidden" id="searchResults"></div>
+    <div class="topbar-actions">
+      <button class="ghost-button" onclick="location.href='modules.html'">基础模块</button>
+      <button class="ghost-button" onclick="location.href='encyclopedia.html'">语言百科</button>
+      <button class="icon-button" id="themeToggle" aria-label="切换主题">◐</button>
+    </div>
+  </header>
+
+  <main class="content">
+    <div class="lang-switcher" id="langStrip" style="justify-content:center;margin-bottom:34px"></div>
+    <div id="advRoot"></div>
+
+    <footer class="page-footer">
+      <span id="footerLeft">Code Atlas 2.0 · 语言进阶</span>
+      <span>语言特性不被平均化 · 每语言独立进阶空间</span>
+    </footer>
+  </main>
+
+  <div class="toast" role="status"></div>
+
+  <script src="concept-data.js"></script>
+  <script src="advanced-data.js"></script>
+  <script src="encyclopedia-data.js"></script>
+  <script src="atlas.js"></script>
+  <script src="language.js"></script>
+</body>
+</html>
