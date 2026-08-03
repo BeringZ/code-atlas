@@ -5,6 +5,6 @@
   "description": "以知识点为主干的多语言编程知识体系（181 知识点 × 6 语言）",
   "scripts": {
     "start": "python3 -m http.server 5174",
-    "test": "node quality/check-data.js && node quality/test-nullability.js && node quality/test-conversion.js && node quality/test-contract.js && node quality/test-mutability.js && node quality/test-maturity.js && node quality/verify-concepts.js"
+    "test": "node quality/check-data.js && node quality/test-nullability.js && node quality/test-conversion.js && node quality/test-contract.js && node quality/test-mutability.js && node quality/test-maturity.js && node quality/test-float-precision.js && node quality/verify-concepts.js"
   }
 }
