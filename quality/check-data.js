@@ -180,6 +180,34 @@ if (SUP && SUP.concepts && SUP.concepts.length) {
 const withErrors = concepts.filter((c) => c.errors && c.errors.length > 0).length;
 notes.push(`含反例/错误案例（errors）的知识点：${withErrors}/${concepts.length}`);
 
+// 9) L3/L4 成熟度结构合同（I6-B：175 个 L2 推广的机器门槛）
+//    L4 硬性要求：六语言 variants + semantic_blocks + comparisonDimensions + errors + acceptanceTests + commonTask
+//    L3 硬性要求：variants（≥3 语言 minimal_code）+ errors ≥ 1 + comparisonDimensions
+const LANG6 = ['python', 'javascript', 'java', 'cpp', 'go', 'rust'];
+let contractErr = 0;
+concepts.forEach((c) => {
+  if (c.level === 'L4') {
+    const v = c.variants || {};
+    const missing = LANG6.filter((l) => !(v[l] && v[l].minimal_code));
+    if (missing.length) { contractErr++; errors.push(`概念 ${c.id}（L4）六语言 variants 缺失：${missing.join(',')}`); }
+    if (!LANG6.every((l) => v[l] && v[l].semantic_blocks && v[l].semantic_blocks.length)) { contractErr++; errors.push(`概念 ${c.id}（L4）需每语言 semantic_blocks`); }
+    if (!c.comparisonDimensions || c.comparisonDimensions.length < 4) { contractErr++; errors.push(`概念 ${c.id}（L4）comparisonDimensions 不足 4 维`); }
+    if (!(c.errors || []).length) { contractErr++; errors.push(`概念 ${c.id}（L4）缺反例 errors`); }
+    if (!(c.acceptanceTests || []).length) { contractErr++; errors.push(`概念 ${c.id}（L4）缺验收断言 acceptanceTests`); }
+    if (!c.commonTask) { contractErr++; errors.push(`概念 ${c.id}（L4）缺同题任务 commonTask`); }
+    if (!(c.transferExercises || []).length) { contractErr++; errors.push(`概念 ${c.id}（L4）缺迁移练习 transferExercises`); }
+  } else if (c.level === 'L3') {
+    const v = c.variants || {};
+    const langCount = LANG6.filter((l) => v[l] && v[l].minimal_code).length;
+    if (langCount < 3) { contractErr++; errors.push(`概念 ${c.id}（L3）语言变体不足（${langCount}/6，需 ≥3）`); }
+    if (!(c.errors || []).length) { contractErr++; errors.push(`概念 ${c.id}（L3）缺反例 errors`); }
+    if (!c.comparisonDimensions || c.comparisonDimensions.length < 3) { contractErr++; errors.push(`概念 ${c.id}（L3）comparisonDimensions 不足 3 维`); }
+  }
+});
+if (contractErr === 0) {
+  notes.push(`L3/L4 结构合同全部满足（${concepts.filter((c) => c.level === 'L3' || c.level === 'L4').length} 个精讲概念）`);
+}
+
 // —— 汇总 ——
 console.log(`Code Atlas 数据质检（${concepts.length} 个概念 / ${modules.length} 个模块）`);
 console.log(`成熟度分布：L1=${levelCount.L1}  L2=${levelCount.L2}  L3=${levelCount.L3}  L4=${levelCount.L4}`);
