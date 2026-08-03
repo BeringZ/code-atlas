@@ -475,14 +475,449 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
     },
 
     // ================= B06 字符串、文本与正则 =================
-    { "id": "string.unicode", "module_id": "B06", "title": "字符、字节与 Unicode", "status": "published",
-      "objectives": ["理解 Unicode 码点与编码", "避免中文/emoji 的索引陷阱"],
-      "prerequisites": ["value.string-bytes"],
-      "core": "Unicode 给每个字符分配唯一码点（如 '中'=U+4E2D）；UTF-8 把码点编码为变长字节（ASCII 1 字节、中文 3 字节、emoji 4 字节）。处理文本时，按「字符」还是按「字节」操作结果完全不同——索引、长度、截取都需注意单位。",
-      "lang_diff": "Python：str 按码点、len('中')=1；JS：String 按 UTF-16 码元、'😀'.length=2（需 [...s] 按码点）；Java：String 也是 UTF-16；C++：std::string 按字节；Go：string 按字节、range 按 rune；Rust：String UTF-8、chars() 按码点、索引需用切片字节。",
+            {
+      "id": "string.unicode",
+      "module_id": "B06",
+      "title": "字符、字节与 Unicode",
+      "status": "published",
+      "level": "L4",
+      "objectives": [
+        "区分四层刻度：字节 / 码元 / 码点 / 字素簇",
+        "识别六语言默认 length 各自返回哪一层（最大陷阱）",
+        "能在六种语言中正确计算用户可见字符数与码点数"
+      ],
+      "prerequisites": [
+        "value.string-bytes"
+      ],
+      "core": "Unicode 字符串有四层刻度，自底向上：① 字节（UTF-8 编码的存储单位）；② 码元（UTF-16 的 16 位单元，Java/JS 的 char）；③ 码点（Unicode 字符编号，如 '中'=U+4E2D、'🙂'=U+1F642）；④ 字素簇（用户可见字符，可含多个码点，如 e+组合重音 é、家庭 emoji 的 ZWJ 序列）。关键认知：不同语言的默认 length API 返回的层不同——Python len() 是码点、JS/Java 的 length 是码元、C++ std::string::size() 与 Go len() 与 Rust len() 是字节。要数「用户可见字符」必须显式做字素簇切分（JS Intl.Segmenter / Java BreakIterator / 其余语言需第三方库）。",
+      "summary": "四层刻度模型：字节 → 码元 → 码点 → 字素簇；六语言默认 length 各不相同，数「字符」前先问清是哪一层。",
+      "commonTask": {
+        "input": "\"A中e\\u0301🙂\"（A + 中文 + e + 组合重音 + emoji）",
+        "expectedOutput": {
+          "utf8Bytes": 11,
+          "utf16Units": 6,
+          "codePoints": 5,
+          "graphemes": 4
+        }
+      },
+      "comparisonDimensions": [
+        "unicode-representation",
+        "type-checking",
+        "failure-mode",
+        "idiomatic-style",
+        "runtime-cost"
+      ],
+      "lang_diff": "Python：str 是码点序列，len()=码点数，但需第三方库做字素簇切分；JS：UTF-16 码元序列，.length=码元数，[...s] 展开可得码点数，Intl.Segmenter 原生切字素簇；Java：char 是 UTF-16 码元，length()=码元数，codePointCount() 得码点数，BreakIterator 原生切字素簇；C++：std::string 是字节串（UTF-8），size()=字节数，无标准库码点/字素簇 API；Go：len()=字节数，utf8.RuneCountInString 得码点数，字素簇需 rivo/uniseg；Rust：str 保证 UTF-8 合法，len()=字节数，chars().count() 得码点数，字素簇需 unicode-segmentation crate。",
+      "variants": {
+        "python": {
+          "version": "3.13",
+          "minimal_code": "s = \"A中e\\u0301🙂\"   # 码点序列\nprint(len(s))              # 5：码点数（默认即码点）",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ],
+          "syntax_notes": [
+            "str 直接支持任意 Unicode 码点",
+            "len(s) 统计码点，中文/emoji 各算 1"
+          ],
+          "semantic_notes": [
+            "Python 的 len 天然是码点数（四层中偏上）",
+            "字素簇需第三方 regex 库或 unicodedata 手工处理",
+            "bytes 类型才是字节层：len('中'.encode()) == 3"
+          ],
+          "idioms": [
+            "判断空串用 if not s，不要比较长度",
+            "处理字素簇用 regex.findall(r'\\X', s)"
+          ],
+          "pitfalls": [
+            "len('e\\u0301') == 2，组合字符被拆成两个码点",
+            "把 len() 当「用户可见字符数」会数错"
+          ],
+          "comparison": {
+            "unicode-representation": "str 是码点序列，len() 天然返回码点数",
+            "type-checking": "动态类型；运行期才暴露字符语义问题",
+            "failure-mode": "不越界；但 len 对组合字符/ZWJ 数成多个码点（逻辑错）",
+            "idiomatic-style": "len() 即码点；字素簇需第三方 regex 的 \\X 或 unicodedata 手写",
+            "runtime-cost": "len() O(1)；字素簇 O(n) 需解析"
+          }
+        },
+        "javascript": {
+          "version": "ES2024",
+          "minimal_code": "const s = \"A中e\\u0301🙂\";       // UTF-16 码元序列\nconsole.log([...s].length);     // 5：码点数（展开迭代）\nconsole.log(s.length);          // 6：UTF-16 码元数（默认陷阱）\nconsole.log([...new Intl.Segmenter().segment(s)].length); // 4：字素簇",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "iterate",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "index",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "stream",
+              "start": 4,
+              "end": 4
+            }
+          ],
+          "syntax_notes": [
+            "字符串是 UTF-16 码元序列，emoji 占 2 个码元",
+            "s.length 返回码元数；[...s] 按码点迭代"
+          ],
+          "semantic_notes": [
+            "Intl.Segmenter 是标准库字素簇切分（grapheme 粒度）",
+            "s[i] 按码元索引，可能切到代理对中间",
+            "textContent/innerHTML 处理的是码点语义，长度另算"
+          ],
+          "idioms": [
+            "数码点用 [...s].length 或 Array.from(s)",
+            "数字素簇用 Intl.Segmenter",
+            "按码元遍历性能高，按码点遍历需展开"
+          ],
+          "pitfalls": [
+            "s.length 对 emoji 偏大（'🙂'.length == 2）",
+            "slice 可能切开代理对产生乱码"
+          ],
+          "comparison": {
+            "unicode-representation": "UTF-16 码元序列；.length 是码元数，[...s] 得码点数",
+            "type-checking": "动态类型；s[i] 可能取到代理对一半（undefined 语义）",
+            "failure-mode": "slice/charAt 切开代理对产生乱码（silent）",
+            "idiomatic-style": "码点用 [...s].length；字素簇用 Intl.Segmenter（原生）",
+            "runtime-cost": ".length O(1)；Segmenter O(n)；展开迭代 O(n) 分配"
+          }
+        },
+        "java": {
+          "version": "21+",
+          "minimal_code": "String s = \"A中e\\u0301🙂\";\nSystem.out.println(s.codePointCount(0, s.length())); // 5：码点数\nSystem.out.println(s.length());                      // 6：UTF-16 码元数",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 3
+            }
+          ],
+          "syntax_notes": [
+            "char 是 UTF-16 码元，emoji 占两个 char（代理对）",
+            "length() 返回码元数"
+          ],
+          "semantic_notes": [
+            "codePointCount(0, s.length()) 得码点数",
+            "BreakIterator.getCharacterInstance() 可切字素簇",
+            "s.charAt(i) 可能只取到代理对的一半"
+          ],
+          "idioms": [
+            "遍历码点用 s.codePoints() 流",
+            "字素簇用 BreakIterator 或 ICU4J"
+          ],
+          "pitfalls": [
+            "'🙂'.length() == 2 而不是 1",
+            "charAt 切代理对产生无效字符"
+          ],
+          "comparison": {
+            "unicode-representation": "char 是 UTF-16 码元；length() 码元数，codePointCount() 码点数",
+            "type-checking": "静态类型；String 不可变，编译期不查码点语义",
+            "failure-mode": "charAt 代理对一半；substring 可切坏组合序列",
+            "idiomatic-style": "codePoints() 流遍历；字素簇用 BreakIterator（原生）",
+            "runtime-cost": "length() O(1)；codePointCount O(n)"
+          }
+        },
+        "cpp": {
+          "version": "C++20",
+          "minimal_code": "std::string s = u8\"A中e\\u0301🙂\"; // UTF-8 字节串\nint n = 0;\nfor (size_t i = 0; i < s.size();) {\n  unsigned char c = s[i];\n  i += (c < 0x80) ? 1 : (c < 0xE0) ? 2 : (c < 0xF0) ? 3 : 4;\n  n++;\n}\nstd::cout << n; // 5：码点数（手写 UTF-8 解码）",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "declare-param",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "iterate",
+              "start": 3,
+              "end": 6
+            },
+            {
+              "role": "call",
+              "start": 7,
+              "end": 7
+            }
+          ],
+          "syntax_notes": [
+            "std::string 是字节串，无 Unicode 语义",
+            "s.size() 返回 UTF-8 字节数"
+          ],
+          "semantic_notes": [
+            "u8 前缀保证 UTF-8 编码",
+            "码点/字素簇均无标准库 API，需 ICU 或手写",
+            "std::u16string 才是码元层（wchar_t 平台相关慎用）"
+          ],
+          "idioms": [
+            "现代 C++ 用 std::u8string + UTF-8 作为事实标准",
+            "项目需要字符处理时引入 ICU"
+          ],
+          "pitfalls": [
+            "std::string(\"中\").size() == 3（字节）",
+            "下标访问可能落到多字节序列中间"
+          ],
+          "comparison": {
+            "unicode-representation": "std::string 是 UTF-8 字节串；size() 是字节数",
+            "type-checking": "静态类型；无字符编码检查，u8 仅保证字面量编码",
+            "failure-mode": "下标访问多字节中间 → 未定义行为；size() 误导字符数",
+            "idiomatic-style": "现代 C++ 用 u8string + UTF-8；字符语义需 ICU",
+            "runtime-cost": "size() O(1)；手写解码 O(n)；ICU 开销较大"
+          }
+        },
+        "go": {
+          "version": "1.23+",
+          "minimal_code": "s := \"A中e\\u0301🙂\"\nfmt.Println(utf8.RuneCountInString(s)) // 5：码点数\nfmt.Println(len(s))                 // 11：UTF-8 字节数",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 3
+            }
+          ],
+          "syntax_notes": [
+            "string 是只读字节切片，无编码语义",
+            "len(s) 是字节数"
+          ],
+          "semantic_notes": [
+            "utf8.RuneCountInString 统计码点（rune）",
+            "range s 按 rune 迭代（自动解码）",
+            "字素簇需 rivo/uniseg 第三方包"
+          ],
+          "idioms": [
+            "遍历字符用 for range（隐式按 rune）",
+            "子串 s[i:j] 是字节切片，可能切开多字节字符"
+          ],
+          "pitfalls": [
+            "len(\"中\") == 3",
+            "s[0] 是首字节而非首字符"
+          ],
+          "comparison": {
+            "unicode-representation": "string 是只读字节切片；len() 字节数，utf8.RuneCountInString 码点数",
+            "type-checking": "静态类型；[]byte(s) 显式转换",
+            "failure-mode": "s[i] 是字节，多字节字符被拆；子串切片可切坏",
+            "idiomatic-style": "range s 按 rune 迭代；字素簇需 rivo/uniseg",
+            "runtime-cost": "len() O(1)；RuneCountInString O(n)；range 每次解码 O(n)"
+          }
+        },
+        "rust": {
+          "version": "2024 Edition",
+          "minimal_code": "let s = \"A中e\\u{301}\\u{1F642}\";\nprintln!(\"{}\", s.chars().count()); // 5：码点数\nprintln!(\"{}\", s.len());          // 11：UTF-8 字节数",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 3
+            }
+          ],
+          "syntax_notes": [
+            "&str 保证合法 UTF-8（编译期/运行期校验）",
+            "s.len() 是字节数"
+          ],
+          "semantic_notes": [
+            "chars() 迭代码点（Unicode Scalar Value）",
+            "s[i] 直接索引被禁止（可能多字节），须用 bytes 或 chars",
+            "字素簇需 unicode-segmentation crate"
+          ],
+          "idioms": [
+            "按码点遍历用 s.chars()",
+            "码元用 s.encode_utf16().count()",
+            "切字节需先验证边界避免 panic"
+          ],
+          "pitfalls": [
+            "s[0] 无法直接取（编译错误，强制思考编码）",
+            "len(\"中\") == 3"
+          ],
+          "comparison": {
+            "unicode-representation": "&str 保证合法 UTF-8；len() 字节数，chars().count() 码点数",
+            "type-checking": "最强静态检查：s[i] 直接索引被编译期拒绝",
+            "failure-mode": "无 panic 风险（索引被禁止）；但语义选择错误会算错",
+            "idiomatic-style": "chars() 遍历；encode_utf16() 码元；字素簇需 unicode-segmentation crate",
+            "runtime-cost": "len() O(1)；chars().count() O(n)；UTF-8 解码有校验开销"
+          }
+        }
+      },
+      "errors": [
+        {
+          "code": "# Python\nlen(\"e\\u0301\")  # 2",
+          "message": "组合字符（e + 组合重音）被拆成 2 个码点",
+          "cause": "len() 数的是码点，不是用户可见字符",
+          "fix": "需要字素簇时用 regex.findall(r'\\X', s) 或第三方 uniseg"
+        },
+        {
+          "code": "// Java\n\"🙂\".length()  // 2",
+          "message": "emoji 在 UTF-16 中占两个码元（代理对）",
+          "cause": "Java char 是 UTF-16 码元，length() 数码元",
+          "fix": "用 codePointCount(0, s.length()) 数码点；字素簇用 BreakIterator"
+        },
+        {
+          "code": "// C++\nstd::string(\"中\").size()  // 3",
+          "message": "一个中文字符在 UTF-8 中占 3 个字节",
+          "cause": "std::string 是字节串，size() 是字节数",
+          "fix": "用 u8 字符串 + 手写解码，或引入 ICU 处理字符语义"
+        },
+        {
+          "code": "// Go\nlen(\"中\")  // 3",
+          "message": "len() 返回 UTF-8 字节数而非字符数",
+          "cause": "Go string 是字节切片",
+          "fix": "用 utf8.RuneCountInString(s) 数码点数；range s 按 rune 迭代"
+        },
+        {
+          "code": "// JavaScript\n\"🙂\".length  // 2",
+          "message": "emoji 在 UTF-16 中占 2 个码元",
+          "cause": "JS 字符串是 UTF-16 码元序列，length 数码元",
+          "fix": "用 [...s].length 数码点；Intl.Segmenter 数字素簇"
+        }
+      ],
+      "transferExercises": [
+        {
+          "type": "migrate",
+          "question": "Python 的 len(\"A中\") 返回 2（码点）。在 Java 中如何得到相同的码点数？",
+          "options": [
+            "\"A中\".length()",
+            "\"A中\".codePointCount(0, \"A中\".length())",
+            "\"A中\".size()",
+            "Arrays.stream(\"A中\").count()"
+          ],
+          "answer": 1,
+          "feedback": "Java length() 是码元数；中文 BMP 内正好 1 码元 1 码点，但 emoji 会暴露差异，必须用 codePointCount。"
+        },
+        {
+          "type": "migrate",
+          "question": "JavaScript 的 s.length 返回 UTF-16 码元数。要在 Rust 得到同样的语义，用哪个 API？",
+          "options": [
+            "s.len()",
+            "s.chars().count()",
+            "s.encode_utf16().count()",
+            "s.bytes().count()"
+          ],
+          "answer": 2,
+          "feedback": "encode_utf16() 迭代 UTF-16 码元，与 JS 的 length 语义一致；s.len() 是 UTF-8 字节数，chars().count() 是码点数。"
+        },
+        {
+          "type": "migrate",
+          "question": "Go 中 len(s) 是字节数。什么时候必须用 utf8.RuneCountInString(s)？",
+          "options": [
+            "永远不需要，len 就够",
+            "字符串只含 ASCII 时",
+            "需要统计用户可见字符数时",
+            "需要统计码点数（含中文/emoji）时"
+          ],
+          "answer": 3,
+          "feedback": "len(s) 数字节；含多字节字符（中文 3 字节、emoji 4 字节）时必须按码点统计用 RuneCountInString。字素簇还需 uniseg。"
+        }
+      ],
+      "acceptanceTests": [
+        {
+          "input": "\"A中e\\u0301🙂\"",
+          "assert": "codePoints == 5",
+          "expect": 5
+        },
+        {
+          "input": "\"A中e\\u0301🙂\"",
+          "assert": "graphemes == 4",
+          "expect": 4
+        },
+        {
+          "input": "\"A中e\\u0301🙂\"",
+          "assert": "utf16Units == 6",
+          "expect": 6
+        },
+        {
+          "input": "\"A中e\\u0301🙂\"",
+          "assert": "utf8Bytes == 11",
+          "expect": 11
+        }
+      ],
       "exercises": [
-        { "type": "concept", "question": "JS 中 \"😀\".length 的值是？", "options": ["4", "0", "1", "2"], "answer": 3, "feedback": "emoji 是代理对占 2 个 UTF-16 码元；[...\"😀\"].length=1。" },
-        { "type": "read", "question": "Python 中 len('中文') 的结果是？", "options": ["3", "2", "1", "6"], "answer": 1, "feedback": "Python str 按码点计数，'中文' 是 2 个字符。" }
+        {
+          "type": "concept",
+          "question": "「字节 → 码元 → 码点 → 字素簇」四层刻度中，哪一层是「用户可见字符」？",
+          "options": [
+            "字节",
+            "码元",
+            "码点",
+            "字素簇"
+          ],
+          "answer": 3,
+          "feedback": "字素簇是用户视觉上的一个字符，可包含多个码点（组合重音、ZWJ 序列）。"
+        },
+        {
+          "type": "read",
+          "question": "JavaScript 中 \"🙂\".length 的值是？",
+          "options": [
+            "1",
+            "2",
+            "3",
+            "4"
+          ],
+          "answer": 1,
+          "feedback": "JS 字符串是 UTF-16 码元序列，emoji 占 2 个码元，所以 length 为 2。"
+        },
+        {
+          "type": "debug",
+          "question": "以下哪段代码在统计「用户可见字符数」时会产生错误结果？",
+          "options": [
+            "Rust: s.chars().count()  // 输入含家庭 emoji（ZWJ 序列）",
+            "Java: s.codePointCount(0, s.length())  // 输入含组合重音",
+            "Go: utf8.RuneCountInString(s)  // 输入含中文",
+            "JS: [...new Intl.Segmenter().segment(s)].length  // 输入任意"
+          ],
+          "answer": 1,
+          "feedback": "家庭 emoji 是 ZWJ 连接的多个码点，chars().count() 会数成多个；字素簇切分才是用户可见字符。组合重音同理（e+\\u0301 是两个码点一个字素簇）。"
+        },
+        {
+          "type": "migrate",
+          "question": "把 Python 的 len(s)（码点）语义迁移到 C++，最贴近的等价写法是？",
+          "options": [
+            "s.size()",
+            "手写 UTF-8 解码计数（或 ICU u_countChar32）",
+            "s.length()",
+            "sizeof(s)"
+          ],
+          "answer": 1,
+          "feedback": "C++ std::string 是字节串，size() 是字节数；码点需手写解码或 ICU。这是「同语义跨语言」的典型迁移陷阱。"
+        }
+      ],
+      "deep_dive": "字素簇（grapheme cluster）由 UAX #29 定义：组合标记（\\u0301）与基字符合并、ZWJ 序列（👨👩👧）整体、Emoji 修饰符跟随主 emoji，都算一个字素簇。因此「用户可见字符数」无法用码点简单推导——必须做字素簇切分。文本规范化（NFC/NFD）也会改变码点组成但不改变字素簇：é 在 NFC 是一个码点 U+00E9，在 NFD 是 e+U+0301 两个码点，两者字素簇都是 1。处理用户输入（表单长度限制、数据库字段长度）时应以字素簇为基准，避免截断产生半个字符。",
+      "next": [
+        "string.index-slice",
+        "string.search-replace"
       ]
     },
     { "id": "string.immutability", "module_id": "B06", "title": "字符串不可变性", "status": "published",
