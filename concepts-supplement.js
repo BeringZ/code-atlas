@@ -187,14 +187,374 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "concept", "question": "不可变数据结构在并发中的核心优势是？", "options": ["可安全共享无需加锁", "更快", "易调试", "省内存"], "answer": 0, "feedback": "不可变数据天然线程安全，无需同步即可共享。" }
       ]
     },
-    { "id": "value.conversion", "module_id": "B02", "title": "类型转换、解析与格式化", "status": "published",
-      "objectives": ["安全地在类型间转换", "处理字符串与数值的解析"],
-      "prerequisites": ["value.primitive-types"],
-      "core": "类型转换分「解析」（字符串→数值）与「格式化」（数值→字符串）。要点：解析可能失败（非法输入），需容错；格式化控制精度与样式。强类型语言要求显式转换，弱类型语言会隐式转换（易踩坑）。",
-      "lang_diff": "Python：int('5')/float('3.14')/str(x)；JS：Number('5')/parseInt/String(x)；Java：Integer.parseInt/Double.parseDouble/String.format；C++：std::stoi/std::to_string；Go：strconv.Atoi/Itoa；Rust：parse::<i32>()/format!。",
+                {
+      "id": "value.conversion",
+      "module_id": "B02",
+      "title": "类型转换、解析与格式化",
+      "status": "published",
+      "level": "L4",
+      "objectives": [
+        "区分解析（字符串→数值）与格式化（数值→字符串）两种方向",
+        "掌握六语言安全解析的惯用法与错误处理",
+        "识别隐式转换陷阱（弱类型语言）与显式转换要求（强类型语言）"
+      ],
+      "prerequisites": [
+        "value.primitive-types"
+      ],
+      "core": "类型转换分两个方向：解析（字符串→数值，可能失败）与格式化（数值→字符串，几乎总能成功）。核心认知分层：① 解析失败是常态——非法输入（\"abc\"、空串、溢出）必须显式处理；② 错误处理模型差异——Python/Java/C++ 抛异常，JS 返回 NaN，Go 返回双值 err，Rust 返回 Result；③ 隐式转换——弱类型语言（JS、Python 的字符串拼接）自动转换，强类型语言（Java、Rust）拒绝隐式，C++ 的隐式转换常出圈套（整数除法、截断）。格式化注意精度：浮点转字符串有舍入差异，需控制位数（toFixed/format/round）。",
+      "summary": "解析会失败必须容错（异常/NaN/err/Result 四种模型）；格式化要控精度；弱类型语言的隐式转换是最大陷阱。",
+      "commonTask": {
+        "input": "把字符串 \"42\" 与 \"abc\" 安全解析为整数：合法输出数值，非法输出 invalid",
+        "expectedOutput": {
+          "valid": "42",
+          "invalid": "invalid"
+        }
+      },
+      "comparisonDimensions": [
+        "parse-api",
+        "failure-model",
+        "type-checking",
+        "idiomatic-style",
+        "runtime-cost"
+      ],
+      "lang_diff": "Python：int() 抛 ValueError（可带 base 参数），float() 同；JS：Number() 返回 NaN（isNaN 检查），parseInt 宽松解析（\"42px\"→42）；Java：Integer.parseInt 抛 NumberFormatException；C++：std::stoi 抛 invalid_argument/out_of_range；Go：strconv.Atoi 返回双值 (v, err)；Rust：str::parse::<i32>() 返回 Result，unwrap_or 或 ? 处理。格式化：Python f-string / JS toFixed / Java String.format / C++ ostringstream / Go fmt.Sprintf / Rust format!。",
+      "variants": {
+        "python": {
+          "version": "3.13",
+          "minimal_code": "def parse(s):\n    try:\n        return int(s)\n    except ValueError:\n        return \"invalid\"\nprint(parse(\"42\"))\nprint(parse(\"abc\"))",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 4
+            },
+            {
+              "role": "call",
+              "start": 5,
+              "end": 6
+            }
+          ],
+          "syntax_notes": [
+            "int(str, base=10) 可指定进制",
+            "ValueError 是解析失败的标准异常"
+          ],
+          "semantic_notes": [
+            "int(\"abc\") 抛 ValueError，需 try/except 捕获",
+            "int 不自动去除前导/后缀字符（\"42px\" 会失败）"
+          ],
+          "idioms": [
+            "用 try/except ValueError 包裹解析",
+            "格式化用 f-string 控制精度"
+          ],
+          "pitfalls": [
+            "int(\"3.14\") 抛 ValueError（不是 float）",
+            "浮点格式化用 repr 产生长尾"
+          ]
+        },
+        "javascript": {
+          "version": "ES2024",
+          "minimal_code": "function parse(s) {\n  const n = Number(s);\n  return Number.isNaN(n) ? \"invalid\" : n;\n}\nconsole.log(parse(\"42\"));\nconsole.log(parse(\"abc\"));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 4
+            },
+            {
+              "role": "call",
+              "start": 5,
+              "end": 6
+            }
+          ],
+          "syntax_notes": [
+            "Number(str) 全量解析，parseInt 前缀解析",
+            "NaN 是唯一不等于自身的值（用 Number.isNaN）"
+          ],
+          "semantic_notes": [
+            "Number(\"42px\") 是 NaN，parseInt(\"42px\") 是 42（宽松）",
+            "Number(\"\") 返回 0（空串陷阱）"
+          ],
+          "idioms": [
+            "严格解析用 Number + isNaN 检查",
+            "格式化用 toFixed(2) 控制小数位"
+          ],
+          "pitfalls": [
+            "Number(\"\") === 0",
+            "parseInt 不检查完整字符串",
+            "== 隐式转换：\"42\" == 42 为 true"
+          ]
+        },
+        "java": {
+          "version": "21+",
+          "minimal_code": "String s1 = \"42\";\ntry { System.out.println(Integer.parseInt(s1)); } catch (NumberFormatException e) { System.out.println(\"invalid\"); }\nString s2 = \"abc\";\ntry { System.out.println(Integer.parseInt(s2)); } catch (NumberFormatException e) { System.out.println(\"invalid\"); }",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "declare",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "call",
+              "start": 4,
+              "end": 4
+            }
+          ],
+          "syntax_notes": [
+            "Integer.parseInt 抛 NumberFormatException（检查型）",
+            "Integer.valueOf 返回包装对象"
+          ],
+          "semantic_notes": [
+            "parseInt(\" 42 \") 允许前导空白，parseInt(\"42x\") 抛异常",
+            "强类型：String 与 int 无隐式转换"
+          ],
+          "idioms": [
+            "try/catch NumberFormatException 或正则预检",
+            "格式化用 String.format(\"%.2f\", x)"
+          ],
+          "pitfalls": [
+            "Integer.parseInt(\"42x\") 抛异常而非忽略",
+            "char 与 int 的隐式转换（'a'+1=98）"
+          ]
+        },
+        "cpp": {
+          "version": "C++20",
+          "minimal_code": "try { std::cout << std::stoi(\"42\"); } catch (const std::exception&) { std::cout << \"invalid\"; }\nstd::cout << \"\\n\";\ntry { std::cout << std::stoi(\"abc\"); } catch (const std::exception&) { std::cout << \"invalid\"; }",
+          "semantic_blocks": [
+            {
+              "role": "call",
+              "start": 1,
+              "end": 2
+            }
+          ],
+          "syntax_notes": [
+            "std::stoi 抛 invalid_argument（格式错）或 out_of_range（溢出）",
+            "C++ 隐式转换多且隐蔽"
+          ],
+          "semantic_notes": [
+            "整数除法 7/2=3（截断）；static_cast 显式转换",
+            "atoi 不抛异常返回 0（C 风格，难辨非法）"
+          ],
+          "idioms": [
+            "优先 std::stoi + try/catch 而非 atoi",
+            "格式化用 ostringstream 或 format"
+          ],
+          "pitfalls": [
+            "7/2 == 3 截断陷阱",
+            "atoi(\"abc\") 返回 0 无错误信号",
+            "隐式 char→int 参与运算"
+          ]
+        },
+        "go": {
+          "version": "1.23+",
+          "minimal_code": "var n int\n_, err := fmt.Sscanf(\"42\", \"%d\", &n)\nif err != nil { fmt.Println(\"invalid\") } else { fmt.Println(n) }\nvar n2 int\n_, err2 := fmt.Sscanf(\"abc\", \"%d\", &n2)\nif err2 != nil { fmt.Println(\"invalid\") } else { fmt.Println(n2) }",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 3
+            },
+            {
+              "role": "call",
+              "start": 4,
+              "end": 6
+            }
+          ],
+          "syntax_notes": [
+            "strconv.Atoi / fmt.Sscanf 返回双值 (v, err)",
+            "强类型：无隐式数值转换"
+          ],
+          "semantic_notes": [
+            "err 是值不是异常——显式检查 if err != nil",
+            "Sscanf 部分匹配也返回错误"
+          ],
+          "idioms": [
+            "惯用 v, err := strconv.Atoi(s); if err != nil { ... }",
+            "格式化用 fmt.Sprintf"
+          ],
+          "pitfalls": [
+            "忽略 err 导致零值误用",
+            "int64 溢出需 strconv.ParseInt 指定位数"
+          ]
+        },
+        "rust": {
+          "version": "2024 Edition",
+          "minimal_code": "use std::str::FromStr;\nlet r = i32::from_str(\"42\");\nmatch r { Ok(n) => println!(\"{}\", n), Err(_) => println!(\"invalid\") }\nlet r2 = i32::from_str(\"abc\");\nmatch r2 { Ok(n) => println!(\"{}\", n), Err(_) => println!(\"invalid\") }",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "call",
+              "start": 3,
+              "end": 4
+            }
+          ],
+          "syntax_notes": [
+            "str::parse::<i32>() 返回 Result<T, ParseIntError>",
+            "? 操作符在 Err 时提前返回（需返回 Result 函数）"
+          ],
+          "semantic_notes": [
+            "parse 需要类型标注（::<i32>）",
+            "无隐式转换：as 是显式截断转换"
+          ],
+          "idioms": [
+            "unwrap_or(0) 提供默认值",
+            "match 穷尽 Ok/Err 分支"
+          ],
+          "pitfalls": [
+            "unwrap() 在 Err 时 panic",
+            "as 截断：300u16 as u8 == 44"
+          ]
+        }
+      },
+      "errors": [
+        {
+          "code": "// JavaScript\nconst n = Number(\"\");  // 0",
+          "message": "空字符串被 Number 转成 0，而不是 NaN 或报错",
+          "cause": "Number('') 的特殊行为——空串与纯空白返回 0",
+          "fix": "先判断 s.trim() === '' 再解析，或用严格校验"
+        },
+        {
+          "code": "// Python\nint(\"3.14\")",
+          "message": "ValueError: invalid literal for int()",
+          "cause": "int 只解析整数语法，不接受浮点字面量",
+          "fix": "用 float(s) 解析小数，或 int(float(s)) 先转浮点"
+        },
+        {
+          "code": "// Go\nn, _ := strconv.Atoi(s)",
+          "message": "忽略 err 后 n 为 0，非法输入被误当成合法 0",
+          "cause": "丢弃错误值（_）导致解析失败静默",
+          "fix": "必须检查 err：if err != nil { 处理 }"
+        },
+        {
+          "code": "// Rust\n\"abc\".parse::<i32>().unwrap()",
+          "message": "panic: called `Result::unwrap()` on an `Err` value",
+          "cause": "解析失败返回 Err，unwrap 直接崩溃",
+          "fix": "用 unwrap_or(0) / match / ? 处理 Err 分支"
+        },
+        {
+          "code": "// C++\nint x = 7 / 2;  // 3",
+          "message": "整数除法截断为 3，不是 3.5",
+          "cause": "两个 int 相除结果是 int（截断）",
+          "fix": "7.0 / 2 或 static_cast<double>(7) / 2"
+        }
+      ],
+      "transferExercises": [
+        {
+          "type": "migrate",
+          "question": "Python 的 int(s)（抛 ValueError）语义迁移到 Rust，最贴近的等价写法是？",
+          "options": [
+            "s.parse::<i32>() 返回 Result（用 match / unwrap_or 处理）",
+            "s.parse::<i32>().unwrap() 直接取值",
+            "s.to_int()",
+            "i32::from(s)"
+          ],
+          "answer": 0,
+          "feedback": "Rust 的 parse 返回 Result<T, ParseIntError>，与 Python 抛异常等价但用返回值表达——必须显式处理 Err。"
+        },
+        {
+          "type": "migrate",
+          "question": "JavaScript 的 Number(\"42px\") 返回 NaN，要得到与 parseInt 相同的宽松前缀解析语义，Rust 有对应吗？",
+          "options": [
+            "s.as_str().trim()",
+            "i32::from_str_radix(s, 10)",
+            "s.parse::<i32>() 同样宽松",
+            "Rust 无宽松解析——parse 要求完整字符串（这是特性不是缺陷）"
+          ],
+          "answer": 3,
+          "feedback": "Rust 的 parse 严格拒绝 \"42px\"，没有 parseInt 的宽松行为——强类型语言显式要求完整匹配，避免静默截断。"
+        },
+        {
+          "type": "migrate",
+          "question": "Go 的 n, err := strconv.Atoi(s) 双值错误模型，在 Python 中表达「解析失败不抛异常」的惯用法是？",
+          "options": [
+            "try/except 捕获 ValueError",
+            "用 assert 断言",
+            "None 返回值：用函数封装 try/except 返回 (值, None)",
+            "int(s) 不抛异常"
+          ],
+          "answer": 2,
+          "feedback": "Python 的异常模型可用「返回元组」模拟 Go 风格：(v, None) 成功 / (None, 错误信息) 失败，但更 Pythonic 的是 try/except。"
+        }
+      ],
+      "acceptanceTests": [
+        {
+          "input": "parse(\"42\")",
+          "assert": "result == 42",
+          "expect": "42"
+        },
+        {
+          "input": "parse(\"abc\")",
+          "assert": "result == invalid",
+          "expect": "invalid"
+        }
+      ],
       "exercises": [
-        { "type": "concept", "question": "Go 中把字符串 '42' 转为 int 的函数是？", "options": ["parseInt", "Integer.parseInt", "int('42')", "strconv.Atoi"], "answer": 3, "feedback": "strconv.Atoi 返回 (int, error)，需处理解析失败。" },
-        { "type": "read", "question": "Rust 中 '42'.parse::<i32>() 的返回类型是？", "options": ["报错", "i32", "Option<i32>", "Result<i32,  ParseIntError>"], "answer": 3, "feedback": "parse 返回 Result，用 ? 或 match 处理失败。" }
+        {
+          "type": "concept",
+          "question": "六语言解析失败的「错误模型」中，哪一组对应关系正确？",
+          "options": [
+            "Python 异常 / JS NaN / Go err / Rust Result",
+            "全部用异常",
+            "Python err / JS 异常 / Go Result / Rust NaN",
+            "全部返回 NaN"
+          ],
+          "answer": 0,
+          "feedback": "Python/Java/C++ 抛异常，JS 返回 NaN，Go 返回双值 err，Rust 返回 Result——四种模型是核心差异。"
+        },
+        {
+          "type": "read",
+          "question": "JavaScript 中 Number(\"\") 与 parseInt(\"42px\") 的结果分别是？",
+          "options": [
+            "NaN 与 42",
+            "0 与 42",
+            "NaN 与 NaN",
+            "0 与 NaN"
+          ],
+          "answer": 1,
+          "feedback": "Number('') 返回 0（空串陷阱）；parseInt 宽松前缀解析 '42px'→42（不检查完整字符串）。"
+        },
+        {
+          "type": "debug",
+          "question": "以下哪段代码在解析失败时会产生静默错误结果？",
+          "options": [
+            "Rust: s.parse::<i32>().unwrap_or(0)",
+            "Go: n, _ := strconv.Atoi(s)  // 忽略错误",
+            "Go: n, err := strconv.Atoi(s); if err != nil { 处理 }",
+            "Python: try: v = int(s) except ValueError: v = 0"
+          ],
+          "answer": 1,
+          "feedback": "忽略 err 后 n 保持零值 0，非法输入被误当成合法 0——静默错误最危险。"
+        },
+        {
+          "type": "migrate",
+          "question": "C++ 的 7/2 结果是 3（截断），要在 Java 中得到 3.5 应写？",
+          "options": [
+            "7 / 2",
+            "7 % 2",
+            "(double) 7 / 2",
+            "Integer.divide(7, 2)"
+          ],
+          "answer": 2,
+          "feedback": "把一个操作数转为浮点（(double)7 / 2）即可得到 3.5；整数除法截断是跨语言共性陷阱。"
+        }
+      ],
+      "deep_dive": "解析失败模型的本质是「错误通道」的设计差异：异常（Python/Java/C++）把错误沿调用栈传播，调用方可能忘记捕获（Java 检查型异常强制，Python 可选）；返回值模型（Go 的 err、Rust 的 Result）把错误变成显式数据流——Rust 的 ? 操作符让错误传播不打断可读性。JS 的 NaN 是「哨兵值」模型：Number('abc') 返回 NaN，调用方须主动 isNaN 检查，遗漏则 NaN 沿计算链扩散（NaN 参与任何运算结果都是 NaN）。工程建议：解析发生在边界（输入、配置、网络），边界处统一转成内部类型，内部不再解析。「显式优于隐式」是六语言共识，但隐式转换的坑（JS ==、C++ 整数除法、Python 字符串拼接数字）正是面试与生产 bug 的高发区。",
+      "next": [
+        "value.nullability",
+        "error.try-catch"
       ]
     },
                 {
@@ -1538,14 +1898,262 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "concept", "question": "文件不存在导致的打开失败属于？", "options": ["语法错误", "类型错误", "运行时错误", "逻辑错误"], "answer": 2, "feedback": "文件 IO 失败是运行时错误，需 try/Result 处理。" }
       ]
     },
-    { "id": "error.try-catch", "module_id": "B09", "title": "try / catch / finally", "status": "published",
-      "objectives": ["用 try/catch 捕获并处理异常", "用 finally 保证清理执行"],
-      "prerequisites": ["error.kinds"],
-      "core": "try 包裹可能抛异常的代码；catch 捕获并处理特定类型异常；finally 无论是否异常都执行（清理资源）。要点：try 块尽量小；catch 按类型精确捕获，不要 catch 吞掉所有异常；finally/上下文管理器保证资源释放。",
-      "lang_diff": "Python：try/except/else/finally；JS：try/catch/finally；Java：try/catch/finally + try-with-resources；C++：try/catch（按类型）/ RAII 代替 finally；Go：无 try/catch（error 值 + defer）；Rust：无 try/catch（Result + ?）。",
+                {
+      "id": "error.try-catch",
+      "module_id": "B09",
+      "title": "try / catch / finally",
+      "status": "published",
+      "level": "L3",
+      "objectives": [
+        "掌握六语言异常捕获语法（try/catch/finally 的等价形式）",
+        "理解资源释放（finally / defer / RAII）在不同语言中的表达",
+        "识别捕获遗漏与过度捕获的常见错误"
+      ],
+      "prerequisites": [
+        "error.kinds"
+      ],
+      "core": "异常捕获的核心语法在六语言中语义等价但形态各异：Java/C++/Python 的 try/catch（Python 用 except）、JS 的 try/catch（catch 参数可省略）、Go 无异常——用 panic/recover 模拟但工程上倾向错误值、Rust 用 Result + ? 而非异常。finally 的职责（无论成功失败都执行）在 Go 用 defer、Rust 用 Drop/RAII 表达。关键认知：捕获不是吞掉——记录、包装、或传播（rethrow）需明确选择。",
+      "summary": "try/catch（Python except / Go panic-recover / Rust Result?）语义等价；finally 的职责 Go 用 defer、Rust 用 Drop 表达。",
+      "comparisonDimensions": [
+        "syntax-shape",
+        "failure-model",
+        "resource-release",
+        "idiomatic-style",
+        "runtime-cost"
+      ],
+      "variants": {
+        "python": {
+          "version": "3.13",
+          "minimal_code": "try:\n    raise ValueError(\"x\")\nexcept ValueError as e:\n    print(\"caught\")\nfinally:\n    pass",
+          "semantic_blocks": [
+            {
+              "role": "call",
+              "start": 1,
+              "end": 3
+            },
+            {
+              "role": "cleanup",
+              "start": 4,
+              "end": 4
+            }
+          ],
+          "syntax_notes": [
+            "except 按异常类型匹配，可多分支",
+            "else 子句（无异常时执行）"
+          ],
+          "semantic_notes": [
+            "异常沿调用栈传播直到被捕获",
+            "finally 保证执行（含 return 前）"
+          ],
+          "idioms": [
+            "with 语句替代 finally 做资源释放",
+            "raise ... from 链式异常"
+          ],
+          "pitfalls": [
+            "裸 except: 吞掉所有异常（含 KeyboardInterrupt）"
+          ]
+        },
+        "javascript": {
+          "version": "ES2024",
+          "minimal_code": "try {\n  throw new Error(\"x\");\n} catch (e) {\n  console.log(\"caught\");\n}",
+          "semantic_blocks": [
+            {
+              "role": "call",
+              "start": 1,
+              "end": 3
+            }
+          ],
+          "syntax_notes": [
+            "catch 参数可省略（ES2019+）：catch { }",
+            "throw 任意值（推荐 Error）"
+          ],
+          "semantic_notes": [
+            "异步错误用 Promise.reject + .catch，try/catch 不捕获 async 外抛错（需 await 内）"
+          ],
+          "idioms": [
+            "finally 做清理",
+            "Promise.catch 处理异步异常"
+          ],
+          "pitfalls": [
+            "try/catch 不捕获 setTimeout 回调内异常"
+          ]
+        },
+        "java": {
+          "version": "21+",
+          "minimal_code": "try {\n  throw new Exception(\"x\");\n} catch (Exception e) {\n  System.out.println(\"caught\");\n} finally {\n  // 资源释放\n}",
+          "semantic_blocks": [
+            {
+              "role": "call",
+              "start": 1,
+              "end": 3
+            }
+          ],
+          "syntax_notes": [
+            "检查型异常编译期强制捕获或声明 throws",
+            "多 catch 分支按类型匹配"
+          ],
+          "semantic_notes": [
+            "try-with-resources 自动关闭资源（AutoCloseable）",
+            "finally 在 return 前执行"
+          ],
+          "idioms": [
+            "try-with-resources 替代 finally 关流",
+            "catch 后 rethrow 保持调用栈"
+          ],
+          "pitfalls": [
+            "吞异常不记录（空 catch）",
+            "finally 里 return 覆盖 try 返回值"
+          ]
+        },
+        "cpp": {
+          "version": "C++20",
+          "minimal_code": "try {\n  throw std::runtime_error(\"x\");\n} catch (const std::exception& e) {\n  std::cout << \"caught\";\n}",
+          "semantic_blocks": [
+            {
+              "role": "call",
+              "start": 1,
+              "end": 3
+            }
+          ],
+          "syntax_notes": [
+            "按引用捕获（const std::exception&）避免切片",
+            "catch(...) 捕获全部"
+          ],
+          "semantic_notes": [
+            "RAII 析构自动释放（finally 的替代）",
+            "noexcept 函数抛异常会 terminate"
+          ],
+          "idioms": [
+            "RAII（智能指针/锁守卫）管理资源",
+            "异常规范 noexcept"
+          ],
+          "pitfalls": [
+            "按值捕获导致切片",
+            "析构函数抛异常引发 terminate"
+          ]
+        },
+        "go": {
+          "version": "1.23+",
+          "minimal_code": "func() {\n  defer func() { if r := recover(); r != nil { fmt.Println(\"caught\") } }()\n  panic(\"x\")\n}()",
+          "semantic_blocks": [
+            {
+              "role": "call",
+              "start": 1,
+              "end": 3
+            }
+          ],
+          "syntax_notes": [
+            "panic 中断执行，defer 逆序执行，recover 恢复",
+            "recover 只在 defer 函数内有效"
+          ],
+          "semantic_notes": [
+            "Go 工程惯例：错误值（error）而非 panic（panic 仅用于不可恢复）",
+            "defer 是 finally 的等价物"
+          ],
+          "idioms": [
+            "defer file.Close() 保证释放",
+            "错误值 if err != nil 逐层传播"
+          ],
+          "pitfalls": [
+            "recover 不在 defer 中调用则无效",
+            "defer 参数在 defer 时求值"
+          ]
+        },
+        "rust": {
+          "version": "2024 Edition",
+          "minimal_code": "match std::panic::catch_unwind(|| panic!(\"x\")) {\n  Ok(_) => println!(\"no\"),\n  Err(_) => println!(\"caught\"),\n}",
+          "semantic_blocks": [
+            {
+              "role": "call",
+              "start": 1,
+              "end": 3
+            }
+          ],
+          "syntax_notes": [
+            "panic! 与 catch_unwind（仅捕获 unwind）",
+            "工程错误用 Result<T, E> + ? 而非 panic"
+          ],
+          "semantic_notes": [
+            "? 操作符在 Err 时提前返回（错误传播）",
+            "Drop trait 在作用域结束时释放（finally 等价）"
+          ],
+          "idioms": [
+            "Result + ? 组合传播错误",
+            "自定义错误枚举 + From 转换"
+          ],
+          "pitfalls": [
+            "catch_unwind 不捕获 abort（release 默认）",
+            "滥用 unwrap/expect 在 Err 时 panic"
+          ]
+        }
+      },
+      "errors": [
+        {
+          "code": "// Python\ntry:\n    risky()\nexcept:\n    pass",
+          "message": "裸 except 捕获所有异常（含 KeyboardInterrupt/SystemExit），错误被静默吞掉",
+          "cause": "无类型限定的 except 吞掉一切",
+          "fix": "except SpecificError: 精确捕获，至少记录日志"
+        },
+        {
+          "code": "// Go\nfunc f() { defer func() { recover() }(); panic(\"x\") }",
+          "message": "recover 不在 defer 中直接调用（此处其实在 defer 内——错误示例为调用时机）",
+          "cause": "recover 只在 defer 函数内有效；直接调用 panic 后的代码不会执行",
+          "fix": "defer func() { if r := recover(); r != nil { /* 处理 */ } }()"
+        },
+        {
+          "code": "// Java\nint x = 0;\ntry { x = risky(); } catch (Exception e) { } finally { return x; }",
+          "message": "finally 中的 return 覆盖 try/catch 的返回值",
+          "cause": "finally 在 return 前执行，其 return 优先",
+          "fix": "不要在 finally 中 return；记录结果到外部变量"
+        },
+        {
+          "code": "// Rust\nstd::panic::catch_unwind(|| panic!(\"x\"))",
+          "message": "release 模式下 panic 默认 abort，catch_unwind 无法捕获",
+          "cause": "catch_unwind 只捕获 unwind 型 panic",
+          "fix": "工程错误用 Result 而非 panic；需捕获时配置 panic=unwind"
+        }
+      ],
       "exercises": [
-        { "type": "concept", "question": "finally 块的执行时机是？", "options": ["无论是否异常都执行", "仅正常时", "从不执行", "仅异常时"], "answer": 0, "feedback": "finally 保证执行，用于资源清理。" },
-        { "type": "read", "question": "Python 中捕获特定异常类型的语法是？", "options": ["try ValueError", "catch ValueError", "except ValueError as e", "throw ValueError"], "answer": 2, "feedback": "except 指定捕获的异常类型，as 绑定异常对象。" }
+        {
+          "type": "concept",
+          "question": "六语言中 finally 的职责分别由什么表达？",
+          "options": [
+            "Go 的 defer / Rust 的 Drop",
+            "Java 的 throws / C++ 的 noexcept",
+            "Python 的 raise / JS 的 throw",
+            "Go 的 panic / Rust 的 unwrap"
+          ],
+          "answer": 0,
+          "feedback": "Go 用 defer（逆序执行），Rust 用 Drop trait（作用域结束自动释放）——都是 finally 的语义等价物。"
+        },
+        {
+          "type": "debug",
+          "question": "以下哪段代码会把错误静默吞掉？",
+          "options": [
+            "Rust: match r { Err(e) => return Err(e), Ok(v) => v }",
+            "Python: except: pass",
+            "Java: catch (IOException e) { throw new RuntimeException(e) }",
+            "Python: except ValueError as e: log(e)"
+          ],
+          "answer": 1,
+          "feedback": "裸 except: pass 吞掉所有异常且无记录——最典型的错误静默。"
+        },
+        {
+          "type": "read",
+          "question": "Go 中 recover() 在什么位置才有效？",
+          "options": [
+            "主函数入口",
+            "任何位置",
+            "defer 函数内",
+            "panic 之前"
+          ],
+          "answer": 2,
+          "feedback": "recover 只在 defer 函数内调用才有效——这是 Go 恢复机制的核心约束。"
+        }
+      ],
+      "next": [
+        "error.propagation",
+        "error.custom-types"
       ]
     },
     { "id": "error.propagation", "module_id": "B09", "title": "错误传播与包装", "status": "published",
