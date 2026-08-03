@@ -434,83 +434,218 @@ window.CODE_ATLAS_2 = {
       "related_advanced": ["go.error-design", "rust.enum-pattern"]
     },
     // ============ 深做样板 6：创建并等待任务 ============
-    {
+        {
       "id": "concurrency.spawn-await",
       "status": "published",
       "module_id": "B13",
       "title": "创建并等待任务",
-      "objectives": ["理解线程/协程/任务三种并发单元", "能创建并等待多个任务完成", "认识结果收集与错误处理的方式"],
-      "prerequisites": ["concurrency.models", "concurrency.sync-async"],
+      "objectives": [
+        "理解线程/协程/任务三种并发单元",
+        "能创建并等待多个任务完成",
+        "认识结果收集与错误处理的方式"
+      ],
+      "prerequisites": [
+        "concurrency.models",
+        "concurrency.sync-async"
+      ],
       "core": "「并发执行 + 汇合结果」是并发编程的入门必修。核心组件：① 并发单元（线程：Java/C++/Go goroutine；协程/任务：Python asyncio、JS Promise、Rust async）；② 等待机制（join、await、WaitGroup）；③ 结果收集（返回值、channel、Future）。要点：创建任务只是起点，必须显式等待（join/await）否则任务可能未完成即退出；共享结果要小心竞争。",
-      "comparisonDimensions": ["type-checking", "failure-mode", "idiomatic-style", "runtime-cost", "mutability"],
+      "comparisonDimensions": [
+        "type-checking",
+        "failure-mode",
+        "idiomatic-style",
+        "runtime-cost",
+        "mutability"
+      ],
       "variants": {
         "python": {
-          "version": "3.13",
-          "minimal_code": "import asyncio\n\nasync def fetch(url):\n    await asyncio.sleep(0.1)  # 模拟 IO\n    return url\n\nasync def main():\n    tasks = [fetch(f\"site{i}\") for i in range(3)]\n    results = await asyncio.gather(*tasks)\n    print(results)\n\nasyncio.run(main())",
-          "semantic_blocks": [{ "role": "define", "start": 3, "end": 5 }, { "role": "spawn", "start": 8, "end": 8 }, { "role": "await-all", "start": 9, "end": 9 }],
-          "syntax_notes": ["async/await + asyncio.gather 并发", "asyncio.run 是顶层入口"],
-          "semantic_notes": ["asyncio 是协程并发（单线程事件循环），适合 IO 密集", "CPU 密集需 multiprocessing/线程"],
-          "idioms": ["gather 收集结果，TaskGroup 处理异常", "timeout 用 asyncio.wait_for"],
-          "pitfalls": ["忘记 await 拿到协程对象而非结果", "在协程里用阻塞 IO 卡住事件循环"]
+          "minimal_code": "import threading\n\ndef task():\n    print(\"task done\")\n\nt = threading.Thread(target=task)\nt.start()\nt.join()\nprint(\"main done\")",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "define",
+              "start": 3,
+              "end": 4
+            },
+            {
+              "role": "spawn",
+              "start": 6,
+              "end": 6
+            },
+            {
+              "role": "join",
+              "start": 7,
+              "end": 7
+            },
+            {
+              "role": "print",
+              "start": 8,
+              "end": 8
+            }
+          ]
         },
         "javascript": {
-          "version": "ES2024",
-          "minimal_code": "async function fetchData(url) {\n    await new Promise(r => setTimeout(r, 100));\n    return url;\n}\n\nconst results = await Promise.all(\n    [\"site0\", \"site1\", \"site2\"].map(fetchData)\n);\nconsole.log(results);",
-          "semantic_blocks": [{ "role": "define", "start": 1, "end": 4 }, { "role": "spawn", "start": 6, "end": 7 }, { "role": "await-all", "start": 6, "end": 7 }],
-          "syntax_notes": ["Promise.all 并行等待；async 函数返回 Promise", "顶层 await 需模块上下文"],
-          "semantic_notes": ["JS 单线程事件循环，并发是异步调度", "Promise.all 一个失败整体拒绝（allSettled 不拒绝）"],
-          "idioms": ["Promise.allSettled 处理部分失败", "用 Promise.all 收集独立任务结果"],
-          "pitfalls": ["忘记 await 得到 Promise 而非结果", "回调地狱（用 async/await 替代）"]
+          "minimal_code": "const p = Promise.resolve().then(() => console.log(\"task done\"));\np.then(() => console.log(\"main done\"));",
+          "semantic_blocks": [
+            {
+              "role": "spawn",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "await-all",
+              "start": 2,
+              "end": 2
+            }
+          ]
         },
         "java": {
-          "version": "21+",
-          "minimal_code": "import java.util.concurrent.*;\n\nExecutorService pool = Executors.newFixedThreadPool(4);\nList<Future<String>> futures = new ArrayList<>();\nfor (int i = 0; i < 3; i++) {\n    futures.add(pool.submit(() -> \"site\" + i));\n}\nfor (Future<String> f : futures) {\n    System.out.println(f.get());  // 阻塞等待结果\n}\npool.shutdown();",
-          "semantic_blocks": [{ "role": "pool", "start": 3, "end": 3 }, { "role": "spawn", "start": 6, "end": 6 }, { "role": "await-all", "start": 8, "end": 9 }],
-          "syntax_notes": ["ExecutorService + Future；f.get() 阻塞", "CompletableFuture 提供异步组合"],
-          "semantic_notes": ["线程池避免反复创建线程", "f.get() 抛受检异常需处理"],
-          "idioms": ["CompletableFuture.allOf 组合任务", "虚拟线程（Java 21）降低线程成本"],
-          "pitfalls": ["忘记 shutdown 导致线程泄漏", "f.get() 无限阻塞（需超时版本 get(timeout)）"]
+          "minimal_code": "Thread t = new Thread(() -> System.out.println(\"task done\"));\nt.start();\ntry { t.join(); } catch (InterruptedException e) {}\nSystem.out.println(\"main done\");",
+          "semantic_blocks": [
+            {
+              "role": "spawn",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "join",
+              "start": 2,
+              "end": 3
+            },
+            {
+              "role": "print",
+              "start": 4,
+              "end": 4
+            }
+          ]
         },
         "cpp": {
-          "version": "C++20",
-          "minimal_code": "#include <thread>\n#include <vector>\n\nstd::vector<int> results(3);\nstd::vector<std::thread> threads;\nfor (int i = 0; i < 3; i++) {\n    threads.emplace_back([i, &results] {\n        results[i] = i * i;  // 需保护：此处演示概念\n    });\n}\nfor (auto& t : threads) t.join();  // 等待全部完成",
-          "semantic_blocks": [{ "role": "spawn", "start": 6, "end": 9 }, { "role": "join-all", "start": 10, "end": 10 }],
-          "syntax_notes": ["std::thread 构造即启动；join() 等待", "detach() 分离后不等待（需确保生命周期）"],
-          "semantic_notes": ["多个线程写同一位置是数据竞争（UB），需互斥/原子", "thread 不可拷贝，移动语义"],
-          "idioms": ["用 std::async + future 收集返回值", "RAII join 包装（如 jthread）"],
-          "pitfalls": ["忘 join 或 detach 导致 terminate", "共享变量无保护导致数据竞争"]
+          "minimal_code": "#include <thread>\nstd::thread t([] { std::cout << \"task done\"; });\nt.join();\nstd::cout << \" main done\";",
+          "semantic_blocks": [
+            {
+              "role": "spawn",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "join",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "print",
+              "start": 4,
+              "end": 4
+            }
+          ]
         },
         "go": {
-          "version": "1.23+",
-          "minimal_code": "var wg sync.WaitGroup\nresults := make([]int, 3)\n\nfor i := 0; i < 3; i++ {\n    wg.Add(1)\n    go func(i int) {\n        defer wg.Done()\n        results[i] = i * i  // 各写各的下标，无竞争\n    }(i)\n}\nwg.Wait()  // 等待全部完成\nfmt.Println(results)",
-          "semantic_blocks": [{ "role": "spawn", "start": 5, "end": 10 }, { "role": "wait-all", "start": 11, "end": 11 }],
-          "syntax_notes": ["go 关键字启动 goroutine；WaitGroup 计数等待", "闭包捕获需显式传参（循环变量陷阱）"],
-          "semantic_notes": ["goroutine 轻量（栈可增长），可大量创建", "不同下标写同一 slice 元素无竞争；同下标需同步"],
-          "idioms": ["WaitGroup.Add 与 go 配对，defer Done", "结果收集用 buffered channel 更安全"],
-          "pitfalls": ["循环变量 i 被闭包共享（旧版本陷阱，Go 1.22+ 已修复）", "wg.Add 在 goroutine 内调用导致 Wait 提前返回"]
+          "minimal_code": "done := make(chan bool)\ngo func() { fmt.Println(\"task done\"); done <- true }()\n<-done\nfmt.Println(\"main done\")",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "spawn",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "await-all",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "print",
+              "start": 4,
+              "end": 4
+            }
+          ]
         },
         "rust": {
-          "version": "2024 Edition",
-          "minimal_code": "use std::thread;\n\nlet handles: Vec<_> = (0..3)\n    .map(|i| thread::spawn(move || i * i))\n    .collect();\n\nlet results: Vec<i32> = handles\n    .into_iter()\n    .map(|h| h.join().unwrap())\n    .collect();\nprintln!(\"{:?}\", results);",
-          "semantic_blocks": [{ "role": "spawn", "start": 3, "end": 5 }, { "role": "join-all", "start": 8, "end": 10 }],
-          "syntax_notes": ["thread::spawn 返回 JoinHandle；join() 返回 Result", "move 闭包把值移入线程"],
-          "semantic_notes": ["所有权保证线程间无数据竞争（Send/Sync 检查）", "共享状态用 Arc<Mutex<T>> 或 channel"],
-          "idioms": ["move 捕获 + collect handles 再逐一 join", "用 crossbeam/crayon 做更高级并行"],
-          "pitfalls": ["join().unwrap() 遇到 panic 线程会传播", "需要共享可变状态时忘记 Arc<Mutex> 无法编译"]
+          "minimal_code": "let handle = std::thread::spawn(|| println!(\"task done\"));\nhandle.join().unwrap();\nprintln!(\"main done\");",
+          "semantic_blocks": [
+            {
+              "role": "spawn",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "join",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 3,
+              "end": 3
+            }
+          ]
         }
       },
       "errors": [
-        { "code": "// Go\nfor i := 0; i < 3; i++ {\n    go func() { fmt.Println(i) }()  // 捕获循环变量\n}", "message": "可能全部打印 3（旧版本闭包共享变量）", "cause": "闭包捕获循环变量 i 的最终值。", "fix": "显式传参 go func(i int) {...}(i)（Go 1.22+ 已默认修复）。" }
+        {
+          "code": "// Go\nfor i := 0; i < 3; i++ {\n    go func() { fmt.Println(i) }()  // 捕获循环变量\n}",
+          "message": "可能全部打印 3（旧版本闭包共享变量）",
+          "cause": "闭包捕获循环变量 i 的最终值。",
+          "fix": "显式传参 go func(i int) {...}(i)（Go 1.22+ 已默认修复）。"
+        }
       ],
       "exercises": [
-        { "type": "concept", "question": "创建线程/任务后不等待（不 join/await）会怎样？", "options": ["程序可能先退出导致任务未完成", "任务自动等待", "任务一定完成", "编译错误"], "answer": 0, "feedback": "主流程退出时未等待的并发任务可能被终止，必须显式 join/await 汇合。" },
-        { "type": "read", "question": "Go 中等待多个 goroutine 完成的标准工具是？", "options": ["Future", "join()", "sync.WaitGroup", "asyncio.gather"], "answer": 2, "feedback": "Go 用 sync.WaitGroup（Add/Wait/Done）汇合 goroutine。" },
-        { "type": "pair", "question": "哪个语言通过所有权系统在编译期防止线程间数据竞争？", "options": ["C++", "Rust", "Java", "Go"], "answer": 1, "feedback": "Rust 的 Send/Sync 与所有权让数据竞争在编译期暴露。" }
+        {
+          "type": "concept",
+          "question": "创建线程/任务后不等待（不 join/await）会怎样？",
+          "options": [
+            "程序可能先退出导致任务未完成",
+            "任务自动等待",
+            "任务一定完成",
+            "编译错误"
+          ],
+          "answer": 0,
+          "feedback": "主流程退出时未等待的并发任务可能被终止，必须显式 join/await 汇合。"
+        },
+        {
+          "type": "read",
+          "question": "Go 中等待多个 goroutine 完成的标准工具是？",
+          "options": [
+            "Future",
+            "join()",
+            "sync.WaitGroup",
+            "asyncio.gather"
+          ],
+          "answer": 2,
+          "feedback": "Go 用 sync.WaitGroup（Add/Wait/Done）汇合 goroutine。"
+        },
+        {
+          "type": "pair",
+          "question": "哪个语言通过所有权系统在编译期防止线程间数据竞争？",
+          "options": [
+            "C++",
+            "Rust",
+            "Java",
+            "Go"
+          ],
+          "answer": 1,
+          "feedback": "Rust 的 Send/Sync 与所有权让数据竞争在编译期暴露。"
+        }
       ],
       "deep_dive": "并发单元差异：OS 线程（Java/C++）重量级；goroutine（Go）由运行时调度、栈可增长；协程/任务（Python/JS/Rust async）在单线程事件循环上协作调度。IO 密集用协程/异步，CPU 密集用线程/多进程。",
       "summary": "一句话模型：创建并发任务必须显式等待汇合（join/await/WaitGroup），结果收集与错误处理是设计重点。",
-      "next": ["concurrency.shared-message", "concurrency.cancel-timeout"],
-      "related_advanced": ["python.concurrency", "go.goroutine-channel", "rust.concurrency-safety"]
+      "next": [
+        "concurrency.shared-message",
+        "concurrency.cancel-timeout"
+      ],
+      "related_advanced": [
+        "python.concurrency",
+        "go.goroutine-channel",
+        "rust.concurrency-safety"
+      ],
+      "level": "L3"
     },
     // ============ 中等深度：每模块 1 个核心知识点 ============
     {
