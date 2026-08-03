@@ -177,14 +177,275 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "read", "question": "Go 中 count := 0 的类型推断结果是？", "options": ["需显式标注", "string", "float64", "int"], "answer": 3, "feedback": ":= 根据右侧 0 推断为 int。" }
       ]
     },
-    { "id": "value.mutability", "module_id": "B02", "title": "可变与不可变", "status": "published",
-      "objectives": ["选择默认不可变提升安全性", "理解不可变数据结构的并发友好性"],
-      "prerequisites": ["value.binding", "value.semantics"],
+                {
+      "id": "value.mutability",
+      "module_id": "B02",
+      "title": "可变与不可变",
+      "status": "published",
+      "objectives": [
+        "选择默认不可变提升安全性",
+        "理解不可变数据结构的并发友好性"
+      ],
+      "prerequisites": [
+        "value.binding",
+        "value.semantics"
+      ],
       "core": "不可变数据创建后不可修改，修改即生成新值。好处：可安全共享（并发无需加锁）、可缓存、行为可预测；代价：频繁修改产生分配开销。最佳实践：默认不可变，需要局部可变时再显式声明。",
       "lang_diff": "Python：tuple/frozenset 不可变、list/dict 可变；JS：Object.freeze 浅冻结；Java：record/Collections.unmodifiable 包装；C++：const 修饰；Go：string 不可变、slice/map 可变；Rust：默认不可变，mut 显式可变。",
       "exercises": [
-        { "type": "concept", "question": "哪个语言默认变量不可变，需显式声明才可修改？", "options": ["Go", "Java", "Python", "Rust"], "answer": 3, "feedback": "Rust 的 let 默认不可变，mut 才允许修改。" },
-        { "type": "concept", "question": "不可变数据结构在并发中的核心优势是？", "options": ["可安全共享无需加锁", "更快", "易调试", "省内存"], "answer": 0, "feedback": "不可变数据天然线程安全，无需同步即可共享。" }
+        {
+          "id": "m-q1",
+          "type": "quiz",
+          "question": "Python 中 s=\"abc\"; s2=s+\"x\" 执行后，s 的值是？",
+          "options": [
+            "\"abc\"",
+            "报错",
+            "空字符串",
+            "\"abcx\""
+          ],
+          "answer": 0,
+          "feedback": "字符串不可变，s+\"x\" 生成新字符串赋给 s2，s 保持 \"abc\" 不变。"
+        },
+        {
+          "id": "m-q2",
+          "type": "quiz",
+          "question": "JS 中 const o={a:1}; o.b=2 是否合法？",
+          "options": [
+            "合法，但 o 会变成字符串",
+            "合法，const 只约束绑定不约束内容",
+            "不合法，语法错误",
+            "不合法，const 对象不可修改"
+          ],
+          "answer": 1,
+          "feedback": "const 防的是重新赋值，对象内容仍可变——这是最常见的可变性误解。"
+        },
+        {
+          "id": "m-q3",
+          "type": "quiz",
+          "question": "哪个语言默认绑定不可变（需显式声明才可变）？",
+          "options": [
+            "JavaScript",
+            "Python",
+            "Rust",
+            "C++"
+          ],
+          "answer": 2,
+          "feedback": "Rust 的 let 默认不可变，let mut 才可变；C++/JS/Python 默认都可变。"
+        },
+        {
+          "id": "m-q4",
+          "type": "quiz",
+          "question": "不可变数据的最大并发优势是？",
+          "options": [
+            "无需垃圾回收",
+            "序列化更快",
+            "占用内存更小",
+            "无需加锁即可安全共享"
+          ],
+          "answer": 3,
+          "feedback": "不可变数据不存在写竞争，天然线程安全，可被多个线程自由共享。"
+        }
+      ],
+      "level": "L4",
+      "commonTask": "同一任务：声明一个不可变字符串 s=\"abc\"，通过拼接生成新值 s2=s+\"x\"，随后同时输出 s 与 s2。展示「修改不可变数据 = 产生新值，原值不变」的跨语言统一语义，以及各语言对不可变的表达（const / final / let 默认 / String 不可变类 / 值拷贝）。六语言输出统一为：abc abcx",
+      "comparisonDimensions": [
+        "rebind-allowed",
+        "in-place-mutation",
+        "default-immutability",
+        "sharing-safety",
+        "performance-tradeoff"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "s = \"abc\"\ns2 = s + \"x\"\nprint(s, s2)",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "transform",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const s = \"abc\";\nconst s2 = s + \"x\";\nconsole.log(s, s2);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "transform",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "String s = \"abc\";\nString s2 = s + \"x\";\nSystem.out.println(s + \" \" + s2);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "transform",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <string>\nstd::string s = \"abc\";\nstd::string s2 = s + \"x\";\nstd::cout << s << \" \" << s2;",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "transform",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "print",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "s := \"abc\"\ns2 := s + \"x\"\nfmt.Println(s, s2)",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "transform",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "let s = String::from(\"abc\");\nlet s2 = s.clone() + \"x\";\nprintln!(\"{} {}\", s, s2);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "transform",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        }
+      },
+      "errors": [
+        "可变陷阱（Python）：lst=[1,2]; other=lst; other[0]=99 —— 列表原地修改，两个引用同时变化，共享方被意外影响",
+        "const 只防重绑定（JS）：const o={}; o.x=1 合法 —— const 约束的是绑定而非对象内容，常被误解为深冻结",
+        "final 引用陷阱（Java）：final List l=...; l.add(x) 合法 —— final 防止重新赋值，但可变对象内容仍可改",
+        "别名修改（C++）：int &r=x; r=99 —— 引用是别名，对 r 的赋值直接改写 x，无拷贝保护",
+        "未声明 mut（Rust）：let v=vec![1,2]; v.push(3) 编译失败 —— 编译器在编译期拒绝可变操作（静态保护）"
+      ],
+      "acceptanceTests": [
+        {
+          "name": "输出含新值与原值",
+          "assert": "output contains \"abc abcx\"",
+          "expect": "abc abcx"
+        },
+        {
+          "name": "原值未被修改",
+          "assert": "output starts with original value",
+          "expect": "abc"
+        },
+        {
+          "name": "六语言同题输出一致",
+          "assert": "all six languages emit identical output",
+          "expect": "abc abcx"
+        },
+        {
+          "name": "无编译/运行错误",
+          "assert": "program compiles and runs",
+          "expect": "0"
+        }
+      ],
+      "transferExercises": [
+        {
+          "id": "m-tr1",
+          "type": "transfer",
+          "question": "Python 里 a=[1,2]; b=a; b.append(3) 后，a 是什么？为什么？",
+          "options": [
+            "a=[1,2,3]，列表是可变对象，b 是 a 的引用",
+            "a=[1,2]，b 的修改不影响 a",
+            "a 变成空列表",
+            "报错"
+          ],
+          "answer": 0,
+          "feedback": "列表可变且 b 只是引用，原地修改影响所有引用。这是可变数据共享的核心陷阱。"
+        },
+        {
+          "id": "m-tr2",
+          "type": "transfer",
+          "question": "并发场景下为什么「默认不可变」更安全？",
+          "options": [
+            "不可变数据运行更快",
+            "不可变数据无需加锁即可安全共享",
+            "不可变数据无法传递",
+            "不可变数据占用更少内存"
+          ],
+          "answer": 1,
+          "feedback": "不可变数据读多写少时天然无数据竞争，无需互斥锁——代价是频繁修改时的分配开销。"
+        },
+        {
+          "id": "m-tr3",
+          "type": "transfer",
+          "question": "Rust 中 let s = String::from(\"abc\") 后想修改 s，正确做法是？",
+          "options": [
+            "重新绑定 s = String::from(\"abcx\") 即可原地改",
+            "直接 s.push('x')",
+            "声明 let mut s = ...",
+            "无法修改 String"
+          ],
+          "answer": 2,
+          "feedback": "Rust 默认不可变，声明 let mut 才允许原地修改——编译器强制显式表达可变意图。"
+        }
       ]
     },
                 {
