@@ -58,22 +58,24 @@ if (concepts.length !== ids.size) errors.push(`概念 id 存在重复（总数 $
 // 2) 字段合法性
 const LEVELS = new Set(['L1', 'L2', 'L3', 'L4']);
 const moduleIds = new Set(modules.map((m) => m.id));
-// 与 atlas.js markConceptLevels 保持一致的启发式标记（质检与页面显示对齐）
+// 启发式候选提示（I7-B：level 改为数据事实，启发式只提示不标注——伪代码虚标由 verify 运行验证兜底）
+const l3Candidates = [];
 concepts.forEach((c) => {
   if (c.level !== undefined) return;
   const v = c.variants || {};
   const hasVariants = Object.keys(v).length > 0;
   const hasSemanticBlocks = Object.values(v).some((x) => x && x.semantic_blocks && x.semantic_blocks.length);
   const hasDeep = !!(c.deep_dive || (c.errors && c.errors.length));
-  c.level = hasVariants && (hasSemanticBlocks || hasDeep) ? 'L3' : 'L2';
+  if (hasVariants && (hasSemanticBlocks || hasDeep)) l3Candidates.push(c.id);
 });
 const levelCount = { L1: 0, L2: 0, L3: 0, L4: 0 };
 concepts.forEach((c) => {
   if (!['published', 'draft'].includes(c.status)) errors.push(`概念 ${c.id} status="${c.status}" 非法`);
   if (c.level != null && !LEVELS.has(c.level)) errors.push(`概念 ${c.id} level="${c.level}" 非法`);
   if (!moduleIds.has(c.module_id)) errors.push(`概念 ${c.id} module_id="${c.module_id}" 不在模块表中`);
-  levelCount[c.level || 'L1']++;
+  levelCount[c.level || 'L2']++;
 });
+if (l3Candidates.length) notes.push(`结构达标但未显式标 L3 的候选（${l3Candidates.length} 个，需 verify 可运行验证后显式升级）：${l3Candidates.join(', ')}`);
 
 // 3) prerequisites 引用 + 循环依赖
 const byId = {};
