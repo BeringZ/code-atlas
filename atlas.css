@@ -700,3 +700,7 @@ a { color: inherit; }
   .concept-nav { flex-direction: column; }
   .section-heading { display: block; }
 }
+
+/* ===== 内容成熟度标签（计划书 · 真实成熟度展示） ===== */
+.meta-tag.maturity { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); }
+.progress-summary { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }

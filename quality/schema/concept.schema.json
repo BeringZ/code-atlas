@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://beringz.github.io/code-atlas/schema/concept.schema.json",
+  "title": "Code Atlas 概念数据合同 v1",
+  "description": "每个知识点（concept）的统一数据合同。按《内容质量升级落地计划书》八层内容结构建模：问题场景 → 语言无关模型 → 最小可运行案例 → 六语言同题实现 → 语义差异矩阵 → 常见错误与反例 → 跨语言迁移练习 → 综合验收。兼容现有 concept-data.js 字段。",
+  "type": "object",
+  "properties": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9.-]*$", "description": "知识点唯一 ID，如 value.binding" },
+    "status": { "type": "string", "enum": ["published", "draft"], "description": "显示态：published 可见，draft 建设中占位" },
+    "level": { "type": "string", "enum": ["L1", "L2", "L3", "L4"], "description": "内容成熟度：L1 概览 / L2 标准 / L3 精讲 / L4 实验（计划书四级）" },
+    "module_id": { "type": "string", "description": "所属模块 ID，必须存在于 CODE_ATLAS_2.modules" },
+    "title": { "type": "string", "minLength": 1 },
+    "objectives": { "type": "array", "items": { "type": "string" }, "description": "学习目标（问题场景层）" },
+    "prerequisites": { "type": "array", "items": { "type": "string" }, "description": "前置知识点 ID 列表，必须有效且无循环依赖" },
+    "core": { "type": "string", "minLength": 1, "description": "语言无关模型（核心解释）" },
+    "variants": {
+      "type": "object",
+      "description": "六语言同题实现（同一任务/输入/输出协议）",
+      "properties": {
+        "python": { "$ref": "#/definitions/variant" },
+        "javascript": { "$ref": "#/definitions/variant" },
+        "java": { "$ref": "#/definitions/variant" },
+        "cpp": { "$ref": "#/definitions/variant" },
+        "go": { "$ref": "#/definitions/variant" },
+        "rust": { "$ref": "#/definitions/variant" }
+      },
+      "minProperties": 0
+    },
+    "comparisonDimensions": {
+      "type": "array",
+      "description": "语义差异矩阵维度（文档工作流 I），现有 lang_diff 文本可迁移为结构化矩阵",
+      "items": { "type": "string", "enum": ["type-checking", "mutability", "memory-model", "failure-mode", "idiomatic-style", "runtime-cost", "unicode-representation", "error-propagation", "ownership"] }
+    },
+    "lang_diff": { "type": "string", "description": "兼容字段：跨语言差异说明文本（L1/L2 可用，L3+ 应逐步迁移到 comparisonDimensions 结构化矩阵）" },
+    "errors": { "type": "array", "items": { "type": "object" }, "description": "常见错误与反例（每项至少含 code/explanation）" },
+    "exercises": {
+      "type": "array",
+      "description": "练习（概念识别/代码输出/错误定位/跨语言迁移/设计选择）",
+      "items": {
+        "type": "object",
+        "required": ["type", "question", "options", "answer"],
+        "properties": {
+          "type": { "type": "string", "enum": ["concept", "read", "output", "debug", "migrate", "design"] },
+          "question": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+          "answer": { "type": "integer", "minimum": 0 },
+          "feedback": { "type": "string" }
+        }
+      }
+    },
+    "deep_dive": { "type": "string", "description": "精讲（L3）：反例/错误案例/状态解释" },
+    "summary": { "type": "string" },
+    "next": { "type": "array", "items": { "type": "string" }, "description": "后续知识点（反向引用，校验有效性）" },
+    "related_advanced": { "type": "array", "items": { "type": "string" }, "description": "关联的语言进阶专题 ID" }
+  },
+  "required": ["id", "status", "module_id", "title"],
+  "additionalProperties": true,
+  "definitions": {
+    "variant": {
+      "type": "object",
+      "properties": {
+        "version": { "type": "string" },
+        "minimal_code": { "type": "string", "description": "最小可运行案例" },
+        "semantic_blocks": {
+          "type": "array",
+          "description": "语义块（角色 + 行号区间），行号必须不越界",
+          "items": {
+            "type": "object",
+            "required": ["role", "start", "end"],
+            "properties": {
+              "role": { "type": "string" },
+              "start": { "type": "integer", "minimum": 1 },
+              "end": { "type": "integer", "minimum": 1 }
+            }
+          }
+        },
+        "syntax_notes": { "type": "array", "items": { "type": "string" } },
+        "semantic_notes": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["minimal_code"]
+    }
+  }
+}

@@ -11,8 +11,11 @@
 
   // 模块主干
   const prog = A.progressSummary();
+  const mat = A.maturityStats();
+  const total = Object.values(mat).reduce((a, b) => a + b, 0);
   document.querySelector("#progressSummary").innerHTML =
-    `<span class="meta-tag published">已浏览 ${prog.browsed} · 已理解 ${prog.understood} · 练习通过 ${prog.passed}</span>`;
+    `<span class="meta-tag published">已浏览 ${prog.browsed} · 已理解 ${prog.understood} · 练习通过 ${prog.passed}</span>` +
+    `<span class="meta-tag maturity" title="内容成熟度（计划书四级）：L1 概览 / L2 标准 / L3 精讲 / L4 实验">成熟度 L2×${mat.L2} · L3×${mat.L3}（共 ${total} 知识点）</span>`;
 
   const conceptCount = (moduleId) => (D2.modules.find((m) => m.id === moduleId) || { concepts: [] }).concepts.length;
 

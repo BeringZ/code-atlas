@@ -1,5 +1,29 @@
 // Code Atlas 2.0 — 共享运行时：主题 / 进度 / 全站搜索 / 工具函数
 window.CodeAtlas2 = (() => {
+  // ===== 内容成熟度标记（计划书四级 · 启发式基线 v0.1） =====
+  // L1 概览 / L2 标准 / L3 精讲 / L4 实验。
+  // 启发式：有 variants + 语义块 + 错误案例/deep_dive → L3（精讲）；
+  //         其余有 core + 练习 → L2（标准）；显式标记的优先保留。
+  function markConceptLevels() {
+    const D2 = window.CODE_ATLAS_2;
+    if (!D2 || !D2.concepts) return;
+    D2.concepts.forEach((c) => {
+      if (c.level !== undefined) return;
+      const v = c.variants || {};
+      const hasVariants = Object.keys(v).length > 0;
+      const hasSemanticBlocks = Object.values(v).some((x) => x && x.semantic_blocks && x.semantic_blocks.length);
+      const hasDeep = !!(c.deep_dive || (c.errors && c.errors.length));
+      c.level = hasVariants && (hasSemanticBlocks || hasDeep) ? "L3" : "L2";
+    });
+  }
+  function maturityStats() {
+    markConceptLevels();
+    const D2 = window.CODE_ATLAS_2;
+    const stats = { L1: 0, L2: 0, L3: 0, L4: 0 };
+    (D2 && D2.concepts || []).forEach((c) => { stats[c.level || "L1"]++; });
+    return stats;
+  }
+
   // ===== 主题（兼容旧 key） =====
   const THEME_KEY = "code-atlas-state";
   function loadTheme() {
@@ -185,6 +209,7 @@ window.CodeAtlas2 = (() => {
     loadTheme, saveTheme, initTheme, toggleTheme,
     loadProgress, saveProgress, markProgress, getProgress, progressSummary,
     buildIndex, search, bindSearch,
+    markConceptLevels, maturityStats,
     esc, qs, langById, showToast, highlight, applySemanticHighlights,
   };
 })();

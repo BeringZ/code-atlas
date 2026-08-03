@@ -9,8 +9,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "脚本语言从文件顶部逐行执行；编译/托管语言有显式入口函数。入口决定了「哪段代码先跑」，也影响「被导入时是否执行」。约定：脚本可用 if __name__ == '__main__' 区分导入与直接运行。",
       "lang_diff": "Python：顶层执行，if __name__=='__main__' 作入口守卫；JS（Node）：文件顶层执行；Java：public static void main(String[] args)；C++：int main()；Go：package main 的 func main()；Rust：fn main()。",
       "exercises": [
-        { "type": "concept", "question": "Java 程序入口的签名是？", "options": ["fn main()", "public static void main(String[] args)", "func main()", "顶层代码"], "answer": 1, "feedback": "Java 需要 public static void main(String[] args)。" },
-        { "type": "read", "question": "Python if __name__=='__main__' 的作用是？", "options": ["定义入口函数", "仅直接运行时执行，被导入时不执行", "声明主类", "必须存在"], "answer": 1, "feedback": "该守卫让文件既能被导入也能作为脚本运行。" }
+        { "type": "concept", "question": "Java 程序入口的签名是？", "options": ["顶层代码", "func main()", "fn main()", "public static void main(String[] args)"], "answer": 3, "feedback": "Java 需要 public static void main(String[] args)。" },
+        { "type": "read", "question": "Python if __name__=='__main__' 的作用是？", "options": ["仅直接运行时执行，被导入时不执行", "声明主类", "定义入口函数", "必须存在"], "answer": 0, "feedback": "该守卫让文件既能被导入也能作为脚本运行。" }
       ]
     },
     { "id": "runtime.compile-interpret", "module_id": "B00", "title": "编译、解释与 JIT", "status": "published",
@@ -19,8 +19,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "代码变成机器行为有三条路：编译（源码→机器码/字节码，如 C++/Rust 直接编译、Java 编译成字节码）、解释（逐行执行，如传统 Python）、JIT（运行时编译热点代码，如 Java JVM、JS V8）。模型影响启动速度、峰值性能与调试体验。",
       "lang_diff": "Python：CPython 先编译为字节码再解释执行；JS：V8 解释 + JIT 编译热点；Java：javac 编译为字节码，JVM 解释 + JIT；C++/Rust：直接编译为机器码；Go：直接编译为机器码。",
       "exercises": [
-        { "type": "concept", "question": "Java 字节码由谁执行并优化？", "options": ["编译器一次性", "JVM 解释 + JIT 编译热点", "直接 CPU", "链接器"], "answer": 1, "feedback": "JVM 解释执行并对热点方法 JIT 编译，兼顾启动与峰值。" },
-        { "type": "concept", "question": "哪个语言直接编译为机器码运行？", "options": ["Python", "Java", "C++", "JavaScript"], "answer": 2, "feedback": "C++/Rust/Go 直接编译为机器码；Python/JS/Java 依赖解释或 JIT。" }
+        { "type": "concept", "question": "Java 字节码由谁执行并优化？", "options": ["链接器", "直接 CPU", "JVM 解释 + JIT 编译热点", "编译器一次性"], "answer": 2, "feedback": "JVM 解释执行并对热点方法 JIT 编译，兼顾启动与峰值。" },
+        { "type": "concept", "question": "哪个语言直接编译为机器码运行？", "options": ["C++", "JavaScript", "Python", "Java"], "answer": 0, "feedback": "C++/Rust/Go 直接编译为机器码；Python/JS/Java 依赖解释或 JIT。" }
       ]
     },
     { "id": "runtime.errors-kinds", "module_id": "B00", "title": "编译错误、运行错误与逻辑错误", "status": "published",
@@ -29,8 +29,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "错误按暴露时机分三类：编译错误（语法/类型问题，编译期暴露，如缺分号、类型不匹配）、运行错误（运行时异常/崩溃，如除零、空指针、文件不存在）、逻辑错误（程序能跑但结果错，最难排查，如边界 off-by-one）。强类型编译语言把更多错误提前到编译期。",
       "lang_diff": "编译期兜底：Rust/C++/Go 最强；Java 次之（受检异常强制处理）；运行期暴露：Python/JS 最多（动态类型）；逻辑错误与语言无关，靠测试与调试定位。",
       "exercises": [
-        { "type": "concept", "question": "「数组越界」在多数语言中属于哪类错误？", "options": ["编译错误", "运行错误", "逻辑错误", "网络错误"], "answer": 1, "feedback": "越界在运行时抛异常/未定义行为；Rust 中部分可被编译器静态阻止。" },
-        { "type": "concept", "question": "哪个语言把「空指针」类错误在编译期大量消除？", "options": ["Python", "Java", "Rust", "JavaScript"], "answer": 2, "feedback": "Rust 的 Option + 所有权在编译期消除空指针与悬垂引用。" }
+        { "type": "concept", "question": "「数组越界」在多数语言中属于哪类错误？", "options": ["编译错误", "逻辑错误", "运行错误", "网络错误"], "answer": 2, "feedback": "越界在运行时抛异常/未定义行为；Rust 中部分可被编译器静态阻止。" },
+        { "type": "concept", "question": "哪个语言把「空指针」类错误在编译期大量消除？", "options": ["JavaScript", "Java", "Rust", "Python"], "answer": 2, "feedback": "Rust 的 Option + 所有权在编译期消除空指针与悬垂引用。" }
       ]
     },
     { "id": "runtime.tooling-roles", "module_id": "B00", "title": "终端、REPL 与 IDE 的角色", "status": "published",
@@ -39,8 +39,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "终端：运行命令行程序与脚本；REPL（Read-Eval-Print Loop）：交互式逐行求值，适合试验 API 与小段逻辑；IDE：整合编辑、调试、补全与项目管理，适合工程开发。三者互补：用 REPL 探索、用 IDE 编码、用终端运行与部署。",
       "lang_diff": "REPL：Python 内置 python、JS 有 node、Rust 有 cargo script 或 evcxr；Go 无官方 REPL（go run 代替）；Java 有 jshell；C++ 无标准 REPL。IDE：VS Code/IDEA/CLion 覆盖全部语言。",
       "exercises": [
-        { "type": "concept", "question": "REPL 最适合什么任务？", "options": ["部署服务", "交互式试验 API 与小段逻辑", "构建打包", "版本管理"], "answer": 1, "feedback": "REPL 逐行求值、即时反馈，最适合探索性试验。" },
-        { "type": "concept", "question": "哪个语言有官方交互式 REPL jshell？", "options": ["Go", "Java", "C++", "Rust"], "answer": 1, "feedback": "Java 9+ 提供 jshell 交互式执行环境。" }
+        { "type": "concept", "question": "REPL 最适合什么任务？", "options": ["部署服务", "构建打包", "版本管理", "交互式试验 API 与小段逻辑"], "answer": 3, "feedback": "REPL 逐行求值、即时反馈，最适合探索性试验。" },
+        { "type": "concept", "question": "哪个语言有官方交互式 REPL jshell？", "options": ["Go", "C++", "Java", "Rust"], "answer": 2, "feedback": "Java 9+ 提供 jshell 交互式执行环境。" }
       ]
     },
 
@@ -51,8 +51,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "语言环境安装首选官方渠道：官网安装包或系统包管理器。安装后必做验证——在终端执行版本命令确认 PATH 配置生效，避免「装了但命令找不到」。",
       "lang_diff": "Python：python.org/winget/brew/apt，验证 python --version；JS：nodejs.org，验证 node -v；Java：Temurin/OpenJDK，验证 java -version && javac -version；C++：MSVC/MinGW/Xcode CLT/build-essential，验证 g++ --version；Go：go.dev，验证 go version；Rust：rustup，验证 rustc --version && cargo --version。",
       "exercises": [
-        { "type": "concept", "question": "Rust 的官方安装工具是？", "options": ["brew", "rustup", "nvm", "sdkman"], "answer": 1, "feedback": "rustup 同时安装 rustc 与 cargo 并管理工具链。" },
-        { "type": "read", "question": "Java 安装后验证编译器是否可用的命令是？", "options": ["java -version", "javac -version", "node -v", "go version"], "answer": 1, "feedback": "javac -version 验证编译器，java -version 验证运行时。" }
+        { "type": "concept", "question": "Rust 的官方安装工具是？", "options": ["sdkman", "rustup", "nvm", "brew"], "answer": 1, "feedback": "rustup 同时安装 rustc 与 cargo 并管理工具链。" },
+        { "type": "read", "question": "Java 安装后验证编译器是否可用的命令是？", "options": ["go version", "javac -version", "node -v", "java -version"], "answer": 1, "feedback": "javac -version 验证编译器，java -version 验证运行时。" }
       ]
     },
     { "id": "env.editor-lsp", "module_id": "B01", "title": "编辑器插件与语言服务器", "status": "published",
@@ -61,8 +61,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "语言服务器协议（LSP）把「补全、跳转、诊断、重构」从 IDE 内部能力抽象为独立进程：编辑器（VS Code/Vim/Neovim）通过 LSP 与语言服务器通信，一次实现多编辑器复用。配置好语言服务器，任何编辑器都能获得类 IDE 体验。",
       "lang_diff": "Python：Pylance；JS/TS：内置 TypeScript Server + ESLint；Java：Eclipse JDT Language Server；C++：clangd；Go：gopls；Rust：rust-analyzer。VS Code 均已有一键安装的官方扩展。",
       "exercises": [
-        { "type": "concept", "question": "Rust 的官方语言服务器是？", "options": ["gopls", "clangd", "rust-analyzer", "Pylance"], "answer": 2, "feedback": "rust-analyzer 提供补全、诊断与内联提示。" },
-        { "type": "concept", "question": "LSP 的核心价值是？", "options": ["加快编译", "编辑器与语言能力解耦，一次实现多编辑器复用", "自动部署", "格式化代码"], "answer": 1, "feedback": "LSP 让语言能力独立于具体编辑器，一次实现随处可用。" }
+        { "type": "concept", "question": "Rust 的官方语言服务器是？", "options": ["rust-analyzer", "Pylance", "gopls", "clangd"], "answer": 0, "feedback": "rust-analyzer 提供补全、诊断与内联提示。" },
+        { "type": "concept", "question": "LSP 的核心价值是？", "options": ["自动部署", "加快编译", "编辑器与语言能力解耦，一次实现多编辑器复用", "格式化代码"], "answer": 2, "feedback": "LSP 让语言能力独立于具体编辑器，一次实现随处可用。" }
       ]
     },
     { "id": "env.cli-run", "module_id": "B01", "title": "命令行编译与运行", "status": "published",
@@ -71,8 +71,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "单文件可直接编译/解释运行：python main.py、node app.js、go run main.go、rustc main.rs；编译语言需先编译再执行：javac + java、g++ -o main && ./main。工程项目用构建工具统一入口（cargo run、mvn exec、go run .、npm start）。",
       "lang_diff": "直接运行：python main.py、node app.js；编译运行：javac Main.java && java Main、g++ main.cpp -o main && ./main；工程运行：cargo run、go run .、mvn exec:java、npm run dev。",
       "exercises": [
-        { "type": "concept", "question": "Rust 工程的标准运行命令是？", "options": ["rustc main.rs", "cargo run", "go run .", "npm start"], "answer": 1, "feedback": "cargo run 编译并执行当前 crate 的主程序。" },
-        { "type": "read", "question": "C++ 单文件编译并运行的完整命令是？", "options": ["python main.cpp", "g++ main.cpp -o main && ./main", "cargo run", "javac main.cpp"], "answer": 1, "feedback": "先 g++ 编译为可执行文件，再执行。" }
+        { "type": "concept", "question": "Rust 工程的标准运行命令是？", "options": ["npm start", "go run .", "cargo run", "rustc main.rs"], "answer": 2, "feedback": "cargo run 编译并执行当前 crate 的主程序。" },
+        { "type": "read", "question": "C++ 单文件编译并运行的完整命令是？", "options": ["g++ main.cpp -o main && ./main", "python main.cpp", "javac main.cpp", "cargo run"], "answer": 0, "feedback": "先 g++ 编译为可执行文件，再执行。" }
       ]
     },
     { "id": "env.debugger", "module_id": "B01", "title": "断点、单步与变量观察", "status": "published",
@@ -81,8 +81,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "调试器让程序在任意位置暂停并检查状态：设置断点 → 触发 → 单步（step over/into/out）→ 观察变量与调用栈。相比 print 调试，断点调试能精确定位复杂逻辑错误，且可在不修改代码的情况下观察中间状态。",
       "lang_diff": "Python：pdb / VS Code 调试器；JS：浏览器 DevTools / Node --inspect；Java：IDEA 调试器；C++：gdb / lldb；Go：delve（dlv）；Rust：rust-gdb / CodeLLDB。",
       "exercises": [
-        { "type": "concept", "question": "「单步进入函数内部」对应的调试操作是？", "options": ["step over", "step into", "continue", "step out"], "answer": 1, "feedback": "step into 进入被调用函数；step over 跳过函数体。" },
-        { "type": "concept", "question": "Go 的官方调试器是？", "options": ["gdb", "delve", "lldb", "jshell"], "answer": 1, "feedback": "delve（dlv）是 Go 的标准调试器。" }
+        { "type": "concept", "question": "「单步进入函数内部」对应的调试操作是？", "options": ["step over", "step into", "step out", "continue"], "answer": 1, "feedback": "step into 进入被调用函数；step over 跳过函数体。" },
+        { "type": "concept", "question": "Go 的官方调试器是？", "options": ["gdb", "lldb", "jshell", "delve"], "answer": 3, "feedback": "delve（dlv）是 Go 的标准调试器。" }
       ]
     },
     { "id": "env.formatter-linter", "module_id": "B01", "title": "格式化器与 Linter", "status": "published",
@@ -91,8 +91,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "格式化器（formatter）自动排版消除风格争议；Linter 静态分析代码发现潜在错误与坏味道（未使用变量、危险模式）。将两者接入提交钩子与 CI，让风格一致与质量底线自动化。",
       "lang_diff": "Python：Black/Ruff；JS：Prettier/ESLint；Java：Checkstyle/Spotless；C++：clang-format/clang-tidy；Go：gofmt（官方强制）/go vet/staticcheck；Rust：rustfmt/clippy（官方）。",
       "exercises": [
-        { "type": "concept", "question": "Go 的官方强制格式化工具是？", "options": ["prettier", "gofmt", "black", "rustfmt"], "answer": 1, "feedback": "gofmt 是 Go 官方强制统一的格式化工具。" },
-        { "type": "concept", "question": "Rust 的静态检查工具是？", "options": ["eslint", "clippy", "ruff", "checkstyle"], "answer": 1, "feedback": "clippy 提供 Rust 的 lint 规则集。" }
+        { "type": "concept", "question": "Go 的官方强制格式化工具是？", "options": ["gofmt", "black", "rustfmt", "prettier"], "answer": 0, "feedback": "gofmt 是 Go 官方强制统一的格式化工具。" },
+        { "type": "concept", "question": "Rust 的静态检查工具是？", "options": ["checkstyle", "clippy", "ruff", "eslint"], "answer": 1, "feedback": "clippy 提供 Rust 的 lint 规则集。" }
       ]
     },
     { "id": "env.package-manager", "module_id": "B01", "title": "包管理器与依赖安装", "status": "published",
@@ -101,8 +101,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "包管理器解决「我需要用别人写好的库」：声明依赖（requirements/package.json/pom.xml/go.mod/Cargo.toml）→ 解析下载 → 生成锁文件（锁定精确版本保证可复现）。锁文件必须入库，保证团队与 CI 拿到完全一致的依赖。",
       "lang_diff": "Python：pip + requirements.txt；JS：npm + package.json + package-lock；Java：Maven pom.xml；C++：vcpkg/Conan + 锁；Go：go.mod + go.sum；Rust：Cargo.toml + Cargo.lock。",
       "exercises": [
-        { "type": "concept", "question": "锁文件（lockfile）的核心作用是？", "options": ["加密代码", "锁定依赖精确版本保证可复现构建", "删除依赖", "加快下载"], "answer": 1, "feedback": "锁文件记录解析后的精确版本，确保各环境一致。" },
-        { "type": "concept", "question": "Go 的依赖清单与锁文件分别是？", "options": ["pom.xml / lock", "go.mod / go.sum", "Cargo.toml / Cargo.lock", "package.json / yarn.lock"], "answer": 1, "feedback": "go.mod 声明模块与依赖，go.sum 记录校验和。" }
+        { "type": "concept", "question": "锁文件（lockfile）的核心作用是？", "options": ["加快下载", "删除依赖", "加密代码", "锁定依赖精确版本保证可复现构建"], "answer": 3, "feedback": "锁文件记录解析后的精确版本，确保各环境一致。" },
+        { "type": "concept", "question": "Go 的依赖清单与锁文件分别是？", "options": ["pom.xml / lock", "go.mod / go.sum", "package.json / yarn.lock", "Cargo.toml / Cargo.lock"], "answer": 1, "feedback": "go.mod 声明模块与依赖，go.sum 记录校验和。" }
       ]
     },
     { "id": "env.project-template", "module_id": "B01", "title": "项目模板与目录约定", "status": "published",
@@ -111,8 +111,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "每个生态都有事实标准的目录结构：源码与测试分离、配置集中在根、依赖声明清晰。遵循约定让新人快速上手、让工具自动发现源码与测试。脚手架（cargo new、create-vite、mvn archetype）一键生成规范骨架。",
       "lang_diff": "Python：src/ + tests/ + pyproject.toml；JS：src/ + package.json；Java：src/main/java + src/test/java（Maven 标准）；C++：include/ + src/ + CMakeLists.txt；Go：cmd/ + internal/ + pkg/ + go.mod；Rust：src/ + tests/ + Cargo.toml。",
       "exercises": [
-        { "type": "concept", "question": "Java Maven 项目的标准源码目录是？", "options": ["src/", "src/main/java", "code/", "main/"], "answer": 1, "feedback": "Maven 约定 src/main/java 放源码，src/test/java 放测试。" },
-        { "type": "concept", "question": "Rust 一键创建工程骨架的命令是？", "options": ["npm init", "cargo new", "mvn archetype", "go mod init"], "answer": 1, "feedback": "cargo new 生成 src/ 与 Cargo.toml 的规范项目。" }
+        { "type": "concept", "question": "Java Maven 项目的标准源码目录是？", "options": ["src/main/java", "src/", "main/", "code/"], "answer": 0, "feedback": "Maven 约定 src/main/java 放源码，src/test/java 放测试。" },
+        { "type": "concept", "question": "Rust 一键创建工程骨架的命令是？", "options": ["cargo new", "npm init", "mvn archetype", "go mod init"], "answer": 0, "feedback": "cargo new 生成 src/ 与 Cargo.toml 的规范项目。" }
       ]
     },
     { "id": "env.environment-vars", "module_id": "B01", "title": "环境变量与本地配置", "status": "published",
@@ -121,8 +121,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "环境变量把「配置」与「代码」分离：数据库连接、API 密钥等不应硬编码入库，而放在环境变量或 .env 文件（gitignore）。按环境（开发/测试/生产）切换配置，保证敏感信息不外泄、同一代码多环境运行。",
       "lang_diff": "Python：os.environ / python-dotenv；JS：process.env / dotenv；Java：System.getenv / 配置中心；C++：std::getenv；Go：os.Getenv / viper；Rust：std::env::var。.env 均不入库，用 .env.example 占位。",
       "exercises": [
-        { "type": "concept", "question": "API 密钥等敏感配置应该放在哪里？", "options": ["硬编码进源码", "环境变量或 .env（不入库）", "注释里", "README"], "answer": 1, "feedback": "敏感信息必须放在环境变量或 gitignore 的 .env，避免泄露入库。" },
-        { "type": "concept", "question": "Go 读取环境变量的标准函数是？", "options": ["env.get", "os.Getenv", "process.env", "std::env"], "answer": 1, "feedback": "os.Getenv(\"KEY\") 读取环境变量。" }
+        { "type": "concept", "question": "API 密钥等敏感配置应该放在哪里？", "options": ["README", "注释里", "环境变量或 .env（不入库）", "硬编码进源码"], "answer": 2, "feedback": "敏感信息必须放在环境变量或 gitignore 的 .env，避免泄露入库。" },
+        { "type": "concept", "question": "Go 读取环境变量的标准函数是？", "options": ["env.get", "process.env", "os.Getenv", "std::env"], "answer": 2, "feedback": "os.Getenv(\"KEY\") 读取环境变量。" }
       ]
     },
 
@@ -134,7 +134,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "lang_diff": "Python：约定大写命名（非强制）；JS：const 绑定不可变（对象属性可变）；Java：final 绑定不可变（对象内部可变）；C++：const/constexpr 编译期常量；Go：const 编译期常量；Rust：let 默认不可变，const 为编译期常量。",
       "exercises": [
         { "type": "concept", "question": "JS 中 const obj = {}; obj.x = 1 是否合法？", "options": ["编译错误", "合法（const 只约束绑定）", "运行时错误", "obj 变为 null"], "answer": 1, "feedback": "const 禁止重新指向，不禁止修改对象属性。" },
-        { "type": "read", "question": "C++ 中编译期常量用哪个关键字？", "options": ["let", "const 或 constexpr", "final", "static"], "answer": 1, "feedback": "constexpr 声明编译期可求值的常量。" }
+        { "type": "read", "question": "C++ 中编译期常量用哪个关键字？", "options": ["final", "static", "const 或 constexpr", "let"], "answer": 2, "feedback": "constexpr 声明编译期可求值的常量。" }
       ]
     },
     { "id": "value.primitive-types", "module_id": "B02", "title": "整数、浮点数、布尔与字符", "status": "published",
@@ -143,8 +143,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "基础类型是数据的起点：整数（int）、浮点数（float/double）、布尔（bool）、字符（char）。要点：类型大小决定取值范围与精度；浮点数不精确（0.1+0.2≠0.3）；字符与编码相关。",
       "lang_diff": "Python：int 任意精度、float 双精度；JS：Number 双精度（BigInt 大整数）；Java：byte/short/int/long/float/double/char/boolean 定宽；C++：int/long long/double/char 定宽；Go：int/int64/float64/rune；Rust：i32/i64/f64/char（Unicode 标量）。",
       "exercises": [
-        { "type": "concept", "question": "JS 中处理大整数应使用？", "options": ["float", "BigInt", "string", "char"], "answer": 1, "feedback": "BigInt 支持任意精度整数，避免 Number 精度丢失。" },
-        { "type": "read", "question": "0.1 + 0.2 === 0.3 在 JS 中的结果与原因？", "options": ["true", "false（浮点二进制不精确）", "报错", "undefined"], "answer": 1, "feedback": "浮点数以二进制存储，0.1/0.2 无法精确表示，比较需用容差。" }
+        { "type": "concept", "question": "JS 中处理大整数应使用？", "options": ["string", "BigInt", "float", "char"], "answer": 1, "feedback": "BigInt 支持任意精度整数，避免 Number 精度丢失。" },
+        { "type": "read", "question": "0.1 + 0.2 === 0.3 在 JS 中的结果与原因？", "options": ["undefined", "false（浮点二进制不精确）", "true", "报错"], "answer": 1, "feedback": "浮点数以二进制存储，0.1/0.2 无法精确表示，比较需用容差。" }
       ]
     },
     { "id": "value.string-bytes", "module_id": "B02", "title": "字符串与字节序列", "status": "published",
@@ -153,8 +153,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "字符串是「字符的逻辑序列」，字节是「内存中的原始数据」。文本编码（UTF-8）把字符变成字节；处理文件/网络 IO 时操作的是字节，需显式编码/解码。混淆两者是中文乱码与截断错误的根源。",
       "lang_diff": "Python：str（Unicode 字符）/ bytes（字节），encode/decode 转换；JS：String（UTF-16 码元）/ Uint8Array（字节）；Java：String / byte[]；C++：std::string（字节串）/ std::u8string；Go：string（UTF-8 字节）/ []byte；Rust：String/&str（UTF-8）/ Vec<u8>/&[u8]。",
       "exercises": [
-        { "type": "concept", "question": "Python 中把字符串转为 UTF-8 字节的方法是？", "options": ["decode()", "encode()", "bytes()", "to_string()"], "answer": 1, "feedback": "str.encode('utf-8') 得 bytes；bytes.decode() 得 str。" },
-        { "type": "read", "question": "Go 中 string 的 range 遍历单位是？", "options": ["字节", "rune（UTF-8 码点）", "字符数组", "码元"], "answer": 1, "feedback": "range 对 string 按 rune 迭代，索引访问是字节。" }
+        { "type": "concept", "question": "Python 中把字符串转为 UTF-8 字节的方法是？", "options": ["to_string()", "bytes()", "decode()", "encode()"], "answer": 3, "feedback": "str.encode('utf-8') 得 bytes；bytes.decode() 得 str。" },
+        { "type": "read", "question": "Go 中 string 的 range 遍历单位是？", "options": ["rune（UTF-8 码点）", "字节", "码元", "字符数组"], "answer": 0, "feedback": "range 对 string 按 rune 迭代，索引访问是字节。" }
       ]
     },
     { "id": "value.static-dynamic", "module_id": "B02", "title": "静态类型与动态类型", "status": "published",
@@ -163,8 +163,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "静态类型：变量类型编译期确定（Java/C++/Go/Rust），编译器提前发现类型错误；动态类型：变量类型运行时确定（Python/JS），灵活但错误延迟到运行期。强弱类型是另一维度：强类型禁止隐式危险转换。",
       "lang_diff": "静态强类型：Java/C++/Go/Rust（Rust 还有类型推断）；动态强类型：Python（运行期类型但严格）；动态弱类型：JS（隐式转换多，如 '5'+1='51'）。静态语言也可有类型推断（auto/:=/var）。",
       "exercises": [
-        { "type": "concept", "question": "「'5' + 1 得 '51'」体现了哪种类型特性？", "options": ["静态强类型", "动态弱类型（隐式转换）", "静态弱类型", "动态强类型"], "answer": 1, "feedback": "JS 的隐式字符串拼接是动态弱类型的典型表现。" },
-        { "type": "concept", "question": "Rust 属于哪种类型系统？", "options": ["动态强类型", "静态强类型 + 类型推断", "动态弱类型", "无类型"], "answer": 1, "feedback": "Rust 是静态强类型，编译期检查且支持推断。" }
+        { "type": "concept", "question": "「'5' + 1 得 '51'」体现了哪种类型特性？", "options": ["动态强类型", "静态强类型", "静态弱类型", "动态弱类型（隐式转换）"], "answer": 3, "feedback": "JS 的隐式字符串拼接是动态弱类型的典型表现。" },
+        { "type": "concept", "question": "Rust 属于哪种类型系统？", "options": ["动态强类型", "动态弱类型", "静态强类型 + 类型推断", "无类型"], "answer": 2, "feedback": "Rust 是静态强类型，编译期检查且支持推断。" }
       ]
     },
     { "id": "value.type-inference", "module_id": "B02", "title": "显式类型与类型推断", "status": "published",
@@ -173,8 +173,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "类型推断让编译器根据右侧表达式自动确定变量类型，省去冗余标注（let x = 5 推断为整数）。推断适合局部变量且初始化即明了的场景；公共 API、复杂表达式、类型不直观时应显式标注以提升可读性。",
       "lang_diff": "Python：类型注解（hint）不强制（def f(x: int) -> str）；JS：TypeScript 推断 + 注解；Java：var（Java 10+ 局部推断）；C++：auto；Go：:=；Rust：let 默认推断，可加 :T 显式。",
       "exercises": [
-        { "type": "concept", "question": "C++ 中根据初始化表达式推断类型的关键字是？", "options": ["var", "auto", "let", "type"], "answer": 1, "feedback": "auto 让编译器推断类型，避免冗长模板类型书写。" },
-        { "type": "read", "question": "Go 中 count := 0 的类型推断结果是？", "options": ["int", "float64", "string", "需显式标注"], "answer": 0, "feedback": ":= 根据右侧 0 推断为 int。" }
+        { "type": "concept", "question": "C++ 中根据初始化表达式推断类型的关键字是？", "options": ["var", "type", "let", "auto"], "answer": 3, "feedback": "auto 让编译器推断类型，避免冗长模板类型书写。" },
+        { "type": "read", "question": "Go 中 count := 0 的类型推断结果是？", "options": ["需显式标注", "string", "float64", "int"], "answer": 3, "feedback": ":= 根据右侧 0 推断为 int。" }
       ]
     },
     { "id": "value.mutability", "module_id": "B02", "title": "可变与不可变", "status": "published",
@@ -183,8 +183,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "不可变数据创建后不可修改，修改即生成新值。好处：可安全共享（并发无需加锁）、可缓存、行为可预测；代价：频繁修改产生分配开销。最佳实践：默认不可变，需要局部可变时再显式声明。",
       "lang_diff": "Python：tuple/frozenset 不可变、list/dict 可变；JS：Object.freeze 浅冻结；Java：record/Collections.unmodifiable 包装；C++：const 修饰；Go：string 不可变、slice/map 可变；Rust：默认不可变，mut 显式可变。",
       "exercises": [
-        { "type": "concept", "question": "哪个语言默认变量不可变，需显式声明才可修改？", "options": ["Python", "Java", "Rust", "Go"], "answer": 2, "feedback": "Rust 的 let 默认不可变，mut 才允许修改。" },
-        { "type": "concept", "question": "不可变数据结构在并发中的核心优势是？", "options": ["更快", "可安全共享无需加锁", "省内存", "易调试"], "answer": 1, "feedback": "不可变数据天然线程安全，无需同步即可共享。" }
+        { "type": "concept", "question": "哪个语言默认变量不可变，需显式声明才可修改？", "options": ["Go", "Java", "Python", "Rust"], "answer": 3, "feedback": "Rust 的 let 默认不可变，mut 才允许修改。" },
+        { "type": "concept", "question": "不可变数据结构在并发中的核心优势是？", "options": ["可安全共享无需加锁", "更快", "易调试", "省内存"], "answer": 0, "feedback": "不可变数据天然线程安全，无需同步即可共享。" }
       ]
     },
     { "id": "value.conversion", "module_id": "B02", "title": "类型转换、解析与格式化", "status": "published",
@@ -193,8 +193,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "类型转换分「解析」（字符串→数值）与「格式化」（数值→字符串）。要点：解析可能失败（非法输入），需容错；格式化控制精度与样式。强类型语言要求显式转换，弱类型语言会隐式转换（易踩坑）。",
       "lang_diff": "Python：int('5')/float('3.14')/str(x)；JS：Number('5')/parseInt/String(x)；Java：Integer.parseInt/Double.parseDouble/String.format；C++：std::stoi/std::to_string；Go：strconv.Atoi/Itoa；Rust：parse::<i32>()/format!。",
       "exercises": [
-        { "type": "concept", "question": "Go 中把字符串 '42' 转为 int 的函数是？", "options": ["int('42')", "strconv.Atoi", "parseInt", "Integer.parseInt"], "answer": 1, "feedback": "strconv.Atoi 返回 (int, error)，需处理解析失败。" },
-        { "type": "read", "question": "Rust 中 '42'.parse::<i32>() 的返回类型是？", "options": ["i32", "Result<i32, ParseIntError>", "Option<i32>", "报错"], "answer": 1, "feedback": "parse 返回 Result，用 ? 或 match 处理失败。" }
+        { "type": "concept", "question": "Go 中把字符串 '42' 转为 int 的函数是？", "options": ["parseInt", "Integer.parseInt", "int('42')", "strconv.Atoi"], "answer": 3, "feedback": "strconv.Atoi 返回 (int, error)，需处理解析失败。" },
+        { "type": "read", "question": "Rust 中 '42'.parse::<i32>() 的返回类型是？", "options": ["报错", "i32", "Option<i32>", "Result<i32,  ParseIntError>"], "answer": 3, "feedback": "parse 返回 Result，用 ? 或 match 处理失败。" }
       ]
     },
     { "id": "value.nullability", "module_id": "B02", "title": "空值、缺失值与可选类型", "status": "published",
@@ -203,8 +203,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "「值不存在」是程序最常见的失败。null/None/nil 表达缺失，但直接访问会引发空指针。可选类型（Option/Maybe）把「可能缺失」编码进类型，强制调用方处理两种情况；Rust 的 Option 从类型层面消灭了空指针。",
       "lang_diff": "Python：None（if x is None）；JS：null/undefined（?. 可选链、?? 空值合并）；Java：null（Optional<T> 包装）；C++：nullptr（std::optional）；Go：nil（指针/接口零值，v, ok :=）；Rust：Option<T>（Some/None，无 null）。",
       "exercises": [
-        { "type": "concept", "question": "Rust 中表示「值可能不存在」的类型是？", "options": ["null", "nil", "Option<T>", "Maybe"], "answer": 2, "feedback": "Option<T> 用 Some/None 强制处理，消除空指针。" },
-        { "type": "read", "question": "JS 中安全访问可能为空对象属性的操作符是？", "options": [".", "?.", "??", "||"], "answer": 1, "feedback": "?. 可选链在对象为 null/undefined 时短路返回 undefined。" }
+        { "type": "concept", "question": "Rust 中表示「值可能不存在」的类型是？", "options": ["nil", "Maybe", "null", "Option<T>"], "answer": 3, "feedback": "Option<T> 用 Some/None 强制处理，消除空指针。" },
+        { "type": "read", "question": "JS 中安全访问可能为空对象属性的操作符是？", "options": ["||", ".", "?.", "??"], "answer": 2, "feedback": "?. 可选链在对象为 null/undefined 时短路返回 undefined。" }
       ]
     },
     { "id": "value.scope-lifetime", "module_id": "B02", "title": "作用域、生命周期与遮蔽", "status": "published",
@@ -213,8 +213,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "作用域决定变量在哪可见（块级/函数级/模块级）；生命周期决定变量存活多久（栈/堆/GC/所有权）。遮蔽：内层作用域声明同名变量会「盖住」外层，离开内层后外层恢复——它改变的是绑定而非原变量。",
       "lang_diff": "Python：LEGB 作用域，无块级（函数级）；JS：let/const 块级、var 函数级（TDZ）；Java/C++：块级作用域，{} 内可见；Go：块级，:= 可遮蔽；Rust：块级 + 所有权生命周期，let 可遮蔽。",
       "exercises": [
-        { "type": "concept", "question": "JS 中 let/const 的作用域是？", "options": ["函数级", "块级", "全局", "模块级"], "answer": 1, "feedback": "let/const 是块级作用域，var 是函数级。" },
-        { "type": "read", "question": "Rust 中内层 let x = x + 1 与外层 x 的关系是？", "options": ["修改外层", "创建新绑定遮蔽外层（不修改外层）", "编译错误", "外层删除"], "answer": 1, "feedback": "shadow 创建新绑定遮蔽同名变量，外层不变。" }
+        { "type": "concept", "question": "JS 中 let/const 的作用域是？", "options": ["全局", "块级", "函数级", "模块级"], "answer": 1, "feedback": "let/const 是块级作用域，var 是函数级。" },
+        { "type": "read", "question": "Rust 中内层 let x = x + 1 与外层 x 的关系是？", "options": ["外层删除", "修改外层", "编译错误", "创建新绑定遮蔽外层（不修改外层）"], "answer": 3, "feedback": "shadow 创建新绑定遮蔽同名变量，外层不变。" }
       ]
     },
     { "id": "value.numeric-edge", "module_id": "B02", "title": "溢出、精度与特殊数值", "status": "published",
@@ -223,8 +223,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "数值计算有边界：整数溢出（定宽类型超出范围回绕或报错）、浮点不精确（二进制无法精确表示 0.1）、特殊值（NaN、Infinity、-0.0）。定宽整数运算要考虑溢出策略（回绕/检查/饱和），浮点比较需用容差而非 ==。",
       "lang_diff": "Python：int 无溢出（任意精度）、float 有精度限制；JS：Number 安全整数 2^53、NaN/Infinity；Java：int 溢出回绕、double 有 NaN；C++：溢出是 UB（signed）；Go：int 溢出回绕；Rust：debug 溢出 panic、release 回绕（wrapping_* 显式）。",
       "exercises": [
-        { "type": "concept", "question": "JS 中能安全表示的最大整数是？", "options": ["2^32", "2^53（Number.MAX_SAFE_INTEGER）", "2^64", "无限制"], "answer": 1, "feedback": "超过 2^53 精度丢失，应用 BigInt。" },
-        { "type": "concept", "question": "浮点数相等比较应该用？", "options": ["==", "容差比较 |a-b| < ε", "字符串比较", "类型转换后比较"], "answer": 1, "feedback": "浮点不精确，相等比较需用容差。" }
+        { "type": "concept", "question": "JS 中能安全表示的最大整数是？", "options": ["2^64", "2^32", "2^53（Number.MAX_SAFE_INTEGER）", "无限制"], "answer": 2, "feedback": "超过 2^53 精度丢失，应用 BigInt。" },
+        { "type": "concept", "question": "浮点数相等比较应该用？", "options": ["容差比较 |a-b| < ε", "==", "字符串比较", "类型转换后比较"], "answer": 0, "feedback": "浮点不精确，相等比较需用容差。" }
       ]
     },
 
@@ -235,8 +235,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "基础算术 + - * / %，但「除法」与「取模」在各语言有微妙差异：整数除法是向下取整还是截断？负数取模符号跟谁？幂运算用 ** 还是 pow？位运算 << >> & | 处理二进制。",
       "lang_diff": "Python：/ 真除法得 float、// 整除（向下取整）、** 幂；JS：/ 总是浮点、** 幂；Java：/ 整数除法（截断）、Math.pow；C++：/ 整数除法、std::pow；Go：/ 整数除法、math.Pow；Rust：/ 整数除法、powi/powf。负数取模：Python 结果符号随除数，C/Java 随被除数。",
       "exercises": [
-        { "type": "concept", "question": "Python 中 7 // 2 的结果是？", "options": ["3.5", "3", "4", "3.0"], "answer": 1, "feedback": "// 是整除（向下取整），得 3。" },
-        { "type": "read", "question": "JS 中 2 ** 10 的结果是？", "options": ["20", "1024", "102", "报错"], "answer": 1, "feedback": "** 是幂运算，2^10 = 1024。" }
+        { "type": "concept", "question": "Python 中 7 // 2 的结果是？", "options": ["4", "3.0", "3", "3.5"], "answer": 2, "feedback": "// 是整除（向下取整），得 3。" },
+        { "type": "read", "question": "JS 中 2 ** 10 的结果是？", "options": ["102", "20", "报错", "1024"], "answer": 3, "feedback": "** 是幂运算，2^10 = 1024。" }
       ]
     },
     { "id": "expr.comparison", "module_id": "B03", "title": "比较与相等性", "status": "published",
@@ -245,8 +245,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "比较运算符 < > <= >= 判断大小，==/=== 判断相等。关键：== 比较的是「值」还是「身份」？多数语言的 == 对对象是身份比较（引用相等），值相等需用 equals/deepEqual。JS 的 == 会做隐式类型转换（坑），应始终用 ===。",
       "lang_diff": "Python：== 调 __eq__、is 身份；JS：=== 严格（推荐）、== 隐式转换；Java：== 基本类型按值/对象按引用、equals 内容；C++：== 可重载（默认逐成员）；Go：== 可比较类型按值；Rust：== 需 PartialEq、derive 可得。",
       "exercises": [
-        { "type": "concept", "question": "JS 中比较两个值应优先使用？", "options": ["==", "===", "equals", "is"], "answer": 1, "feedback": "=== 不做隐式类型转换，避免 '5'==5 为 true 的坑。" },
-        { "type": "concept", "question": "Java 中判断两个 String 内容相等应使用？", "options": ["==", "===", "equals()", "is"], "answer": 2, "feedback": "== 比较引用，equals() 比较内容。" }
+        { "type": "concept", "question": "JS 中比较两个值应优先使用？", "options": ["===", "is", "==", "equals"], "answer": 0, "feedback": "=== 不做隐式类型转换，避免 '5'==5 为 true 的坑。" },
+        { "type": "concept", "question": "Java 中判断两个 String 内容相等应使用？", "options": ["is", "==", "equals()", "==="], "answer": 2, "feedback": "== 比较引用，equals() 比较内容。" }
       ]
     },
     { "id": "expr.assignment", "module_id": "B03", "title": "赋值与复合赋值", "status": "published",
@@ -255,18 +255,18 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "赋值把名字绑定到值。复合赋值 += -= *= 是「原地运算 + 重新绑定」的简写，对可变对象可能是原地修改（Python list += 等价 extend）。注意语言差异：JS/C 的赋值是表达式（可嵌套），Python 的赋值是语句（需用 := 海象运算符作表达式）。",
       "lang_diff": "Python：= 语句、:= 海象表达式（3.8+）；JS：= 表达式（可链式 a = b = 1）；Java：= 表达式；C++：= 表达式返回引用；Go：= 语句、:= 声明；Rust：= 语句（let 绑定）。复合赋值对 Python list 是原地操作。",
       "exercises": [
-        { "type": "concept", "question": "Python 中 lst += [1] 对可变列表的行为是？", "options": ["创建新列表", "原地 extend（等价 lst.extend）", "报错", "替换引用"], "answer": 1, "feedback": "对可变对象 += 是原地修改；对不可变对象（int/str）是重新绑定。" },
-        { "type": "read", "question": "JS 中 a = b = 5 的执行顺序是？", "options": ["左到右", "右到左（先 b=5 再 a=结果）", "报错", "同时"], "answer": 1, "feedback": "赋值右结合：b=5 返回 5，再赋给 a。" }
+        { "type": "concept", "question": "Python 中 lst += [1] 对可变列表的行为是？", "options": ["替换引用", "原地 extend（等价 lst.extend）", "报错", "创建新列表"], "answer": 1, "feedback": "对可变对象 += 是原地修改；对不可变对象（int/str）是重新绑定。" },
+        { "type": "read", "question": "JS 中 a = b = 5 的执行顺序是？", "options": ["同时", "左到右", "报错", "右到左（先 b=5 再 a=结果）"], "answer": 3, "feedback": "赋值右结合：b=5 返回 5，再赋给 a。" }
       ]
     },
     { "id": "expr.index-slice", "module_id": "B03", "title": "成员访问、索引与切片", "status": "published",
       "objectives": ["访问对象成员与序列元素", "用切片提取子序列"],
-      "prerequisites": ["collection.array-list", "string.index-slice"],
+      "prerequisites": ["collection.array-list"],
       "core": "成员访问（obj.attr / obj->attr / map[key]）、索引（arr[i]）、切片（arr[start:end]）是数据访问三件套。切片语法差异大：Python 的 [start:end:step] 最强大，其他语言多需循环或库方法。负索引（从尾部数）是 Python 特色。",
       "lang_diff": "Python：obj.attr、seq[i]、seq[1:5:2]、负索引 seq[-1]；JS：obj.prop / obj['key']、arr[i]、arr.slice(1,5)；Java：obj.field、list.get(i)、无原生切片（subList）；C++：obj.field / ptr->field、vec[i]、无原生切片；Go：obj.Field、slice[i]、slice[1:5]；Rust：obj.field、vec[i]、&vec[1..5]。",
       "exercises": [
-        { "type": "concept", "question": "Python 中获取序列最后一个元素的惯用法是？", "options": ["seq[len(seq)-1]", "seq[-1]", "seq.last", "seq.tail"], "answer": 1, "feedback": "负索引 -1 表示倒数第一个元素。" },
-        { "type": "read", "question": "Rust 中 &vec[1..5] 的结果是？", "options": ["新 Vec", "切片引用 &[T]", "数组", "报错"], "answer": 1, "feedback": ".. 范围切片返回借用，不复制数据。" }
+        { "type": "concept", "question": "Python 中获取序列最后一个元素的惯用法是？", "options": ["seq[len(seq)-1]", "seq.last", "seq[-1]", "seq.tail"], "answer": 2, "feedback": "负索引 -1 表示倒数第一个元素。" },
+        { "type": "read", "question": "Rust 中 &vec[1..5] 的结果是？", "options": ["报错", "新 Vec", "数组", "切片引用 &[T]"], "answer": 3, "feedback": ".. 范围切片返回借用，不复制数据。" }
       ]
     },
     { "id": "expr.conditional-expr", "module_id": "B03", "title": "条件表达式（三目）", "status": "published",
@@ -276,7 +276,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "lang_diff": "Python：x if cond else y；JS：cond ? x : y；Java：cond ? x : y；C++：cond ? x : y；Go：无三目，用 if（或立即函数）；Rust：let v = if cond { x } else { y }（if 是表达式）。",
       "exercises": [
         { "type": "concept", "question": "JS 中 cond ? a : b 的正确读法是？", "options": ["逻辑与或", "条件为真取 a 否则取 b", "位运算", "比较"], "answer": 1, "feedback": "三目运算符：条件真取 : 前，假取 : 后。" },
-        { "type": "concept", "question": "Go 中如何实现三目表达式效果？", "options": ["cond ? a : b", "if 语句（Go 无三目运算符）", "?:", "??"], "answer": 1, "feedback": "Go 没有三目运算符，用 if 语句表达。" }
+        { "type": "concept", "question": "Go 中如何实现三目表达式效果？", "options": ["cond ? a : b", "??", "?:", "if 语句（Go 无三目运算符）"], "answer": 3, "feedback": "Go 没有三目运算符，用 if 语句表达。" }
       ]
     },
     { "id": "expr.precedence", "module_id": "B03", "title": "运算符优先级与结合性", "status": "published",
@@ -285,8 +285,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "运算符有优先级（* 先于 +）与结合性（赋值右结合）。记忆全部优先级不现实，最佳实践：复杂表达式一律加括号明确意图，既避免错误也提升可读性。常见的坑：== 与位运算、&& 与 || 混用、移位与加减。",
       "lang_diff": "优先级表各语言略有差异但大体一致（算术 > 比较 > 逻辑）。特例：JS 的 == 与位运算优先级、Go 无三目、Rust 无隐式 bool 转换（if 条件必须 bool）。所有语言：加括号总是安全的。",
       "exercises": [
-        { "type": "concept", "question": "表达式 a + b * c 按优先级等价于？", "options": ["(a+b)*c", "a+(b*c)", "语法错误", "a*b+c"], "answer": 1, "feedback": "* 优先级高于 +，等价 a+(b*c)。" },
-        { "type": "concept", "question": "处理复杂运算符表达式最稳妥的做法是？", "options": ["背优先级表", "加括号明确意图", "拆开写", "用注释"], "answer": 1, "feedback": "加括号既防错又提升可读性，是工程惯例。" }
+        { "type": "concept", "question": "表达式 a + b * c 按优先级等价于？", "options": ["a*b+c", "(a+b)*c", "语法错误", "a+(b*c)"], "answer": 3, "feedback": "* 优先级高于 +，等价 a+(b*c)。" },
+        { "type": "concept", "question": "处理复杂运算符表达式最稳妥的做法是？", "options": ["加括号明确意图", "用注释", "拆开写", "背优先级表"], "answer": 0, "feedback": "加括号既防错又提升可读性，是工程惯例。" }
       ]
     },
     { "id": "expr.coercion", "module_id": "B03", "title": "类型提升与隐式转换风险", "status": "published",
@@ -295,8 +295,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "混合类型运算时语言会自动「提升」或「转换」类型：小类型→大类型（int→float 通常安全）、字符串与数字拼接（危险）。隐式转换的规则因语言而异，弱类型语言（JS）转换最激进，是大量诡异 bug 的来源。防御：显式转换、开启严格检查。",
       "lang_diff": "Python：强类型，隐式转换少（int+float→float）；JS：弱类型，'5'+1='51'、'5'-1=4（减号转数字）；Java：int+long→long、String+任意→String；C++：隐式转换多但可有警告；Go：基本无隐式转换（需显式）；Rust：无隐式转换（需 as 或 From）。",
       "exercises": [
-        { "type": "concept", "question": "JS 中 '5' - 1 的结果是？", "options": ["'51'", "4", "报错", "undefined"], "answer": 1, "feedback": "减号触发数字转换，'5'→5，5-1=4；但 '5'+1='51'。" },
-        { "type": "concept", "question": "哪个语言基本不做隐式类型转换，需显式 as/From？", "options": ["JavaScript", "Java", "Rust", "C++"], "answer": 2, "feedback": "Rust 强制显式转换，避免隐式转换的坑。" }
+        { "type": "concept", "question": "JS 中 '5' - 1 的结果是？", "options": ["'51'", "undefined", "报错", "4"], "answer": 3, "feedback": "减号触发数字转换，'5'→5，5-1=4；但 '5'+1='51'。" },
+        { "type": "concept", "question": "哪个语言基本不做隐式类型转换，需显式 as/From？", "options": ["Rust", "Java", "JavaScript", "C++"], "answer": 0, "feedback": "Rust 强制显式转换，避免隐式转换的坑。" }
       ]
     },
 
@@ -307,8 +307,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "当判断「同一值的多种取值」时，switch/match 比 if 链更聚焦。模式匹配进一步：匹配字面量、范围、解构结构体/枚举，且编译器（Rust）能检查穷尽性。选择：简单值分发用 switch，需要解构或穷尽保证用 match。",
       "lang_diff": "Python：3.10+ match（支持解构与守卫）；JS：switch（无模式匹配）；Java：switch 表达式（->）与 record 模式（21+）；C++：switch 仅整型/枚举；Go：switch（自动跳出，无 fallthrough）；Rust：match（穷尽性检查，可解构）。",
       "exercises": [
-        { "type": "concept", "question": "Rust 的 match 漏掉一个分支会怎样？", "options": ["运行时异常", "编译错误（穷尽性检查）", "忽略", "匹配 default"], "answer": 1, "feedback": "Rust match 必须穷尽所有分支，否则编译失败。" },
-        { "type": "read", "question": "Go 的 switch 是否需要 break 防穿透？", "options": ["需要", "不需要（自动跳出）", "仅 default 需要", "取决于编译器"], "answer": 1, "feedback": "Go 的 switch 分支自动跳出，无需 break。" }
+        { "type": "concept", "question": "Rust 的 match 漏掉一个分支会怎样？", "options": ["运行时异常", "匹配 default", "忽略", "编译错误（穷尽性检查）"], "answer": 3, "feedback": "Rust match 必须穷尽所有分支，否则编译失败。" },
+        { "type": "read", "question": "Go 的 switch 是否需要 break 防穿透？", "options": ["不需要（自动跳出）", "需要", "仅 default 需要", "取决于编译器"], "answer": 0, "feedback": "Go 的 switch 分支自动跳出，无需 break。" }
       ]
     },
     { "id": "control.iteration-protocol", "module_id": "B04", "title": "范围与迭代协议", "status": "published",
@@ -317,8 +317,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "「for x in 容器」背后是迭代协议：容器提供「产生下一个元素」的机制，语言用统一接口遍历。实现该协议，自定义类型也能参与 for 循环。范围（range/区间）是迭代协议的特例，表达数值序列。",
       "lang_diff": "Python：__iter__/__next__ 协议、range(n)；JS：Symbol.iterator、自定义 [Symbol.iterator]()；Java：Iterable/Iterator 接口；C++：begin()/end() 迭代器对；Go：range（内建，无通用协议）；Rust：IntoIterator/Iterator trait、0..n。",
       "exercises": [
-        { "type": "concept", "question": "Python 自定义类要能 for 遍历需实现？", "options": ["toString", "__iter__ 与 __next__", "equals", "hash"], "answer": 1, "feedback": "__iter__ 返回迭代器，__next__ 产生下一元素。" },
-        { "type": "read", "question": "JS 中使对象可被 for...of 遍历的方法是？", "options": ["实现 toString", "实现 [Symbol.iterator]()", "继承 Array", "加 length 属性"], "answer": 1, "feedback": "for...of 依赖 Symbol.iterator 协议。" }
+        { "type": "concept", "question": "Python 自定义类要能 for 遍历需实现？", "options": ["toString", "hash", "__iter__ 与 __next__", "equals"], "answer": 2, "feedback": "__iter__ 返回迭代器，__next__ 产生下一元素。" },
+        { "type": "read", "question": "JS 中使对象可被 for...of 遍历的方法是？", "options": ["加 length 属性", "实现 toString", "实现 [Symbol.iterator]()", "继承 Array"], "answer": 2, "feedback": "for...of 依赖 Symbol.iterator 协议。" }
       ]
     },
     { "id": "control.break-continue", "module_id": "B04", "title": "break / continue / return", "status": "published",
@@ -327,8 +327,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "break 跳出当前循环、continue 跳过本次迭代、return 退出整个函数。多层嵌套时 break 只跳出最内层（部分语言支持带标签的 break 跳出指定层）。提前 return 是「守卫式」编程的核心，减少嵌套层级。",
       "lang_diff": "全部语言支持 break/continue/return。标签化 break：Java（outer: 标签）、Rust（'outer: 标签）；Python 无标签，用 else 子句或重构；JS 有标签 break label。for-else 是 Python 特色（循环正常结束执行 else）。",
       "exercises": [
-        { "type": "concept", "question": "嵌套循环中 break 默认跳出哪一层？", "options": ["最外层", "最内层", "所有层", "函数"], "answer": 1, "feedback": "break 默认只跳出最内层循环；跳出多层需标签（Java/Rust）。" },
-        { "type": "read", "question": "Rust 中带标签跳出外层循环的语法是？", "options": ["break 2", "break 'outer", "goto outer", "return outer"], "answer": 1, "feedback": "Rust 用 'outer: 标签，break 'outer 跳出指定层。" }
+        { "type": "concept", "question": "嵌套循环中 break 默认跳出哪一层？", "options": ["函数", "最外层", "最内层", "所有层"], "answer": 2, "feedback": "break 默认只跳出最内层循环；跳出多层需标签（Java/Rust）。" },
+        { "type": "read", "question": "Rust 中带标签跳出外层循环的语法是？", "options": ["break 'outer", "return outer", "goto outer", "break 2"], "answer": 0, "feedback": "Rust 用 'outer: 标签，break 'outer 跳出指定层。" }
       ]
     },
     { "id": "control.early-return", "module_id": "B04", "title": "嵌套控制流与提前返回", "status": "published",
@@ -337,8 +337,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "深嵌套的 if-for-if 让主流程淹没在缩进里。守卫式返回（guard clause）：先处理异常/边界情况并提前返回，让主逻辑保持在最左侧。原则：每个条件只增加一层缩进；超过三层考虑拆函数。",
       "lang_diff": "各语言通用，但语法便利度不同：Python 无显式区块符号更依赖缩进可读性；Rust 的 ? 运算符把错误提前返回语法化；Go 的多返回值 + if err != nil { return } 是强制守卫；JS/Java 用 if (!valid) return 守卫。",
       "exercises": [
-        { "type": "concept", "question": "守卫式返回（guard clause）的主要作用是？", "options": ["加快执行", "提前处理边界，让主逻辑左对齐减少嵌套", "隐藏错误", "增加安全性"], "answer": 1, "feedback": "先处理异常提前返回，主流程保持低缩进，可读性更好。" },
-        { "type": "read", "question": "Go 中 if err != nil { return err } 属于哪种模式？", "options": ["递归", "守卫式返回", "装饰器", "回调"], "answer": 1, "feedback": "错误即返回的守卫式处理，是 Go 的标准错误处理模式。" }
+        { "type": "concept", "question": "守卫式返回（guard clause）的主要作用是？", "options": ["隐藏错误", "提前处理边界，让主逻辑左对齐减少嵌套", "增加安全性", "加快执行"], "answer": 1, "feedback": "先处理异常提前返回，主流程保持低缩进，可读性更好。" },
+        { "type": "read", "question": "Go 中 if err != nil { return err } 属于哪种模式？", "options": ["装饰器", "递归", "回调", "守卫式返回"], "answer": 3, "feedback": "错误即返回的守卫式处理，是 Go 的标准错误处理模式。" }
       ]
     },
     { "id": "control.recursion", "module_id": "B04", "title": "递归与迭代的转换", "status": "published",
@@ -347,8 +347,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "递归：函数调用自身处理规模更小的同类问题，必须有基例（终止条件）否则栈溢出。迭代：用循环+状态变量达成同样效果。递归表达更贴近问题本质（树遍历、分治），迭代更高效（无调用开销）。尾递归可被优化为迭代（部分语言）。",
       "lang_diff": "全部语言支持递归。栈深度：Python 默认 1000（sys.setrecursionlimit）、JS 引擎相关（约 1 万）、Java/C++ 深（数万但有限）、Go 栈可增长（递归较深安全）、Rust 无尾调用优化保证。尾递归优化：Scheme/部分语言支持，主流语言多不保证。",
       "exercises": [
-        { "type": "concept", "question": "递归函数缺少基例（终止条件）会导致？", "options": ["编译错误", "栈溢出（无限递归）", "返回 null", "死锁"], "answer": 1, "feedback": "无终止条件的递归会无限调用直至栈溢出。" },
-        { "type": "concept", "question": "哪个语言的栈可动态增长，较深递归相对安全？", "options": ["Python", "Java", "Go", "C++"], "answer": 2, "feedback": "Go 的 goroutine 栈可增长，深递归比固定栈语言更安全。" }
+        { "type": "concept", "question": "递归函数缺少基例（终止条件）会导致？", "options": ["编译错误", "栈溢出（无限递归）", "死锁", "返回 null"], "answer": 1, "feedback": "无终止条件的递归会无限调用直至栈溢出。" },
+        { "type": "concept", "question": "哪个语言的栈可动态增长，较深递归相对安全？", "options": ["Python", "Go", "Java", "C++"], "answer": 1, "feedback": "Go 的 goroutine 栈可增长，深递归比固定栈语言更安全。" }
       ]
     },
     { "id": "control.comprehension", "module_id": "B04", "title": "推导式与流式操作", "status": "published",
@@ -357,8 +357,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "推导式/流式操作用「做什么」替代「怎么做」：map/filter/reduce 或列表推导把循环+条件+转换压缩为声明式表达式。读法：先描述转换规则，再指定数据来源与条件。超过两层的嵌套推导应拆回普通循环保可读性。",
       "lang_diff": "Python：列表推导 [x*2 for x in a if x>0]、生成器表达式；JS：数组 map/filter/reduce；Java：Stream map/filter/collect；C++：ranges（C++20）或算法+lambda；Go：无推导式，用 for 循环；Rust：迭代器链 iter().map().filter().collect()。",
       "exercises": [
-        { "type": "concept", "question": "Python 中 [x*x for x in nums if x>0] 属于？", "options": ["循环", "列表推导式", "函数", "生成器函数"], "answer": 1, "feedback": "列表推导式：声明式生成新列表。" },
-        { "type": "read", "question": "Rust 中 iter().map(f).collect() 的特点是？", "options": ["立即执行", "惰性（不 collect 不执行）", "多线程", "修改原集合"], "answer": 1, "feedback": "Rust 迭代器惰性，collect 等终端操作才触发执行。" }
+        { "type": "concept", "question": "Python 中 [x*x for x in nums if x>0] 属于？", "options": ["列表推导式", "循环", "生成器函数", "函数"], "answer": 0, "feedback": "列表推导式：声明式生成新列表。" },
+        { "type": "read", "question": "Rust 中 iter().map(f).collect() 的特点是？", "options": ["修改原集合", "多线程", "立即执行", "惰性（不 collect 不执行）"], "answer": 3, "feedback": "Rust 迭代器惰性，collect 等终端操作才触发执行。" }
       ]
     },
     { "id": "control.state-machine", "module_id": "B04", "title": "状态机的基础表达", "status": "published",
@@ -367,8 +367,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "当对象有多种互斥状态且状态间有明确转换规则时，用状态机：状态（State）× 事件（Event）→ 新状态。用枚举表示状态、match/switch 表达转换，比一堆布尔标志清晰且能防止非法状态组合。",
       "lang_diff": "Rust：enum + match 是状态机的理想载体（穷尽性保证）；Python：Enum + if/match；JS：对象查找表或 switch；Java：enum + switch；C++：enum class + switch；Go：自定义 int 类型 + switch。",
       "exercises": [
-        { "type": "concept", "question": "表达「订单：待支付→已支付→已发货→已完成」最适合的结构是？", "options": ["多个布尔字段", "枚举 + 状态机", "字符串拼接", "数组索引"], "answer": 1, "feedback": "枚举表达互斥状态，状态机管理转换，避免布尔组合的非法状态。" },
-        { "type": "concept", "question": "哪个语言的 enum + match 对状态机支持最强？", "options": ["JavaScript", "Python", "Rust", "Go"], "answer": 2, "feedback": "Rust 的 enum 可携带数据 + match 穷尽检查，是状态机最佳载体。" }
+        { "type": "concept", "question": "表达「订单：待支付→已支付→已发货→已完成」最适合的结构是？", "options": ["字符串拼接", "数组索引", "多个布尔字段", "枚举 + 状态机"], "answer": 3, "feedback": "枚举表达互斥状态，状态机管理转换，避免布尔组合的非法状态。" },
+        { "type": "concept", "question": "哪个语言的 enum + match 对状态机支持最强？", "options": ["Python", "Rust", "JavaScript", "Go"], "answer": 1, "feedback": "Rust 的 enum 可携带数据 + match 穷尽检查，是状态机最佳载体。" }
       ]
     },
 
@@ -379,8 +379,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "函数是「命名的可复用代码块」：声明定义签名（名字、参数、返回类型），调用传入实参执行。签名是契约——调用方只需知道「给什么、得什么」，无需关心内部实现。",
       "lang_diff": "Python：def name(args): return；JS：function name() {} 或箭头函数；Java：返回类型 name(参数类型 参数名)；C++：返回类型 name(参数)；Go：func name(参数) 返回类型；Rust：fn name(参数: 类型) -> 返回类型。",
       "exercises": [
-        { "type": "concept", "question": "Rust 函数签名的正确形式是？", "options": ["def f(x): return x", "fn f(x: i32) -> i32", "func f(x) int", "function f(x) {}"], "answer": 1, "feedback": "Rust 用 fn，参数与返回值都需类型标注。" },
-        { "type": "read", "question": "Go 声明返回 int 的函数语法是？", "options": ["def f() int", "func f() int", "fn f() -> int", "function f(): int"], "answer": 1, "feedback": "Go 用 func f() int，返回类型在参数后。" }
+        { "type": "concept", "question": "Rust 函数签名的正确形式是？", "options": ["function f(x) {}", "fn f(x: i32) -> i32", "def f(x): return x", "func f(x) int"], "answer": 1, "feedback": "Rust 用 fn，参数与返回值都需类型标注。" },
+        { "type": "read", "question": "Go 声明返回 int 的函数语法是？", "options": ["def f() int", "function f(): int", "fn f() -> int", "func f() int"], "answer": 3, "feedback": "Go 用 func f() int，返回类型在参数后。" }
       ]
     },
     { "id": "function.parameters-return", "module_id": "B05", "title": "参数、返回值与多返回值", "status": "published",
@@ -389,8 +389,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "参数是输入、返回值是输出。多数语言单返回值，多返回值需打包（元组/对象/结构体）。Go 原生多返回值（常用 value, err），Python 元组解包。返回值应表达「结果 + 错误/状态」，而非用输出参数或全局变量。",
       "lang_diff": "Python：return a, b（元组解包 x, y = f()）；JS：返回对象/数组 {x, y} 或 [x, y]；Java：单返回值，多值需封装对象；C++：std::pair/tuple 或引用参数；Go：func f() (int, error) 原生多返回；Rust：元组 (i32, String) 或结构体。",
       "exercises": [
-        { "type": "concept", "question": "Go 函数返回多个值的标准写法是？", "options": ["返回数组", "func f() (int, error)", "输出参数", "全局变量"], "answer": 1, "feedback": "Go 原生支持多返回值，错误处理用 (value, err)。" },
-        { "type": "read", "question": "Python 中 x, y = get_point() 利用了？", "options": ["多返回值", "元组解包", "列表", "字典"], "answer": 1, "feedback": "函数返回元组，调用处解包赋值。" }
+        { "type": "concept", "question": "Go 函数返回多个值的标准写法是？", "options": ["func f() (int,  error)", "全局变量", "返回数组", "输出参数"], "answer": 0, "feedback": "Go 原生支持多返回值，错误处理用 (value, err)。" },
+        { "type": "read", "question": "Python 中 x, y = get_point() 利用了？", "options": ["多返回值", "列表", "元组解包", "字典"], "answer": 2, "feedback": "函数返回元组，调用处解包赋值。" }
       ]
     },
     { "id": "function.named-default", "module_id": "B05", "title": "位置参数、命名参数与默认参数", "status": "published",
@@ -400,7 +400,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "lang_diff": "Python：def f(a, b=10) 支持命名调用 f(b=1)；JS：默认参数 function f(a=1)，无命名参数（用对象解构）；Java：无默认/命名参数（用重载/Builder）；C++：默认参数（仅尾部）无命名参数；Go：无默认/命名参数（用选项模式）；Rust：无默认/命名参数（用 Builder/Option）。",
       "exercises": [
         { "type": "concept", "question": "Python 中 def f(x=[]) 的陷阱是？", "options": ["每次调用新建列表", "默认参数只求值一次，列表跨调用共享", "语法错误", "性能问题"], "answer": 1, "feedback": "可变默认参数在函数定义时只求值一次，后续调用共享同一列表，应改为 x=None。" },
-        { "type": "concept", "question": "Java 中没有默认参数时的惯用替代是？", "options": ["全局变量", "方法重载或 Builder 模式", "递归", "异常"], "answer": 1, "feedback": "Java 用重载提供不同参数组合，复杂场景用 Builder。" }
+        { "type": "concept", "question": "Java 中没有默认参数时的惯用替代是？", "options": ["异常", "全局变量", "递归", "方法重载或 Builder 模式"], "answer": 3, "feedback": "Java 用重载提供不同参数组合，复杂场景用 Builder。" }
       ]
     },
     { "id": "function.variadic", "module_id": "B05", "title": "可变参数", "status": "published",
@@ -409,8 +409,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "可变参数（variadic）让函数接受任意个实参：*args（Python）、...rest（JS）、T... args（Java）、...args（Go）、模板参数包（C++）。函数内把它们当列表/切片/数组处理。调用处也可用展开语法把集合拆成独立参数。",
       "lang_diff": "Python：*args（元组）、**kwargs（关键字字典）；JS：...rest（数组）、展开 [...arr]；Java：String... args（数组）；C++：模板参数包 typename... Args；Go：...T（切片）；Rust：宏可变参数（函数本身不支持，用切片 &[T]）。",
       "exercises": [
-        { "type": "concept", "question": "Python 中接收任意个数位置参数的语法是？", "options": ["...args", "*args", "args[]", "**args"], "answer": 1, "feedback": "*args 收集为元组；**kwargs 收集关键字参数为字典。" },
-        { "type": "read", "question": "Go 中 func sum(nums ...int) 的 nums 类型是？", "options": ["数组", "切片 []int", "元组", "指针"], "answer": 1, "feedback": "...int 在函数内是 []int 切片。" }
+        { "type": "concept", "question": "Python 中接收任意个数位置参数的语法是？", "options": ["**args", "...args", "args[]", "*args"], "answer": 3, "feedback": "*args 收集为元组；**kwargs 收集关键字参数为字典。" },
+        { "type": "read", "question": "Go 中 func sum(nums ...int) 的 nums 类型是？", "options": ["数组", "指针", "切片 []int", "元组"], "answer": 2, "feedback": "...int 在函数内是 []int 切片。" }
       ]
     },
     { "id": "function.overload", "module_id": "B05", "title": "重载、可选参数与替代方案", "status": "published",
@@ -419,8 +419,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "重载：同名函数不同参数（类型或个数）共存，编译器按调用点选择。Python/JS 无真正重载（后定义覆盖前者）；Java/C++ 支持；Go/Rust 不支持（用不同函数名或泛型）。替代方案：默认参数、可选参数、泛型、Builder。",
       "lang_diff": "Python：无重载，用默认参数/单分派 functools.singledispatch；JS：无重载，检查参数类型/个数；Java：支持（按签名区分）；C++：支持（含模板）；Go：不支持（函数名区分）；Rust：不支持（泛型或 trait）。",
       "exercises": [
-        { "type": "concept", "question": "Java 中两个同名方法可以共存的条件是？", "options": ["不同返回类型", "不同参数签名（类型或个数）", "不同访问修饰符", "不能共存"], "answer": 1, "feedback": "重载按参数签名区分，仅返回类型不同不构成重载。" },
-        { "type": "concept", "question": "Go 中实现类似重载效果的惯用方式是？", "options": ["同名函数", "不同函数名或泛型", "默认参数", "宏"], "answer": 1, "feedback": "Go 不支持重载，用不同函数名或泛型（1.18+）。" }
+        { "type": "concept", "question": "Java 中两个同名方法可以共存的条件是？", "options": ["不同参数签名（类型或个数）", "不同返回类型", "不同访问修饰符", "不能共存"], "answer": 0, "feedback": "重载按参数签名区分，仅返回类型不同不构成重载。" },
+        { "type": "concept", "question": "Go 中实现类似重载效果的惯用方式是？", "options": ["默认参数", "同名函数", "不同函数名或泛型", "宏"], "answer": 2, "feedback": "Go 不支持重载，用不同函数名或泛型（1.18+）。" }
       ]
     },
     { "id": "function.first-class", "module_id": "B05", "title": "一等函数与函数值", "status": "published",
@@ -429,18 +429,18 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "一等函数：函数可赋值给变量、作为参数传递、作为返回值返回。这是函数式编程的基础，让「行为」可以像数据一样组合与传递。回调、策略模式、装饰器都建立在此之上。",
       "lang_diff": "Python：函数是对象（可赋值/传递）；JS：函数是一等值（const f = () => {}）；Java：lambda/方法引用（Comparator.comparing）；C++：函数指针/std::function；Go：函数类型 func(int) int 可作类型；Rust：fn 指针与闭包 trait（Fn/FnMut/FnOnce）。",
       "exercises": [
-        { "type": "concept", "question": "「函数是一等公民」意味着函数可以？", "options": ["只能调用", "赋值给变量、作为参数传递、作为返回值", "只在类中定义", "必须命名"], "answer": 1, "feedback": "一等函数可像普通值一样被传递、赋值和返回。" },
-        { "type": "read", "question": "Java 中把方法作为值传递的写法是？", "options": ["函数指针", "方法引用 Class::method 或 lambda", "宏", "注解"], "answer": 1, "feedback": "方法引用与 lambda 让 Java 函数可作为值传递。" }
+        { "type": "concept", "question": "「函数是一等公民」意味着函数可以？", "options": ["只能调用", "只在类中定义", "赋值给变量、作为参数传递、作为返回值", "必须命名"], "answer": 2, "feedback": "一等函数可像普通值一样被传递、赋值和返回。" },
+        { "type": "read", "question": "Java 中把方法作为值传递的写法是？", "options": ["宏", "方法引用 Class::method 或 lambda", "注解", "函数指针"], "answer": 1, "feedback": "方法引用与 lambda 让 Java 函数可作为值传递。" }
       ]
     },
     { "id": "function.lambda", "module_id": "B05", "title": "匿名函数 / Lambda", "status": "published",
       "objectives": ["用匿名函数表达简短逻辑", "理解 lambda 的捕获与语法"],
-      "prerequisites": ["function.first-class", "function.closure"],
+      "prerequisites": ["function.first-class"],
       "core": "匿名函数（lambda）是「没有名字的短函数」，适合一次性使用的逻辑（排序比较器、事件回调、集合转换）。语法越简短越好；逻辑复杂时应命名以提升可读性与可测试性。",
       "lang_diff": "Python：lambda x: x*2（仅单表达式）；JS：(x) => x*2 或 function；Java：(x, y) -> x+y；C++：[捕获](参数) -> 类型 { }；Go：func(x int) int { } 匿名函数；Rust：|x| x*2 闭包。",
       "exercises": [
-        { "type": "concept", "question": "Python lambda 的限制是？", "options": ["不能传参", "只能包含单个表达式", "不能返回值", "不能用变量"], "answer": 1, "feedback": "lambda 仅限单表达式，多语句需用 def。" },
-        { "type": "read", "question": "Rust 闭包 |x| x * 2 的类型推断依据是？", "options": ["必须标注", "由调用上下文推断参数与返回类型", "总是 i32", "宏"], "answer": 1, "feedback": "Rust 闭包参数与返回类型由使用处推断，可省略标注。" }
+        { "type": "concept", "question": "Python lambda 的限制是？", "options": ["不能用变量", "不能返回值", "不能传参", "只能包含单个表达式"], "answer": 3, "feedback": "lambda 仅限单表达式，多语句需用 def。" },
+        { "type": "read", "question": "Rust 闭包 |x| x * 2 的类型推断依据是？", "options": ["宏", "由调用上下文推断参数与返回类型", "必须标注", "总是 i32"], "answer": 1, "feedback": "Rust 闭包参数与返回类型由使用处推断，可省略标注。" }
       ]
     },
     { "id": "function.recursion", "module_id": "B05", "title": "递归函数", "status": "published",
@@ -449,8 +449,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "递归函数 = 基例（直接可解的最小规模）+ 递归步骤（把问题缩小后调用自身）。设计要点：每次递归必须向基例逼近；状态通过参数传递而非全局。阶乘、斐波那契、树遍历是经典练习。",
       "lang_diff": "各语言递归写法一致：基例判断 + 自身调用。栈深度限制不同（Python 默认 1000、Go 栈可增长）。树/图递归遍历比迭代更自然；线性递归可轻易改迭代。",
       "exercises": [
-        { "type": "concept", "question": "递归函数必须包含的要素是？", "options": ["循环", "基例（终止条件）与递归步骤", "全局变量", "异常处理"], "answer": 1, "feedback": "无基例会无限递归导致栈溢出。" },
-        { "type": "read", "question": "def fib(n): return n if n<2 else fib(n-1)+fib(n-2) 的问题是？", "options": ["语法错误", "指数级重复计算（无记忆化）", "栈溢出", "返回类型错误"], "answer": 1, "feedback": "朴素递归斐波那契是 O(2^n)，应加记忆化或改迭代。" }
+        { "type": "concept", "question": "递归函数必须包含的要素是？", "options": ["循环", "基例（终止条件）与递归步骤", "异常处理", "全局变量"], "answer": 1, "feedback": "无基例会无限递归导致栈溢出。" },
+        { "type": "read", "question": "def fib(n): return n if n<2 else fib(n-1)+fib(n-2) 的问题是？", "options": ["栈溢出", "返回类型错误", "语法错误", "指数级重复计算（无记忆化）"], "answer": 3, "feedback": "朴素递归斐波那契是 O(2^n)，应加记忆化或改迭代。" }
       ]
     },
     { "id": "function.pure-side-effect", "module_id": "B05", "title": "纯函数、副作用与可测试性", "status": "published",
@@ -459,7 +459,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "纯函数：相同输入总是相同输出、无副作用（不修改外部状态、不做 IO）。副作用：读写外部变量、打印、网络、修改入参。纯函数天然易测试、可缓存、可并行；工程原则：把业务逻辑做成纯函数，副作用集中在系统边界（IO 层）。",
       "lang_diff": "概念与语言无关，但强制力不同：Rust 的借用检查让副作用更显式；Haskell 完全强制纯；Python/JS 靠纪律。测试纯函数只需断言输入输出，无需 mock。",
       "exercises": [
-        { "type": "concept", "question": "下列哪项属于副作用？", "options": ["计算两数之和", "修改全局变量或打印日志", "返回新数组", "类型转换"], "answer": 1, "feedback": "修改外部状态或 IO（打印/网络/写文件）都是副作用。" },
+        { "type": "concept", "question": "下列哪项属于副作用？", "options": ["修改全局变量或打印日志", "类型转换", "返回新数组", "计算两数之和"], "answer": 0, "feedback": "修改外部状态或 IO（打印/网络/写文件）都是副作用。" },
         { "type": "concept", "question": "纯函数的最大测试优势是？", "options": ["更快", "相同输入恒同输出，断言简单无需 mock", "省内存", "可并行"], "answer": 1, "feedback": "纯函数确定性输出，测试只需给定输入断言输出。" }
       ]
     },
@@ -469,8 +469,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "高阶函数：接收函数作为参数或返回函数的函数。map/filter/reduce 是典型高阶函数——把「遍历」抽象化，把「做什么」作为函数参数传入。回调是被传递并在特定时机调用的函数，广泛用于事件处理与异步编程。",
       "lang_diff": "Python：map/filter/sorted(key=f)、装饰器；JS：数组 map/filter/reduce、addEventListener 回调；Java：Stream map/filter、Comparator；C++：std::transform/sort 传 lambda；Go：把函数当参数（sort.Slice(slice, less)）；Rust：迭代器适配器 map/filter、Fn trait。",
       "exercises": [
-        { "type": "concept", "question": "sorted(items, key=len) 中 key=len 体现了？", "options": ["递归", "高阶函数（函数作为参数）", "继承", "装饰器"], "answer": 1, "feedback": "sorted 接收 key 函数决定排序依据，是高阶函数应用。" },
-        { "type": "read", "question": "JS 中 arr.map(x => x*2) 的 map 属于？", "options": ["循环", "高阶函数", "类", "异常"], "answer": 1, "feedback": "map 接收转换函数并应用到每个元素，是高阶函数。" }
+        { "type": "concept", "question": "sorted(items, key=len) 中 key=len 体现了？", "options": ["装饰器", "高阶函数（函数作为参数）", "递归", "继承"], "answer": 1, "feedback": "sorted 接收 key 函数决定排序依据，是高阶函数应用。" },
+        { "type": "read", "question": "JS 中 arr.map(x => x*2) 的 map 属于？", "options": ["循环", "类", "高阶函数", "异常"], "answer": 2, "feedback": "map 接收转换函数并应用到每个元素，是高阶函数。" }
       ]
     },
 
@@ -481,8 +481,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "Unicode 给每个字符分配唯一码点（如 '中'=U+4E2D）；UTF-8 把码点编码为变长字节（ASCII 1 字节、中文 3 字节、emoji 4 字节）。处理文本时，按「字符」还是按「字节」操作结果完全不同——索引、长度、截取都需注意单位。",
       "lang_diff": "Python：str 按码点、len('中')=1；JS：String 按 UTF-16 码元、'😀'.length=2（需 [...s] 按码点）；Java：String 也是 UTF-16；C++：std::string 按字节；Go：string 按字节、range 按 rune；Rust：String UTF-8、chars() 按码点、索引需用切片字节。",
       "exercises": [
-        { "type": "concept", "question": "JS 中 \"😀\".length 的值是？", "options": ["1", "2", "4", "0"], "answer": 1, "feedback": "emoji 是代理对占 2 个 UTF-16 码元；[...\"😀\"].length=1。" },
-        { "type": "read", "question": "Python 中 len('中文') 的结果是？", "options": ["6", "2", "3", "1"], "answer": 1, "feedback": "Python str 按码点计数，'中文' 是 2 个字符。" }
+        { "type": "concept", "question": "JS 中 \"😀\".length 的值是？", "options": ["4", "0", "1", "2"], "answer": 3, "feedback": "emoji 是代理对占 2 个 UTF-16 码元；[...\"😀\"].length=1。" },
+        { "type": "read", "question": "Python 中 len('中文') 的结果是？", "options": ["3", "2", "1", "6"], "answer": 1, "feedback": "Python str 按码点计数，'中文' 是 2 个字符。" }
       ]
     },
     { "id": "string.immutability", "module_id": "B06", "title": "字符串不可变性", "status": "published",
@@ -491,8 +491,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "多数语言的字符串不可变：任何「修改」操作（拼接、替换、转大写）都生成新字符串。好处：可安全共享、可缓存（字符串池/驻留）；代价：循环内反复拼接产生大量临时对象（O(n²)），应改用 join/Builder。",
       "lang_diff": "Python：str 不可变，join 高效拼接；JS：String 不可变，模板字符串拼接；Java：String 不可变，StringBuilder 高效；C++：std::string 可变（例外）；Go：string 不可变，strings.Builder；Rust：String 可变（拥有所有权可 push_str）、&str 不可变。",
       "exercises": [
-        { "type": "concept", "question": "Python 中循环内 s += part 的问题与替代？", "options": ["语法错误", "O(n²) 效率差，应用 ''.join()", "内存泄漏", "无问题"], "answer": 1, "feedback": "不可变字符串每次拼接新建对象，应收集到列表后 join。" },
-        { "type": "read", "question": "Java 中高效拼接大量字符串应使用？", "options": ["+", "StringBuilder", "concat", "format"], "answer": 1, "feedback": "StringBuilder 避免反复创建新 String 对象。" }
+        { "type": "concept", "question": "Python 中循环内 s += part 的问题与替代？", "options": ["无问题", "O(n²) 效率差，应用 ''.join()", "语法错误", "内存泄漏"], "answer": 1, "feedback": "不可变字符串每次拼接新建对象，应收集到列表后 join。" },
+        { "type": "read", "question": "Java 中高效拼接大量字符串应使用？", "options": ["+", "format", "concat", "StringBuilder"], "answer": 3, "feedback": "StringBuilder 避免反复创建新 String 对象。" }
       ]
     },
     { "id": "string.concat-format", "module_id": "B06", "title": "拼接、插值与格式化", "status": "published",
@@ -501,8 +501,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "把变量嵌入字符串有三代方式：拼接（+）、格式化（% / format / printf）、插值（f-string / 模板字符串 / format!）。插值最直观安全，且支持格式说明（小数位、对齐、千分位）。避免用 + 拼接数字与字符串（隐式转换坑）。",
       "lang_diff": "Python：f'你好 {name}，{pi:.2f}'；JS：`你好 ${name}`；Java：String.format(\"你好 %s\", name)、\"%d\".formatted(21)；C++：std::format（C++20）或 sprintf；Go：fmt.Sprintf(\"你好 %s\", name)；Rust：format!(\"你好 {}\", name)、{name} 捕获。",
       "exercises": [
-        { "type": "concept", "question": "Python 中嵌入变量并保留两位小数的写法是？", "options": ["'%.2f' % x", "f'{x:.2f}'", "str(x)+'2'", "format(x,2)"], "answer": 1, "feedback": "f-string 的 :.2f 格式说明最直观。" },
-        { "type": "read", "question": "JS 中把变量嵌入字符串的现代写法是？", "options": ["\"+name+\"", "`${name}`", "name.concat()", "sprintf"], "answer": 1, "feedback": "模板字符串用反引号与 ${} 插值。" }
+        { "type": "concept", "question": "Python 中嵌入变量并保留两位小数的写法是？", "options": ["'%.2f' % x", "format(x, 2)", "str(x)+'2'", "f'{x:.2f}'"], "answer": 3, "feedback": "f-string 的 :.2f 格式说明最直观。" },
+        { "type": "read", "question": "JS 中把变量嵌入字符串的现代写法是？", "options": ["sprintf", "name.concat()", "\"+name+\"", "`${name}`"], "answer": 3, "feedback": "模板字符串用反引号与 ${} 插值。" }
       ]
     },
     { "id": "string.index-slice", "module_id": "B06", "title": "长度、索引与切片", "status": "published",
@@ -511,8 +511,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "长度统计、按下标访问、切片提取子串是文本处理基础。关键陷阱：索引单位是字符还是字节？切片区间是闭区间还是半开？负索引从尾部计数是部分语言特性。越界行为各语言不同（报错 vs undefined vs panic）。",
       "lang_diff": "Python：len、seq[i]（越界 IndexError）、seq[1:5] 半开、负索引；JS：length、charAt/at、slice(1,5) 半开、负索引 at(-1)；Java：length、charAt、substring(1,5)；C++：size、operator[]、substr(1,4) 长度制；Go：len（字节）、s[i]（字节）、s[1:5]；Rust：len（字节）、chars().nth()、&s[1..5]（字节索引）。",
       "exercises": [
-        { "type": "concept", "question": "Python 中 'hello'[1:4] 的结果是？", "options": ["'hel'", "'ell'", "'ello'", "'llo'"], "answer": 1, "feedback": "切片半开 [1,4)，取索引 1,2,3 → 'ell'。" },
-        { "type": "read", "question": "Rust 中直接 s[0] 对 String 的行为是？", "options": ["返回首字符", "编译错误（需 chars() 或字节索引）", "返回首字节", "panic"], "answer": 1, "feedback": "Rust 的 String 不支持按字符索引，避免 UTF-8 边界歧义。" }
+        { "type": "concept", "question": "Python 中 'hello'[1:4] 的结果是？", "options": ["'hel'", "'ello'", "'llo'", "'ell'"], "answer": 3, "feedback": "切片半开 [1,4)，取索引 1,2,3 → 'ell'。" },
+        { "type": "read", "question": "Rust 中直接 s[0] 对 String 的行为是？", "options": ["panic", "返回首字节", "返回首字符", "编译错误（需 chars() 或字节索引）"], "answer": 3, "feedback": "Rust 的 String 不支持按字符索引，避免 UTF-8 边界歧义。" }
       ]
     },
     { "id": "string.search-replace", "module_id": "B06", "title": "查找、替换、拆分与连接", "status": "published",
@@ -521,8 +521,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "文本操作四件套：查找（find/indexOf/contains）、替换（replace）、拆分（split）、连接（join）。要点：替换生成新串；split 与 join 互逆；find 找不到时的返回值各语言不同（-1 / undefined / None）。",
       "lang_diff": "Python：find（找不到-1）、replace、split、sep.join(list)；JS：indexOf（-1）、replace/replaceAll、split、join；Java：indexOf、replace、split、String.join；C++：find（npos）、replace、无内置 split；Go：strings.Index/Replace/Split/Join；Rust：find（Option）、replace、split、collect/join。",
       "exercises": [
-        { "type": "concept", "question": "Python 中 'a,b,c'.split(',') 的结果是？", "options": ["'a,b,c'", "['a','b','c']", "('a','b','c')", "'abc'"], "answer": 1, "feedback": "split 按分隔符拆分为列表。" },
-        { "type": "read", "question": "JS 中 ['a','b'].join('-') 的结果是？", "options": ["['a-b']", "'a-b'", "'ab'", "'a,b'"], "answer": 1, "feedback": "join 用指定分隔符连接数组元素。" }
+        { "type": "concept", "question": "Python 中 'a,b,c'.split(',') 的结果是？", "options": ["['a', 'b', 'c']", "'a, b, c'", "'abc'", "('a', 'b', 'c')"], "answer": 0, "feedback": "split 按分隔符拆分为列表。" },
+        { "type": "read", "question": "JS 中 ['a','b'].join('-') 的结果是？", "options": ["'a, b'", "'ab'", "'a-b'", "['a-b']"], "answer": 2, "feedback": "join 用指定分隔符连接数组元素。" }
       ]
     },
     { "id": "string.case-whitespace", "module_id": "B06", "title": "大小写与空白处理", "status": "published",
@@ -531,8 +531,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "输入规范化先处理大小写与空白：去首尾空白（trim/strip）、统一大小写（lower/upper）、压缩连续空白。这是比较、校验、去重前的标准步骤，避免 'Ada ' 与 'ada' 被判为不同。",
       "lang_diff": "Python：strip/lower/upper/title；JS：trim/toLowerCase/toUpperCase；Java：trim/strip（11+）/toLowerCase；C++：无内置（手写或 boost）；Go：strings.TrimSpace/ToLower/ToUpper；Rust：trim/to_lowercase/to_uppercase。",
       "exercises": [
-        { "type": "concept", "question": "Python 中去除字符串首尾空白的方法是？", "options": ["trim()", "strip()", "clean()", "remove()"], "answer": 1, "feedback": "strip() 去首尾空白；lstrip/rstrip 单侧。" },
-        { "type": "read", "question": "比较用户输入忽略大小写与空白应先？", "options": ["直接 ==", "规范化（strip + lower）后比较", "转数字", "替换空格"], "answer": 1, "feedback": "规范化后再比较，避免格式差异导致误判。" }
+        { "type": "concept", "question": "Python 中去除字符串首尾空白的方法是？", "options": ["clean()", "trim()", "strip()", "remove()"], "answer": 2, "feedback": "strip() 去首尾空白；lstrip/rstrip 单侧。" },
+        { "type": "read", "question": "比较用户输入忽略大小写与空白应先？", "options": ["转数字", "规范化（strip + lower）后比较", "替换空格", "直接 =="], "answer": 1, "feedback": "规范化后再比较，避免格式差异导致误判。" }
       ]
     },
     { "id": "string.builder", "module_id": "B06", "title": "字符串构建器与缓冲区", "status": "published",
@@ -542,7 +542,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "lang_diff": "Python：列表收集 + ''.join() 或 io.StringIO；JS：数组 push + join('')；Java：StringBuilder（非线程安全）/StringBuffer；C++：std::string +=（可变，可优化）/ostringstream；Go：strings.Builder；Rust：String::with_capacity + push_str。",
       "exercises": [
         { "type": "concept", "question": "构建大量字符串时，相比 s += 更高效的方式是？", "options": ["更多 +=", "用构建器/join 一次性生成", "转列表", "转字节"], "answer": 1, "feedback": "构建器/join 避免反复复制，O(n) 完成。" },
-        { "type": "read", "question": "Go 中高效构建字符串的类型是？", "options": ["string", "strings.Builder", "bytes.Buffer（通用）", "rune"], "answer": 1, "feedback": "strings.Builder 专为字符串构建优化。" }
+        { "type": "read", "question": "Go 中高效构建字符串的类型是？", "options": ["string", "rune", "strings.Builder", "bytes.Buffer（通用）"], "answer": 2, "feedback": "strings.Builder 专为字符串构建优化。" }
       ]
     },
     { "id": "string.regex", "module_id": "B06", "title": "正则表达式基础", "status": "published",
@@ -551,8 +551,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "正则表达式用紧凑语法描述文本模式：\\d 数字、\\w 单词字符、+ 一次以上、* 零次以上、? 可选、() 分组、| 或、[] 字符集。用途：校验（邮箱/手机号）、提取（捕获组）、替换。原则：简单匹配用字符串方法，复杂模式再用正则；正则不可读时加注释。",
       "lang_diff": "Python：re 模块（re.match/search/findall）；JS：RegExp（/\\d+/.test、str.match）；Java：Pattern/Matcher；C++：std::regex；Go：regexp 包；Rust：regex crate（标准库无）。",
       "exercises": [
-        { "type": "concept", "question": "正则 \\d+ 匹配什么？", "options": ["单个字母", "一个或多个数字", "小数点", "空白"], "answer": 1, "feedback": "\\d 是数字，+ 表示一次或多次。" },
-        { "type": "read", "question": "Python 中提取所有数字用 re 的哪个函数？", "options": ["re.compile", "re.findall(r'\\d+', s)", "re.split", "re.sub"], "answer": 1, "feedback": "findall 返回所有匹配结果的列表。" }
+        { "type": "concept", "question": "正则 \\d+ 匹配什么？", "options": ["小数点", "一个或多个数字", "单个字母", "空白"], "answer": 1, "feedback": "\\d 是数字，+ 表示一次或多次。" },
+        { "type": "read", "question": "Python 中提取所有数字用 re 的哪个函数？", "options": ["re.sub", "re.findall(r'\\d+',  s)", "re.split", "re.compile"], "answer": 1, "feedback": "findall 返回所有匹配结果的列表。" }
       ]
     },
     { "id": "string.parsing-validation", "module_id": "B06", "title": "文本解析与输入校验", "status": "published",
@@ -562,7 +562,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "lang_diff": "Python：split/int() + try/正则；JS：Number/parseInt + 正则；Java：Integer.parseInt + 正则，受检异常强制处理；C++：std::stoi + 异常；Go：strconv + error 检查；Rust：parse::<T>() 返回 Result 强制处理。",
       "exercises": [
         { "type": "concept", "question": "处理用户输入数字最安全的做法是？", "options": ["直接 int(input)", "先校验格式再解析并处理失败", "忽略错误", "用正则提取全部数字"], "answer": 1, "feedback": "先校验格式、再解析、并给非法输入明确提示。" },
-        { "type": "concept", "question": "Rust 中解析失败的处理方式是？", "options": ["panic", "parse 返回 Result，用 ? 或 match 处理", "返回 0", "返回 -1"], "answer": 1, "feedback": "parse::<T>() 返回 Result，强制处理解析失败。" }
+        { "type": "concept", "question": "Rust 中解析失败的处理方式是？", "options": ["返回 -1", "parse 返回 Result，用 ? 或 match 处理", "返回 0", "panic"], "answer": 1, "feedback": "parse::<T>() 返回 Result，强制处理解析失败。" }
       ]
     },
 
@@ -573,8 +573,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "数组：定长连续存储，随机访问 O(1)；动态数组/列表：自动扩容，尾部追加摊还 O(1)，中间插入 O(n)。选择：已知长度用定长，需要增删用动态列表；头部频繁插入考虑链表或双端队列。",
       "lang_diff": "Python：list 动态列表；JS：Array 动态（可稀疏）；Java：数组定长、ArrayList 动态；C++：数组定长、std::vector 动态；Go：数组定长 [n]T、slice 动态；Rust：数组 [T; N] 定长、Vec 动态。",
       "exercises": [
-        { "type": "concept", "question": "动态列表尾部追加的时间复杂度是？", "options": ["O(1) 摊还", "O(n)", "O(log n)", "O(n²)"], "answer": 0, "feedback": "尾部追加摊还 O(1)（扩容时复制，但均摊后 O(1)）。" },
-        { "type": "read", "question": "Go 中定长数组与动态切片的类型写法分别是？", "options": ["[]int 与 [5]int", "[5]int 与 []int", "array 与 slice", "list 与 array"], "answer": 1, "feedback": "[5]int 是定长数组，[]int 是动态切片。" }
+        { "type": "concept", "question": "动态列表尾部追加的时间复杂度是？", "options": ["O(n)", "O(1) 摊还", "O(n²)", "O(log n)"], "answer": 1, "feedback": "尾部追加摊还 O(1)（扩容时复制，但均摊后 O(1)）。" },
+        { "type": "read", "question": "Go 中定长数组与动态切片的类型写法分别是？", "options": ["array 与 slice", "[]int 与 [5]int", "list 与 array", "[5]int 与 []int"], "answer": 3, "feedback": "[5]int 是定长数组，[]int 是动态切片。" }
       ]
     },
     { "id": "collection.tuple", "module_id": "B07", "title": "元组与固定结构", "status": "published",
@@ -583,8 +583,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "元组（tuple）是固定长度、通常异构的有序组合，适合表达「一组相关的不同类型值」（坐标、键值、多返回值）。与列表的区别：元组强调结构固定、不可变，列表强调同构可变序列。解构让元组使用更便捷。",
       "lang_diff": "Python：tuple 不可变、解包 x, y = t；JS：无原生元组（数组或对象代替）；Java：无原生元组（record/Pair）；C++：std::tuple/pair、结构化绑定 auto [a,b]；Go：无元组（多返回值代替）；Rust：tuple (i32, &str)、解包 let (a, b) = t。",
       "exercises": [
-        { "type": "concept", "question": "Python 元组与列表的核心区别是？", "options": ["元组更快", "元组不可变、适合固定结构", "元组更大", "无区别"], "answer": 1, "feedback": "元组不可变、表达固定结构；列表可变、表达动态序列。" },
-        { "type": "read", "question": "C++ 中解包 std::pair 的现代语法是？", "options": ["pair.first/second", "auto [a, b] = pair（结构化绑定）", "tuple_get", "unpack"], "answer": 1, "feedback": "C++17 结构化绑定可直接解包 tuple/pair。" }
+        { "type": "concept", "question": "Python 元组与列表的核心区别是？", "options": ["元组不可变、适合固定结构", "元组更快", "无区别", "元组更大"], "answer": 0, "feedback": "元组不可变、表达固定结构；列表可变、表达动态序列。" },
+        { "type": "read", "question": "C++ 中解包 std::pair 的现代语法是？", "options": ["tuple_get", "auto [a,  b] = pair（结构化绑定）", "unpack", "pair.first/second"], "answer": 1, "feedback": "C++17 结构化绑定可直接解包 tuple/pair。" }
       ]
     },
     { "id": "collection.set", "module_id": "B07", "title": "集合 Set", "status": "published",
@@ -593,8 +593,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "集合（Set）存储不重复元素：自动去重、成员判断 O(1)、支持交并差集运算。元素需可哈希（不可变）。适用：去重、快速成员判断、求两个集合的关系。不保证顺序（部分实现有序）。",
       "lang_diff": "Python：set（{1,2,3}）、frozenset 不可变、& | - 运算；JS：Set（new Set()）、has/add；Java：HashSet（无序）、TreeSet（有序）、LinkedHashSet；C++：std::unordered_set/std::set；Go：无原生 Set（map[T]bool 模拟）；Rust：HashSet/BTreeSet。",
       "exercises": [
-        { "type": "concept", "question": "用集合快速判断元素是否存在的时间复杂度是？", "options": ["O(n)", "O(1)（哈希）", "O(log n)", "O(n²)"], "answer": 1, "feedback": "哈希集合成员判断平均 O(1)。" },
-        { "type": "read", "question": "Go 中实现集合的惯用方式是？", "options": ["set 类型", "map[T]bool 或 map[T]struct{}", "slice", "array"], "answer": 1, "feedback": "Go 无原生 Set，用 map 的键作为集合元素。" }
+        { "type": "concept", "question": "用集合快速判断元素是否存在的时间复杂度是？", "options": ["O(n²)", "O(log n)", "O(n)", "O(1)（哈希）"], "answer": 3, "feedback": "哈希集合成员判断平均 O(1)。" },
+        { "type": "read", "question": "Go 中实现集合的惯用方式是？", "options": ["map[T]bool 或 map[T]struct{}", "array", "slice", "set 类型"], "answer": 0, "feedback": "Go 无原生 Set，用 map 的键作为集合元素。" }
       ]
     },
     { "id": "collection.stack-queue", "module_id": "B07", "title": "栈、队列与双端队列", "status": "published",
@@ -603,8 +603,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "栈（LIFO）：push 入栈、pop 出栈，用于括号匹配、函数调用、撤销操作；队列（FIFO）：enqueue 入队、dequeue 出队，用于任务调度、BFS。双端队列（deque）两端都可进出，更灵活。列表尾部操作 O(1)，头部操作 O(n)，需注意。",
       "lang_diff": "Python：list（栈 append/pop）、collections.deque（队列）；JS：数组 push/pop（栈）、push/shift（队列，shift 慢）；Java：ArrayDeque（栈与队列）、Stack（过时）；C++：std::stack/queue/deque；Go：slice 模拟栈、channel 或容器模拟队列；Rust：Vec 作栈、VecDeque 作队列。",
       "exercises": [
-        { "type": "concept", "question": "栈（LIFO）的典型应用是？", "options": ["BFS", "括号匹配与撤销操作", "任务调度", "排序"], "answer": 1, "feedback": "栈后进先出，适合括号匹配、函数调用栈、撤销。" },
-        { "type": "read", "question": "JS 数组作队列时出队操作为何低效？", "options": ["语法复杂", "shift 头部删除需移动所有元素 O(n)", "内存不足", "无问题"], "answer": 1, "feedback": "shift 是 O(n)；高频队列应用专用结构或链表。" }
+        { "type": "concept", "question": "栈（LIFO）的典型应用是？", "options": ["排序", "任务调度", "BFS", "括号匹配与撤销操作"], "answer": 3, "feedback": "栈后进先出，适合括号匹配、函数调用栈、撤销。" },
+        { "type": "read", "question": "JS 数组作队列时出队操作为何低效？", "options": ["语法复杂", "内存不足", "无问题", "shift 头部删除需移动所有元素 O(n)"], "answer": 3, "feedback": "shift 是 O(n)；高频队列应用专用结构或链表。" }
       ]
     },
     { "id": "collection.crud", "module_id": "B07", "title": "增删改查", "status": "published",
@@ -613,8 +613,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "增（append/push/add/insert）、删（remove/pop/delete）、改（索引赋值）、查（索引/查找/in）。效率：尾部增删 O(1)、中间增删 O(n)、按下标查 O(1)、按值查 O(n)。映射的按键操作均 O(1)。",
       "lang_diff": "Python：append/insert/remove/pop/del；JS：push/splice/pop/shift/unshift/delete；Java：add/remove/set/get；C++：push_back/insert/erase/operator[]；Go：append/slice 删除（无内置 remove）；Rust：push/insert/remove/truncate。",
       "exercises": [
-        { "type": "concept", "question": "在动态列表中间插入元素的时间复杂度是？", "options": ["O(1)", "O(n)", "O(log n)", "O(n log n)"], "answer": 1, "feedback": "中间插入需移动后续元素，O(n)；尾部 O(1) 摊还。" },
-        { "type": "read", "question": "Go 中删除切片第 i 个元素的惯用法是？", "options": ["delete(s, i)", "append(s[:i], s[i+1:]...)", "s.remove(i)", "pop(s, i)"], "answer": 1, "feedback": "Go 无内置删除，用切片拼接跳过目标元素。" }
+        { "type": "concept", "question": "在动态列表中间插入元素的时间复杂度是？", "options": ["O(n)", "O(log n)", "O(n log n)", "O(1)"], "answer": 0, "feedback": "中间插入需移动后续元素，O(n)；尾部 O(1) 摊还。" },
+        { "type": "read", "question": "Go 中删除切片第 i 个元素的惯用法是？", "options": ["append(s[:i],  s[i+1:]...)", "s.remove(i)", "pop(s,  i)", "delete(s,  i)"], "answer": 0, "feedback": "Go 无内置删除，用切片拼接跳过目标元素。" }
       ]
     },
     { "id": "collection.copy", "module_id": "B07", "title": "复制、引用与深浅拷贝", "status": "published",
@@ -623,8 +623,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "赋值对象/集合通常是「复制引用」——两个名字指向同一对象，改一个影响另一个。浅拷贝：复制容器本身，内部嵌套对象仍共享；深拷贝：递归复制全部嵌套。需要独立副本时务必显式拷贝，嵌套结构需深拷贝。",
       "lang_diff": "Python：= 引用、list.copy()/[:] 浅拷贝、copy.deepcopy 深拷贝；JS：= 引用、[...arr]/Object.assign 浅拷贝、structuredClone 深拷贝；Java：= 引用、clone 浅拷贝、序列化深拷贝；C++：= 值拷贝（默认深拷贝值语义）；Go：= 值拷贝（slice 共享底层数组）、copy()；Rust：= 移动、clone() 显式深拷贝。",
       "exercises": [
-        { "type": "concept", "question": "Python 中 b = a（a 是列表）后修改 b，a 会？", "options": ["不变", "一起变（共享引用）", "报错", "变为副本"], "answer": 1, "feedback": "赋值是引用拷贝，共享同一对象；独立副本用 a.copy() 或 a[:]。" },
-        { "type": "read", "question": "JS 中深拷贝嵌套对象的现代方法是？", "options": ["[...obj]", "structuredClone(obj)", "Object.assign({}, obj)", "JSON.parse(JSON.stringify(obj))"], "answer": 1, "feedback": "structuredClone 递归深拷贝；浅拷贝方法对嵌套对象仍共享。" }
+        { "type": "concept", "question": "Python 中 b = a（a 是列表）后修改 b，a 会？", "options": ["报错", "一起变（共享引用）", "变为副本", "不变"], "answer": 1, "feedback": "赋值是引用拷贝，共享同一对象；独立副本用 a.copy() 或 a[:]。" },
+        { "type": "read", "question": "JS 中深拷贝嵌套对象的现代方法是？", "options": ["JSON.parse(JSON.stringify(obj))", "[...obj]", "structuredClone(obj)", "Object.assign({},  obj)"], "answer": 2, "feedback": "structuredClone 递归深拷贝；浅拷贝方法对嵌套对象仍共享。" }
       ]
     },
     { "id": "collection.sort-search", "module_id": "B07", "title": "排序、查找与去重", "status": "published",
@@ -633,8 +633,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "排序：稳定 vs 不稳定、自定义比较器（key/comparator）。查找：线性 O(n) vs 有序二分 O(log n)。去重：保序用「见过的加入集合判断」、不保序直接转集合。排序是许多算法的前置（二分查找、合并区间）。",
       "lang_diff": "Python：sorted(list, key=f) 返回新列表、list.sort() 原地、bisect 二分；JS：arr.sort(compareFn) 原地（默认字典序！）、find/findIndex、Set 去重；Java：Collections.sort/Arrays.sort + Comparator、binarySearch；C++：std::sort/binary_search；Go：sort.Slice/sort.Ints；Rust：vec.sort()/sort_by/binary_search。",
       "exercises": [
-        { "type": "concept", "question": "JS 中 [10, 9, 1].sort() 的默认结果是？", "options": ["[1,9,10]", "[1,10,9]（按字典序）", "[10,9,1]", "报错"], "answer": 1, "feedback": "sort() 默认按字符串字典序，数字排序需 arr.sort((a,b)=>a-b)。" },
-        { "type": "read", "question": "Python 中保序去重的惯用法是？", "options": ["set(lst)", "list(dict.fromkeys(lst))", "lst.unique()", "sorted(set(lst))"], "answer": 1, "feedback": "dict.fromkeys 保序去重；set 不保序。" }
+        { "type": "concept", "question": "JS 中 [10, 9, 1].sort() 的默认结果是？", "options": ["[1, 9, 10]", "报错", "[1, 10, 9]（按字典序）", "[10, 9, 1]"], "answer": 2, "feedback": "sort() 默认按字符串字典序，数字排序需 arr.sort((a,b)=>a-b)。" },
+        { "type": "read", "question": "Python 中保序去重的惯用法是？", "options": ["set(lst)", "lst.unique()", "list(dict.fromkeys(lst))", "sorted(set(lst))"], "answer": 2, "feedback": "dict.fromkeys 保序去重；set 不保序。" }
       ]
     },
     { "id": "collection.filter-map-reduce", "module_id": "B07", "title": "过滤、映射与归约", "status": "published",
@@ -643,7 +643,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "声明式集合处理三件套：filter 保留满足条件的元素、map 逐个转换、reduce 归约为单一值。链式组合形成数据管线（filter→map→reduce），比显式循环更聚焦意图。惰性实现（流/迭代器）可处理大集合。",
       "lang_diff": "Python：filter/map（惰性）或推导式、functools.reduce；JS：arr.filter/map/reduce；Java：Stream filter/map/reduce/collect；C++：ranges::views::filter/transform（C++20）；Go：无内置，for 循环；Rust：iter().filter().map().fold()/collect()。",
       "exercises": [
-        { "type": "concept", "question": "把集合中所有元素求和应该用？", "options": ["map", "filter", "reduce/fold", "sort"], "answer": 2, "feedback": "reduce/fold 把集合归约为单一值。" },
+        { "type": "concept", "question": "把集合中所有元素求和应该用？", "options": ["reduce/fold", "sort", "map", "filter"], "answer": 0, "feedback": "reduce/fold 把集合归约为单一值。" },
         { "type": "read", "question": "JS 中 arr.filter(x => x > 0).map(x => x * 2) 的结果是？", "options": ["原数组", "先过滤正数再翻倍的新数组", "排序", "报错"], "answer": 1, "feedback": "链式：filter 先筛选，map 再转换，返回新数组。" }
       ]
     },
@@ -654,7 +654,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "lang_diff": "Python：__eq__/__hash__（dataclass 自动生成，mutable 需 frozen=True）；JS：对象作键按引用身份；Java：equals/hashCode 契约；C++：operator== 与 hash 特化；Go：可比较类型（struct 逐字段）可作键；Rust：Eq/Hash derive。",
       "exercises": [
         { "type": "concept", "question": "Java 中重写 equals 但不重写 hashCode 的后果是？", "options": ["编译错误", "HashSet/HashMap 中对象无法正确查找", "无影响", "更快"], "answer": 1, "feedback": "equals 相等必须 hashCode 相同，否则哈希容器行为错误。" },
-        { "type": "concept", "question": "Python 可变 dataclass 要可作集合元素需？", "options": ["无需处理", "frozen=True（不可变才可哈希）", "加 __iter__", "转字符串"], "answer": 1, "feedback": "可变对象默认不可哈希；frozen=True 使其可哈希。" }
+        { "type": "concept", "question": "Python 可变 dataclass 要可作集合元素需？", "options": ["无需处理", "转字符串", "加 __iter__", "frozen=True（不可变才可哈希）"], "answer": 3, "feedback": "可变对象默认不可哈希；frozen=True 使其可哈希。" }
       ]
     },
     { "id": "collection.complexity", "module_id": "B07", "title": "常见操作的时间复杂度", "status": "published",
@@ -663,8 +663,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "容器选型看操作复杂度：数组/动态列表——按下标 O(1)、中间插删 O(n)、按值查 O(n)；链表——头尾 O(1)、随机访问 O(n)；哈希表——按键 O(1)、无序；有序树——O(log n)、有序。识别隐式 O(n)：in 判断、shift、中间 insert。",
       "lang_diff": "各语言同名容器复杂度一致（list/vector/ArrayList 均为动态数组）。特例：Python dict 与 JS Map 均哈希 O(1)；Java LinkedList 与 ArrayList 差异大；Go slice 头部操作需重新分配。",
       "exercises": [
-        { "type": "concept", "question": "按下标访问动态列表元素的时间复杂度是？", "options": ["O(n)", "O(1)", "O(log n)", "O(n log n)"], "answer": 1, "feedback": "连续内存 + 下标计算，O(1) 随机访问。" },
-        { "type": "concept", "question": "频繁在序列头部插入元素应选择？", "options": ["动态数组", "链表或双端队列", "哈希表", "栈"], "answer": 1, "feedback": "链表/双端队列头部插入 O(1)；动态数组头部插入 O(n)。" }
+        { "type": "concept", "question": "按下标访问动态列表元素的时间复杂度是？", "options": ["O(n)", "O(1)", "O(n log n)", "O(log n)"], "answer": 1, "feedback": "连续内存 + 下标计算，O(1) 随机访问。" },
+        { "type": "concept", "question": "频繁在序列头部插入元素应选择？", "options": ["动态数组", "栈", "哈希表", "链表或双端队列"], "answer": 3, "feedback": "链表/双端队列头部插入 O(1)；动态数组头部插入 O(n)。" }
       ]
     },
 
@@ -675,8 +675,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "构造器在创建对象时初始化字段，保证对象一创建就处于合法状态（不变量成立）。要点：必填字段通过构造参数传入，可选字段给默认值；构造期不应做耗时/可失败操作（放工厂方法）。Rust/Go 无构造器，用字面量或工厂函数。",
       "lang_diff": "Python：__init__(self) 初始化；JS：constructor()；Java：构造方法与类同名、new 调用；C++：构造函数 + 初始化列表（成员初始化优先用初始化列表）；Go：无构造器，NewT() 工厂函数惯用；Rust：无构造器，T::new() 关联函数惯用。",
       "exercises": [
-        { "type": "concept", "question": "Go 中初始化结构体的惯用方式是？", "options": ["constructor", "NewT() 工厂函数或字面量", "__init__", "new T()"], "answer": 1, "feedback": "Go 无构造器，用工厂函数或结构体字面量初始化。" },
-        { "type": "read", "question": "C++ 成员初始化的推荐方式是？", "options": ["构造体内赋值", "初始化列表", "静态方法", "宏"], "answer": 1, "feedback": "初始化列表直接构造成员，避免先默认构造再赋值。" }
+        { "type": "concept", "question": "Go 中初始化结构体的惯用方式是？", "options": ["NewT() 工厂函数或字面量", "new T()", "__init__", "constructor"], "answer": 0, "feedback": "Go 无构造器，用工厂函数或结构体字面量初始化。" },
+        { "type": "read", "question": "C++ 成员初始化的推荐方式是？", "options": ["构造体内赋值", "宏", "静态方法", "初始化列表"], "answer": 3, "feedback": "初始化列表直接构造成员，避免先默认构造再赋值。" }
       ]
     },
     { "id": "model.field-property-method", "module_id": "B08", "title": "字段、属性与方法", "status": "published",
@@ -685,8 +685,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "字段存数据、方法定义行为、属性是对字段访问的受控封装（getter/setter）。方法通过 self/this 访问所属对象的数据。属性让「像访问字段一样」调用方法，便于在不改接口的前提下加校验/计算逻辑。",
       "lang_diff": "Python：实例属性 self.x、方法 def m(self)、@property 受控属性；JS：this.x、方法、get/set 访问器；Java：字段、方法、getter/setter 惯例（无内置属性）；C++：成员变量、成员函数、无属性语法；Go：结构体字段、func (r T) M() 接收者方法；Rust：结构体字段、impl 中 fn m(&self)。",
       "exercises": [
-        { "type": "concept", "question": "Python 中把方法伪装成属性访问的装饰器是？", "options": ["@staticmethod", "@property", "@classmethod", "@dataclass"], "answer": 1, "feedback": "@property 让 obj.x 调用方法而无需括号。" },
-        { "type": "read", "question": "Rust 中读取自身数据的方法签名是？", "options": ["fn m(self)", "fn m(&self)", "fn m(&mut self)", "fn m()"], "answer": 1, "feedback": "&self 只读借用；&mut self 可变借用；self 移动所有权。" }
+        { "type": "concept", "question": "Python 中把方法伪装成属性访问的装饰器是？", "options": ["@staticmethod", "@classmethod", "@dataclass", "@property"], "answer": 3, "feedback": "@property 让 obj.x 调用方法而无需括号。" },
+        { "type": "read", "question": "Rust 中读取自身数据的方法签名是？", "options": ["fn m(self)", "fn m()", "fn m(&mut self)", "fn m(&self)"], "answer": 3, "feedback": "&self 只读借用；&mut self 可变借用；self 移动所有权。" }
       ]
     },
     { "id": "model.encapsulation", "module_id": "B08", "title": "访问控制与封装", "status": "published",
@@ -695,8 +695,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "封装：把内部状态设为私有，只通过公开方法访问。好处：不变量可控（字段不会被随意改坏）、实现可换（接口不变）。原则：默认私有，按需开放；不要为每个字段都生成 getter/setter（那是把私有改名的伪封装）。",
       "lang_diff": "Python：约定 _private（非强制）/ __name（名称改写）；JS：#private 字段（ES2022）；Java：private/protected/public 强制；C++：private/public 访问修饰符；Go：小写包内私有、大写导出；Rust：默认私有、pub 公开。",
       "exercises": [
-        { "type": "concept", "question": "Go 中包内私有标识符的规则是？", "options": ["private 关键字", "首字母小写", "_ 前缀", "internal 包"], "answer": 1, "feedback": "Go 用首字母大小写控制可见性：小写包内私有，大写导出。" },
-        { "type": "concept", "question": "JS 中真正的私有字段语法是？", "options": ["_x（约定）", "#x", "private x", "x$"], "answer": 1, "feedback": "#x 是 ES2022 真正的私有字段，外部无法访问。" }
+        { "type": "concept", "question": "Go 中包内私有标识符的规则是？", "options": ["private 关键字", "首字母小写", "internal 包", "_ 前缀"], "answer": 1, "feedback": "Go 用首字母大小写控制可见性：小写包内私有，大写导出。" },
+        { "type": "concept", "question": "JS 中真正的私有字段语法是？", "options": ["#x", "private x", "x$", "_x（约定）"], "answer": 0, "feedback": "#x 是 ES2022 真正的私有字段，外部无法访问。" }
       ]
     },
     { "id": "model.static-instance", "module_id": "B08", "title": "实例成员与静态成员", "status": "published",
@@ -705,8 +705,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "实例成员属于每个对象（各自独立）；静态/类成员属于类型本身（所有实例共享一份，如计数器、常量、工厂方法）。访问：实例成员通过对象、静态成员通过类型。静态方法不依赖实例状态。",
       "lang_diff": "Python：实例属性 self.x、类属性（类体定义）、@staticmethod/@classmethod；JS：static 关键字；Java：static 字段/方法（类名访问）；C++：static 成员（类外初始化）；Go：无静态（包级变量代替）；Rust：无 static 方法成员（关联函数 Self::new 代替）、const/static 项。",
       "exercises": [
-        { "type": "concept", "question": "Java 中静态成员的访问方式是？", "options": ["对象.静态成员", "类名.静态成员（也可对象但不推荐）", "this.静态成员", "只能实例访问"], "answer": 1, "feedback": "静态成员属于类，应通过类名访问。" },
-        { "type": "concept", "question": "Python 中所有实例共享一份的属性定义在？", "options": ["__init__ 中 self.x", "类体中直接定义（类属性）", "@property", "全局"], "answer": 1, "feedback": "类体直接定义的是类属性，所有实例共享；__init__ 中 self.x 是实例属性。" }
+        { "type": "concept", "question": "Java 中静态成员的访问方式是？", "options": ["对象.静态成员", "只能实例访问", "this.静态成员", "类名.静态成员（也可对象但不推荐）"], "answer": 3, "feedback": "静态成员属于类，应通过类名访问。" },
+        { "type": "concept", "question": "Python 中所有实例共享一份的属性定义在？", "options": ["全局", "类体中直接定义（类属性）", "__init__ 中 self.x", "@property"], "answer": 1, "feedback": "类体直接定义的是类属性，所有实例共享；__init__ 中 self.x 是实例属性。" }
       ]
     },
     { "id": "model.inheritance", "module_id": "B08", "title": "继承与方法重写", "status": "published",
@@ -715,8 +715,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "继承：子类获得父类的字段与方法，并可重写（override）特定行为。调用时按实际类型分派（多态）。要点：is-a 关系才用继承；重写保持签名一致并可用 super 调用父类实现；构造时先初始化父类。",
       "lang_diff": "Python：class B(A)、super().method()；JS：class B extends A、super.method()；Java：extends（单继承）、@Override、super；C++：class B : public A、virtual 虚函数；Go：无继承（组合嵌入代替）；Rust：无继承（trait 默认实现 + 组合）。",
       "exercises": [
-        { "type": "concept", "question": "Java 中重写父类方法应加的注解是？", "options": ["@Override", "@Inherited", "@Super", "@Virtual"], "answer": 0, "feedback": "@Override 让编译器检查确实重写了父类方法，防止签名写错。" },
-        { "type": "concept", "question": "Go 中实现代码复用的方式是？", "options": ["继承", "结构体嵌入（组合）", "虚函数", "模板"], "answer": 1, "feedback": "Go 无继承，用嵌入（组合）获得字段与方法。" }
+        { "type": "concept", "question": "Java 中重写父类方法应加的注解是？", "options": ["@Virtual", "@Super", "@Override", "@Inherited"], "answer": 2, "feedback": "@Override 让编译器检查确实重写了父类方法，防止签名写错。" },
+        { "type": "concept", "question": "Go 中实现代码复用的方式是？", "options": ["模板", "继承", "结构体嵌入（组合）", "虚函数"], "answer": 2, "feedback": "Go 无继承，用嵌入（组合）获得字段与方法。" }
       ]
     },
     { "id": "model.composition", "module_id": "B08", "title": "组合优于继承", "status": "published",
@@ -725,8 +725,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "继承强耦合（子类依赖父类实现）、层级深难维护、多重继承复杂。组合：把能力拆成小对象，用「持有」代替「是」——has-a 替代 is-a。好处：运行时灵活替换、依赖明确、可测试。经验法则：优先组合，继承只用于真正的 is-a 且层级浅。",
       "lang_diff": "Go/Rust 从设计上只支持组合（无继承），验证了其可行性；Python/JS/Java/C++ 都可用组合替代继承。设计模式（策略/装饰器/适配器）本质是组合。",
       "exercises": [
-        { "type": "concept", "question": "「组合优于继承」的核心优势是？", "options": ["更快", "松耦合、可运行时替换、易测试", "省内存", "语法简单"], "answer": 1, "feedback": "组合依赖明确、可替换，避免继承的强耦合。" },
-        { "type": "concept", "question": "表达「车有引擎」应该用？", "options": ["车继承引擎", "车持有引擎（组合）", "引擎继承车", "接口"], "answer": 1, "feedback": "has-a 关系用组合；is-a 才考虑继承。" }
+        { "type": "concept", "question": "「组合优于继承」的核心优势是？", "options": ["更快", "省内存", "松耦合、可运行时替换、易测试", "语法简单"], "answer": 2, "feedback": "组合依赖明确、可替换，避免继承的强耦合。" },
+        { "type": "concept", "question": "表达「车有引擎」应该用？", "options": ["车持有引擎（组合）", "接口", "引擎继承车", "车继承引擎"], "answer": 0, "feedback": "has-a 关系用组合；is-a 才考虑继承。" }
       ]
     },
     { "id": "model.interface-trait", "module_id": "B08", "title": "接口、协议与 Trait", "status": "published",
@@ -735,8 +735,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "接口/trait/协议定义「能做什么」的契约而不关心「怎么做」：任何类型实现了要求的方法即满足接口。这让代码面向抽象而非具体类型编程（依赖倒置）。关键差异：显式实现（Java/C++ 需声明 implements）vs 隐式实现（Go/Python 鸭子类型，有方法即满足）。",
       "lang_diff": "Python：鸭子类型 + Protocol（类型标注）；JS：鸭子类型（结构匹配）；Java：interface + implements 显式；C++：抽象基类（纯虚函数）/ concept（C++20）；Go：interface 隐式实现（有方法即满足）；Rust：trait + impl 显式实现（但无需在类型处声明）。",
       "exercises": [
-        { "type": "concept", "question": "Go 接口的实现方式是？", "options": ["显式 implements", "隐式：类型拥有接口要求的方法即自动满足", "继承", "注解"], "answer": 1, "feedback": "Go 接口隐式实现，无需声明，促进解耦。" },
-        { "type": "concept", "question": "Rust 中定义行为契约的机制是？", "options": ["interface", "trait", "abstract class", "protocol"], "answer": 1, "feedback": "Rust 用 trait 定义共享行为，impl 实现。" }
+        { "type": "concept", "question": "Go 接口的实现方式是？", "options": ["显式 implements", "注解", "隐式：类型拥有接口要求的方法即自动满足", "继承"], "answer": 2, "feedback": "Go 接口隐式实现，无需声明，促进解耦。" },
+        { "type": "concept", "question": "Rust 中定义行为契约的机制是？", "options": ["abstract class", "interface", "protocol", "trait"], "answer": 3, "feedback": "Rust 用 trait 定义共享行为，impl 实现。" }
       ]
     },
 
@@ -747,7 +747,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "语法错误：代码不符合语法规则，编译/解析期暴露，最易修复；类型错误：类型不匹配（如字符串加数字），强类型语言编译期发现；运行时错误：程序运行中失败（除零、越界、文件不存在、空指针），需错误处理机制应对。前两类靠编译器，运行时错误靠防御与处理。",
       "lang_diff": "语法/类型错误：Rust/C++/Go/Java 编译期暴露最多；Python/JS 运行期暴露。运行时错误处理：异常（Python/JS/Java/C++）vs 错误值（Go/Rust）。",
       "exercises": [
-        { "type": "concept", "question": "类型不匹配（如 '1' + 1）在 Rust 中何时暴露？", "options": ["运行时", "编译期（类型检查）", "部署后", "不报错"], "answer": 1, "feedback": "Rust 静态类型在编译期拒绝类型不匹配。" },
+        { "type": "concept", "question": "类型不匹配（如 '1' + 1）在 Rust 中何时暴露？", "options": ["不报错", "编译期（类型检查）", "运行时", "部署后"], "answer": 1, "feedback": "Rust 静态类型在编译期拒绝类型不匹配。" },
         { "type": "concept", "question": "文件不存在导致的打开失败属于？", "options": ["语法错误", "类型错误", "运行时错误", "逻辑错误"], "answer": 2, "feedback": "文件 IO 失败是运行时错误，需 try/Result 处理。" }
       ]
     },
@@ -757,8 +757,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "try 包裹可能抛异常的代码；catch 捕获并处理特定类型异常；finally 无论是否异常都执行（清理资源）。要点：try 块尽量小；catch 按类型精确捕获，不要 catch 吞掉所有异常；finally/上下文管理器保证资源释放。",
       "lang_diff": "Python：try/except/else/finally；JS：try/catch/finally；Java：try/catch/finally + try-with-resources；C++：try/catch（按类型）/ RAII 代替 finally；Go：无 try/catch（error 值 + defer）；Rust：无 try/catch（Result + ?）。",
       "exercises": [
-        { "type": "concept", "question": "finally 块的执行时机是？", "options": ["仅异常时", "仅正常时", "无论是否异常都执行", "从不执行"], "answer": 2, "feedback": "finally 保证执行，用于资源清理。" },
-        { "type": "read", "question": "Python 中捕获特定异常类型的语法是？", "options": ["catch ValueError", "except ValueError as e", "try ValueError", "throw ValueError"], "answer": 1, "feedback": "except 指定捕获的异常类型，as 绑定异常对象。" }
+        { "type": "concept", "question": "finally 块的执行时机是？", "options": ["无论是否异常都执行", "仅正常时", "从不执行", "仅异常时"], "answer": 0, "feedback": "finally 保证执行，用于资源清理。" },
+        { "type": "read", "question": "Python 中捕获特定异常类型的语法是？", "options": ["try ValueError", "catch ValueError", "except ValueError as e", "throw ValueError"], "answer": 2, "feedback": "except 指定捕获的异常类型，as 绑定异常对象。" }
       ]
     },
     { "id": "error.propagation", "module_id": "B09", "title": "错误传播与包装", "status": "published",
@@ -767,8 +767,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "底层出错时，若不就地处理应向上传播给能处理的层。传播时「包装」错误——附加本层上下文（哪个文件、哪个操作），形成错误链便于定位。Go 的 fmt.Errorf %w、Rust 的 ? 自动传播、Java 的异常 cause 链都是为此设计。",
       "lang_diff": "Python：raise ... from e 显式链；JS：throw new Error(msg, { cause: e })；Java：new Exception(msg, cause)；C++：重新抛出或嵌套异常；Go：fmt.Errorf(\"...: %w\", err) 包装；Rust：? 传播 + thiserror 的 #[from] 自动转换。",
       "exercises": [
-        { "type": "concept", "question": "Go 中包装错误并保留原错误的写法是？", "options": ["errors.New", "fmt.Errorf(\"...: %w\", err)", "panic", "return err"], "answer": 1, "feedback": "%w 动词包装错误，可用 errors.Is/As 检查链。" },
-        { "type": "concept", "question": "Rust 中 ? 运算符对 Err 的作用是？", "options": ["panic", "提前返回 Err 传播给调用方", "转为 None", "忽略"], "answer": 1, "feedback": "? 在 Err 时 return Err(...)，自动传播错误。" }
+        { "type": "concept", "question": "Go 中包装错误并保留原错误的写法是？", "options": ["return err", "errors.New", "fmt.Errorf(\"...: %w\",  err)", "panic"], "answer": 2, "feedback": "%w 动词包装错误，可用 errors.Is/As 检查链。" },
+        { "type": "concept", "question": "Rust 中 ? 运算符对 Err 的作用是？", "options": ["忽略", "提前返回 Err 传播给调用方", "panic", "转为 None"], "answer": 1, "feedback": "? 在 Err 时 return Err(...)，自动传播错误。" }
       ]
     },
     { "id": "error.custom-types", "module_id": "B09", "title": "自定义错误类型", "status": "published",
@@ -777,8 +777,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "自定义错误类型让错误可分类、可携带上下文（错误码、字段、原因），便于程序化判断与定位。原则：按错误来源/处理策略分类；实现标准错误接口（Error trait/Exception 基类）；保留底层原因。",
       "lang_diff": "Python：继承 Exception；JS：继承 Error 并设置 name/code；Java：继承 Exception/RuntimeException；C++：继承 std::exception；Go：实现 error 接口（Error() string）+ 哨兵错误/自定义结构；Rust：实现 Display + Error（thiserror 简化）或 anyhow。",
       "exercises": [
-        { "type": "concept", "question": "Go 中自定义错误类型需实现的方法是？", "options": ["toString()", "Error() string", "message()", "panic()"], "answer": 1, "feedback": "实现 Error() string 即满足 error 接口。" },
-        { "type": "concept", "question": "Rust 中简化自定义错误类型的常用库是？", "options": ["serde", "thiserror / anyhow", "tokio", "regex"], "answer": 1, "feedback": "thiserror 用 derive 快速定义错误，anyhow 简化应用层错误。" }
+        { "type": "concept", "question": "Go 中自定义错误类型需实现的方法是？", "options": ["Error() string", "toString()", "panic()", "message()"], "answer": 0, "feedback": "实现 Error() string 即满足 error 接口。" },
+        { "type": "concept", "question": "Rust 中简化自定义错误类型的常用库是？", "options": ["regex", "serde", "tokio", "thiserror / anyhow"], "answer": 3, "feedback": "thiserror 用 derive 快速定义错误，anyhow 简化应用层错误。" }
       ]
     },
     { "id": "error.assertions", "module_id": "B09", "title": "断言与防御式检查", "status": "published",
@@ -787,8 +787,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "断言（assert）：验证「这里必须为真」的内部不变量，失败立即暴露 bug（开发期）。防御式检查：在公共边界校验输入合法性并给出明确错误。区别：断言针对「绝不应发生」的编程错误（可在生产关闭），防御针对「可能发生」的外部输入（必须保留）。",
       "lang_diff": "Python：assert（-O 可关闭）；JS：无内置（console.assert 或手写）；Java：assert（-ea 开启）；C++：assert/assert 宏、static_assert 编译期；Go：无 assert（显式 if + panic）；Rust：assert!/debug_assert!（debug 版）。",
       "exercises": [
-        { "type": "concept", "question": "断言最适合检查什么？", "options": ["用户输入", "程序内部不可能出现的状态（不变量）", "网络错误", "文件格式"], "answer": 1, "feedback": "断言验证内部不变量；外部输入用防御式校验。" },
-        { "type": "concept", "question": "Rust 中仅在 debug 构建执行的断言是？", "options": ["assert!", "debug_assert!", "panic!", "expect"], "answer": 1, "feedback": "debug_assert! 在 release 中被剥离，assert! 始终执行。" }
+        { "type": "concept", "question": "断言最适合检查什么？", "options": ["用户输入", "程序内部不可能出现的状态（不变量）", "文件格式", "网络错误"], "answer": 1, "feedback": "断言验证内部不变量；外部输入用防御式校验。" },
+        { "type": "concept", "question": "Rust 中仅在 debug 构建执行的断言是？", "options": ["debug_assert!", "expect", "assert!", "panic!"], "answer": 0, "feedback": "debug_assert! 在 release 中被剥离，assert! 始终执行。" }
       ]
     },
     { "id": "error.resource-release", "module_id": "B09", "title": "资源释放与作用域", "status": "published",
@@ -797,18 +797,18 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "资源（文件、锁、连接、内存）必须确定释放。异常/提前返回最易导致泄漏。确定性释放三机制：RAII（析构自动释放）、defer（函数结束执行）、with/try-with-resources（块结束自动关闭）。手动 close 易被跳过，应避免。",
       "lang_diff": "Python：with 上下文管理器；JS：try/finally 手动；Java：try-with-resources（AutoCloseable）；C++：RAII（析构）；Go：defer；Rust：Drop trait（RAII）。",
       "exercises": [
-        { "type": "concept", "question": "Python 中保证文件自动关闭的写法是？", "options": ["f = open(); f.close()", "with open(...) as f:", "try/finally", "del f"], "answer": 1, "feedback": "with 语句退出时自动调用 __exit__ 关闭文件。" },
-        { "type": "concept", "question": "Go 中在函数结束时关闭资源的机制是？", "options": ["finally", "defer", "析构函数", "with"], "answer": 1, "feedback": "defer 注册函数结束时执行的清理调用。" }
+        { "type": "concept", "question": "Python 中保证文件自动关闭的写法是？", "options": ["try/finally", "with open(...) as f:", "del f", "f = open(); f.close()"], "answer": 1, "feedback": "with 语句退出时自动调用 __exit__ 关闭文件。" },
+        { "type": "concept", "question": "Go 中在函数结束时关闭资源的机制是？", "options": ["with", "defer", "析构函数", "finally"], "answer": 1, "feedback": "defer 注册函数结束时执行的清理调用。" }
       ]
     },
     { "id": "error.retry-timeout", "module_id": "B09", "title": "重试、降级与超时", "status": "published",
       "objectives": ["用重试应对瞬时故障", "用超时防止无限等待"],
-      "prerequisites": ["error.propagation", "concurrency.cancel-timeout"],
+      "prerequisites": ["error.propagation"],
       "core": "网络/IO 的瞬时故障可通过重试恢复：指数退避（间隔倍增）+ 抖动 + 最大次数，避免惊群。超时给每个操作设上限防止无限挂起。降级：主路径失败时提供备用结果（缓存/默认值），保证系统可用。",
       "lang_diff": "Python：tenacity/手动循环 + asyncio.wait_for；JS：AbortController 超时、Promise.race；Java：Future.get(timeout)、Resilience4j；C++：std::future::wait_for；Go：context.WithTimeout 取消与超时；Rust：tokio::time::timeout。",
       "exercises": [
-        { "type": "concept", "question": "重试策略中「指数退避 + 抖动」的作用是？", "options": ["加快重试", "避免大量客户端同时重试（惊群）", "减少次数", "记录日志"], "answer": 1, "feedback": "退避倍增间隔、抖动打散时间，防止重试风暴压垮服务。" },
-        { "type": "concept", "question": "Go 中给操作设置超时上限的标准方式是？", "options": ["sleep", "context.WithTimeout", "select default", "panic"], "answer": 1, "feedback": "context.WithTimeout 超时自动取消，贯穿调用链。" }
+        { "type": "concept", "question": "重试策略中「指数退避 + 抖动」的作用是？", "options": ["记录日志", "避免大量客户端同时重试（惊群）", "减少次数", "加快重试"], "answer": 1, "feedback": "退避倍增间隔、抖动打散时间，防止重试风暴压垮服务。" },
+        { "type": "concept", "question": "Go 中给操作设置超时上限的标准方式是？", "options": ["sleep", "panic", "select default", "context.WithTimeout"], "answer": 3, "feedback": "context.WithTimeout 超时自动取消，贯穿调用链。" }
       ]
     },
 
@@ -819,8 +819,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "命名空间/包把相关代码组织为有名字的边界，避免全局命名冲突。包名通常反映目录结构或域名倒置（Java）。包内代码可互相访问，跨包需导入。好的包划分：高内聚低耦合、职责单一。",
       "lang_diff": "Python：包 = 目录 + __init__.py；JS：模块 = 文件（无显式包，路径即命名空间）；Java：package com.example.xxx（目录对应）；C++：namespace xxx { }；Go：package xxx（目录即包，导入路径含域名）；Rust：mod xxx（文件/目录即模块）。",
       "exercises": [
-        { "type": "concept", "question": "Java 包的命名惯例是？", "options": ["大写下划线", "域名倒置 com.example.app", "驼峰", "任意"], "answer": 1, "feedback": "Java 用域名倒置保证包名全局唯一。" },
-        { "type": "concept", "question": "Go 中一个目录对应？", "options": ["多个包", "一个包（目录即包）", "一个类", "一个模块"], "answer": 1, "feedback": "Go 一个目录是一个包，包名通常与目录名一致。" }
+        { "type": "concept", "question": "Java 包的命名惯例是？", "options": ["域名倒置 com.example.app", "大写下划线", "驼峰", "任意"], "answer": 0, "feedback": "Java 用域名倒置保证包名全局唯一。" },
+        { "type": "concept", "question": "Go 中一个目录对应？", "options": ["多个包", "一个模块", "一个类", "一个包（目录即包）"], "answer": 3, "feedback": "Go 一个目录是一个包，包名通常与目录名一致。" }
       ]
     },
     { "id": "module.public-private", "module_id": "B10", "title": "公开与私有 API", "status": "published",
@@ -829,8 +829,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "模块应只暴露最小必要接口（公开 API），隐藏内部实现（私有）。公开 API 是契约，改动需谨慎（向后兼容）；私有部分可自由重构。可见性控制让大型项目可维护——使用者只依赖稳定的公开面。",
       "lang_diff": "Python：_private 约定 + __all__ 控制导出；JS：模块内不导出即私有、export 公开；Java：public/private/package-private；C++：头文件公开声明、实现细节在 .cpp/匿名命名空间；Go：大写导出、小写包内私有、internal/ 目录限制导入；Rust：默认私有、pub 公开、pub(crate) 限定。",
       "exercises": [
-        { "type": "concept", "question": "Go 中限制包只能被内部代码导入的机制是？", "options": ["private 目录", "internal/ 目录", "_ 前缀", "build tag"], "answer": 1, "feedback": "internal/ 目录下的包只能被其父目录内的代码导入。" },
-        { "type": "concept", "question": "Rust 中默认的可见性是？", "options": ["公开", "私有（需 pub 才公开）", "包级", "模块级"], "answer": 1, "feedback": "Rust 项默认私有，pub 显式公开。" }
+        { "type": "concept", "question": "Go 中限制包只能被内部代码导入的机制是？", "options": ["build tag", "_ 前缀", "internal/ 目录", "private 目录"], "answer": 2, "feedback": "internal/ 目录下的包只能被其父目录内的代码导入。" },
+        { "type": "concept", "question": "Rust 中默认的可见性是？", "options": ["公开", "私有（需 pub 才公开）", "模块级", "包级"], "answer": 1, "feedback": "Rust 项默认私有，pub 显式公开。" }
       ]
     },
     { "id": "module.relative-absolute", "module_id": "B10", "title": "相对导入与绝对导入", "status": "published",
@@ -839,8 +839,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "绝对导入：从项目根/包名开始的完整路径（import a.b.c），位置无关、可读性好；相对导入：从当前文件位置出发（./、../），适合包内引用但移动文件易断。工程惯例：优先绝对导入，包内紧密关联的模块才用相对导入。",
       "lang_diff": "Python：绝对 import pkg.mod、相对 from . import mod；JS：相对 ./mod、../mod 或绝对（配置 alias）；Java：绝对全限定名 import com.x.Y；C++：#include 相对或库路径；Go：绝对导入路径（模块路径/包）；Rust：crate:: 绝对、self::/super:: 相对。",
       "exercises": [
-        { "type": "concept", "question": "Python 中 from . import utils 属于？", "options": ["绝对导入", "相对导入（当前包内）", "库导入", "动态导入"], "answer": 1, "feedback": "点号开头是相对导入，. 当前包、.. 父包。" },
-        { "type": "concept", "question": "Rust 中引用当前 crate 根的绝对路径前缀是？", "options": ["./", "crate::", "super::", "self::"], "answer": 1, "feedback": "crate:: 从 crate 根开始；self:: 当前模块、super:: 父模块。" }
+        { "type": "concept", "question": "Python 中 from . import utils 属于？", "options": ["动态导入", "绝对导入", "相对导入（当前包内）", "库导入"], "answer": 2, "feedback": "点号开头是相对导入，. 当前包、.. 父包。" },
+        { "type": "concept", "question": "Rust 中引用当前 crate 根的绝对路径前缀是？", "options": ["./", "super::", "self::", "crate::"], "answer": 3, "feedback": "crate:: 从 crate 根开始；self:: 当前模块、super:: 父模块。" }
       ]
     },
     { "id": "module.dependency-lockfile", "module_id": "B10", "title": "依赖声明与锁文件", "status": "published",
@@ -849,8 +849,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "依赖声明文件记录项目需要哪些库及版本范围（requirements/package.json/pom.xml/go.mod/Cargo.toml）；锁文件记录解析后的精确版本与校验（lock 文件）。声明文件给人看（版本范围），锁文件给机器用（精确一致）。锁文件必须入库。",
       "lang_diff": "Python：requirements.txt/pyproject.toml + pip-tools/uv lock；JS：package.json + package-lock.json；Java：pom.xml（Maven 解析，无强制锁）；C++：vcpkg.json/Conan + 锁；Go：go.mod + go.sum；Rust：Cargo.toml + Cargo.lock。",
       "exercises": [
-        { "type": "concept", "question": "锁文件是否应该提交到版本库？", "options": ["不应该", "应该（保证各环境依赖一致）", "仅生产", "仅开发"], "answer": 1, "feedback": "锁文件入库确保团队与 CI 拿到完全相同的依赖版本。" },
-        { "type": "concept", "question": "Go 的依赖校验文件是？", "options": ["go.lock", "go.sum", "go.mod", "vendor/"], "answer": 1, "feedback": "go.sum 记录依赖的加密校验和，go.mod 声明依赖。" }
+        { "type": "concept", "question": "锁文件是否应该提交到版本库？", "options": ["仅开发", "不应该", "应该（保证各环境依赖一致）", "仅生产"], "answer": 2, "feedback": "锁文件入库确保团队与 CI 拿到完全相同的依赖版本。" },
+        { "type": "concept", "question": "Go 的依赖校验文件是？", "options": ["go.mod", "go.lock", "go.sum", "vendor/"], "answer": 2, "feedback": "go.sum 记录依赖的加密校验和，go.mod 声明依赖。" }
       ]
     },
     { "id": "module.semver", "module_id": "B10", "title": "语义化版本", "status": "published",
@@ -859,8 +859,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "语义化版本 SemVer：主版本.次版本.修订号（MAJOR.MINOR.PATCH）。修订号：向后兼容的 bug 修复；次版本：向后兼容的新功能；主版本：不兼容的破坏性变更。版本范围符号：~（允许修订升级）、^（允许次版本升级）、=（精确）。",
       "lang_diff": "SemVer 是跨语言通用约定。范围语法：npm 的 ^1.2.3（<2.0.0）、~1.2.3（<1.3.0）；Go 的模块版本 v1.2.3；Rust 的 1.2（默认 ^1.2）；Maven 的版本范围 [1.0,2.0)。",
       "exercises": [
-        { "type": "concept", "question": "版本号 2.0.0 → 2.1.0 表示？", "options": ["破坏性变更", "向后兼容的新功能", "bug 修复", "预发布"], "answer": 1, "feedback": "次版本号升级 = 向后兼容的新功能。" },
-        { "type": "concept", "question": "npm 中 ^1.2.3 允许升级到？", "options": ["2.0.0", "1.x 最新（<2.0.0）", "仅 1.2.3", "1.2.4 止"], "answer": 1, "feedback": "^ 允许次版本与修订升级，但不跨主版本。" }
+        { "type": "concept", "question": "版本号 2.0.0 → 2.1.0 表示？", "options": ["bug 修复", "向后兼容的新功能", "破坏性变更", "预发布"], "answer": 1, "feedback": "次版本号升级 = 向后兼容的新功能。" },
+        { "type": "concept", "question": "npm 中 ^1.2.3 允许升级到？", "options": ["仅 1.2.3", "1.2.4 止", "1.x 最新（<2.0.0）", "2.0.0"], "answer": 2, "feedback": "^ 允许次版本与修订升级，但不跨主版本。" }
       ]
     },
     { "id": "module.registry", "module_id": "B10", "title": "本地包与远程仓库", "status": "published",
@@ -869,8 +869,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "远程包仓库（registry）集中托管可复用的库：PyPI（Python）、npm（JS）、Maven Central（Java）、crates.io（Rust）、Go 模块代理。安装从仓库拉取，发布把自己打包上传。也可用私有源或本地路径引用未发布的包。",
       "lang_diff": "Python：PyPI（pip install / twine upload）；JS：npm registry；Java：Maven Central（mvn deploy）；C++：vcpkg/ConanCenter；Go：proxy.golang.org + 模块路径即仓库地址；Rust：crates.io（cargo publish）。",
       "exercises": [
-        { "type": "concept", "question": "Rust 的官方包仓库是？", "options": ["npm", "crates.io", "PyPI", "Maven Central"], "answer": 1, "feedback": "crates.io 托管 Rust 的库，cargo 直接集成。" },
-        { "type": "concept", "question": "Python 的第三方包安装来源默认是？", "options": ["npm", "PyPI", "GitHub", "apt"], "answer": 1, "feedback": "pip 默认从 PyPI 安装包。" }
+        { "type": "concept", "question": "Rust 的官方包仓库是？", "options": ["Maven Central", "crates.io", "PyPI", "npm"], "answer": 1, "feedback": "crates.io 托管 Rust 的库，cargo 直接集成。" },
+        { "type": "concept", "question": "Python 的第三方包安装来源默认是？", "options": ["PyPI", "apt", "GitHub", "npm"], "answer": 0, "feedback": "pip 默认从 PyPI 安装包。" }
       ]
     },
     { "id": "module.cycle", "module_id": "B10", "title": "循环依赖", "status": "published",
@@ -879,8 +879,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "循环依赖：A 依赖 B、B 又依赖 A，导致编译/加载失败或脆弱耦合。解法：提取公共部分为第三模块 C（A、B 都依赖 C）；依赖注入（运行时传入而非编译期引用）；接口隔离（A 依赖 B 的接口而非实现）。预防：按层组织（上层可依赖下层，反之不可）。",
       "lang_diff": "Go/Rust 编译器直接拒绝包循环依赖（强制解决）；Java 允许类间循环但应避免；Python/JS 运行时才暴露（部分初始化对象）；C++ 头文件循环包含需前向声明。",
       "exercises": [
-        { "type": "concept", "question": "Go 遇到包循环依赖时会？", "options": ["运行时警告", "编译器直接拒绝", "自动解决", "忽略"], "answer": 1, "feedback": "Go 编译器禁止包循环依赖，强制开发者解耦。" },
-        { "type": "concept", "question": "消除 A↔B 循环依赖的常用方法是？", "options": ["增加依赖", "提取公共部分为模块 C，A、B 都依赖 C", "合并 A 和 B", "用全局变量"], "answer": 1, "feedback": "提取共享部分为第三方模块是最干净的解法。" }
+        { "type": "concept", "question": "Go 遇到包循环依赖时会？", "options": ["自动解决", "忽略", "运行时警告", "编译器直接拒绝"], "answer": 3, "feedback": "Go 编译器禁止包循环依赖，强制开发者解耦。" },
+        { "type": "concept", "question": "消除 A↔B 循环依赖的常用方法是？", "options": ["合并 A 和 B", "提取公共部分为模块 C，A、B 都依赖 C", "增加依赖", "用全局变量"], "answer": 1, "feedback": "提取共享部分为第三方模块是最干净的解法。" }
       ]
     },
     { "id": "module.artifact-publish", "module_id": "B10", "title": "构建产物与发布", "status": "published",
@@ -889,8 +889,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "构建产物是交付给用户的最终形式：可执行文件（go build）、库包（wheel/jar/crate）、容器镜像。发布流程：打版本号 → 构建产物 → 生成变更记录 → 上传到仓库/制品库 → 打标签。产物应可复现（同一代码同一产物）。",
       "lang_diff": "Python：wheel/sdist（python -m build）；JS：npm pack / 打包产物 dist/；Java：mvn package 生成 JAR；C++：编译产物 + CMake install；Go：go build 静态单文件（交叉编译 GOOS/GOARCH）；Rust：cargo build --release 或 cargo package。",
       "exercises": [
-        { "type": "concept", "question": "Go 交叉编译 Windows 可执行文件的环境变量是？", "options": ["TARGET", "GOOS=windows GOARCH=amd64", "OS=win", "ARCH"], "answer": 1, "feedback": "设置 GOOS/GOARCH 即可交叉编译目标平台单文件。" },
-        { "type": "concept", "question": "Java 项目的标准可分发产物是？", "options": [".exe", "JAR（Java ARchive）", ".whl", ".dll"], "answer": 1, "feedback": "Maven/Gradle 打包生成 JAR 文件分发。" }
+        { "type": "concept", "question": "Go 交叉编译 Windows 可执行文件的环境变量是？", "options": ["TARGET", "OS=win", "GOOS=windows GOARCH=amd64", "ARCH"], "answer": 2, "feedback": "设置 GOOS/GOARCH 即可交叉编译目标平台单文件。" },
+        { "type": "concept", "question": "Java 项目的标准可分发产物是？", "options": ["JAR（Java ARchive）", ".dll", ".whl", ".exe"], "answer": 0, "feedback": "Maven/Gradle 打包生成 JAR 文件分发。" }
       ]
     },
 
@@ -901,8 +901,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "程序默认有三个标准流：stdin（输入）、stdout（正常输出）、stderr（错误输出）。分离 stdout 与 stderr 让正常输出可被管道处理而错误不被吞掉。命令行组合：管道 | 把前一命令输出作后一命令输入，重定向 > >> < 读写文件。",
       "lang_diff": "Python：input()/print()（file=sys.stderr）；JS：process.stdin/console.log/console.error；Java：Scanner/System.out/System.err；C++：std::cin/cout/cerr；Go：os.Stdin/fmt.Println/fmt.Fprintln(os.Stderr)；Rust：io::stdin()/println!/eprintln!。",
       "exercises": [
-        { "type": "concept", "question": "错误信息应该输出到哪个流？", "options": ["stdout", "stderr", "stdin", "文件"], "answer": 1, "feedback": "错误输出到 stderr，不污染 stdout 的管道数据。" },
-        { "type": "concept", "question": "Go 中向标准错误输出的写法是？", "options": ["fmt.Println", "fmt.Fprintln(os.Stderr, ...)", "print(stderr)", "console.error"], "answer": 1, "feedback": "fmt.Fprintln 指定目标流，os.Stderr 是标准错误。" }
+        { "type": "concept", "question": "错误信息应该输出到哪个流？", "options": ["stderr", "stdout", "文件", "stdin"], "answer": 0, "feedback": "错误输出到 stderr，不污染 stdout 的管道数据。" },
+        { "type": "concept", "question": "Go 中向标准错误输出的写法是？", "options": ["fmt.Println", "print(stderr)", "fmt.Fprintln(os.Stderr,  ...)", "console.error"], "answer": 2, "feedback": "fmt.Fprintln 指定目标流，os.Stderr 是标准错误。" }
       ]
     },
     { "id": "io.paths", "module_id": "B11", "title": "路径与目录操作", "status": "published",
@@ -911,8 +911,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "路径分隔符因系统而异（Windows \\ 、Unix /），手动拼接字符串易错且不可移植。应使用专门的路径库：拼接（join）、取目录/文件名、绝对化、规范化、遍历目录。永远不要用 + 拼接路径。",
       "lang_diff": "Python：pathlib.Path（/ 运算符拼接）；JS：path.join/path.resolve；Java：java.nio.file.Path/Paths/Files；C++：std::filesystem::path；Go：path/filepath（Join/Walk）；Rust：std::path::Path/PathBuf。",
       "exercises": [
-        { "type": "concept", "question": "拼接路径的正确做法是？", "options": ["dir + '/' + name", "用路径库的 join/Path", "字符串 format", "硬编码 /"], "answer": 1, "feedback": "路径库自动处理分隔符与跨平台差异，字符串拼接不可移植。" },
-        { "type": "concept", "question": "Go 中跨平台路径拼接的包是？", "options": ["strings", "path/filepath", "os", "fmt"], "answer": 1, "feedback": "path/filepath 提供 Join/Walk 等跨平台路径操作。" }
+        { "type": "concept", "question": "拼接路径的正确做法是？", "options": ["dir + '/' + name", "字符串 format", "硬编码 /", "用路径库的 join/Path"], "answer": 3, "feedback": "路径库自动处理分隔符与跨平台差异，字符串拼接不可移植。" },
+        { "type": "concept", "question": "Go 中跨平台路径拼接的包是？", "options": ["path/filepath", "fmt", "os", "strings"], "answer": 0, "feedback": "path/filepath 提供 Join/Walk 等跨平台路径操作。" }
       ]
     },
     { "id": "io.text-binary", "module_id": "B11", "title": "文本文件与二进制文件", "status": "published",
@@ -921,8 +921,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "文本模式读写「字符」（自动处理编码与换行转换），二进制模式读写「原始字节」（图片、序列化数据）。用错模式会导致乱码（二进制当文本）或数据损坏（文本模式改二进制字节）。读写时明确指定编码（UTF-8）。",
       "lang_diff": "Python：open(path, 'r'/'rb')、encoding='utf-8'；JS：fs.readFileSync(path, 'utf8') 文本 / Buffer 二进制；Java：Files.readString 文本 / readAllBytes 二进制；C++：ifstream 文本 / ios::binary 二进制；Go：os.ReadFile 返回 []byte（自行解码）；Rust：fs::read_to_string 文本 / fs::read 二进制。",
       "exercises": [
-        { "type": "concept", "question": "Python 中读取图片文件应使用的模式是？", "options": ["'r'", "'rb'", "'w'", "'rt'"], "answer": 1, "feedback": "图片是二进制数据，必须用 'rb' 模式避免字节被当作字符解码。" },
-        { "type": "concept", "question": "Rust 中读取文本文件为 String 的函数是？", "options": ["fs::read", "fs::read_to_string", "fs::read_bytes", "io::read"], "answer": 1, "feedback": "fs::read_to_string 读文本（UTF-8），fs::read 读字节。" }
+        { "type": "concept", "question": "Python 中读取图片文件应使用的模式是？", "options": ["'rt'", "'r'", "'w'", "'rb'"], "answer": 3, "feedback": "图片是二进制数据，必须用 'rb' 模式避免字节被当作字符解码。" },
+        { "type": "concept", "question": "Rust 中读取文本文件为 String 的函数是？", "options": ["fs::read_bytes", "fs::read_to_string", "io::read", "fs::read"], "answer": 1, "feedback": "fs::read_to_string 读文本（UTF-8），fs::read 读字节。" }
       ]
     },
     { "id": "io.streams-buffering", "module_id": "B11", "title": "流、缓冲与大文件", "status": "published",
@@ -931,8 +931,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "一次性读入整个文件对大文件会撑爆内存。流式处理：分块读取、逐行处理、处理完即丢弃——内存占用恒定。缓冲（buffering）减少系统调用次数提升吞吐；写操作需 flush 确保落盘。大文件与网络数据都应流式处理。",
       "lang_diff": "Python：for line in open(path) 逐行；JS：fs.createReadStream 流式；Java：BufferedReader.lines()；C++：std::getline 逐行；Go：bufio.Scanner 逐行；Rust：BufReader::lines()。",
       "exercises": [
-        { "type": "concept", "question": "处理 10GB 日志文件的正确方式是？", "options": ["read() 全量读入", "逐行流式处理", "先压缩", "存入数组"], "answer": 1, "feedback": "逐行流式处理内存恒定，全量读入会撑爆内存。" },
-        { "type": "concept", "question": "Go 中逐行读取大文件的工具是？", "options": ["os.ReadFile", "bufio.Scanner", "io.ReadAll", "fmt.Scan"], "answer": 1, "feedback": "bufio.Scanner 逐行扫描大文件，内存占用小。" }
+        { "type": "concept", "question": "处理 10GB 日志文件的正确方式是？", "options": ["逐行流式处理", "存入数组", "read() 全量读入", "先压缩"], "answer": 0, "feedback": "逐行流式处理内存恒定，全量读入会撑爆内存。" },
+        { "type": "concept", "question": "Go 中逐行读取大文件的工具是？", "options": ["io.ReadAll", "fmt.Scan", "bufio.Scanner", "os.ReadFile"], "answer": 2, "feedback": "bufio.Scanner 逐行扫描大文件，内存占用小。" }
       ]
     },
     { "id": "io.serialization", "module_id": "B11", "title": "序列化与反序列化", "status": "published",
@@ -941,8 +941,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "序列化把内存对象转为字节流/文本以便存储或网络传输；反序列化还原。格式：JSON（可读、通用）、二进制（高效）。注意：反序列化不可信数据有安全风险（代码执行）；版本演进时保持字段兼容。语言原生序列化（pickle/Java Serializable）有安全隐患，跨语言用 JSON/Protobuf。",
       "lang_diff": "Python：json/pickle（pickle 不可信数据危险）；JS：JSON.stringify/parse；Java：Serializable（危险）/Jackson JSON；C++：第三方（nlohmann/json、Protobuf）；Go：encoding/json + struct tag；Rust：serde + derive Serialize/Deserialize。",
       "exercises": [
-        { "type": "concept", "question": "Python 的 pickle 反序列化不可信数据的风险是？", "options": ["格式错误", "可执行任意代码（安全漏洞）", "速度慢", "无风险"], "answer": 1, "feedback": "pickle 反序列化可执行任意代码，绝不可用于不可信数据，应用 JSON。" },
-        { "type": "concept", "question": "Rust 中序列化结构体的标准方式是？", "options": ["手写 toString", "serde + #[derive(Serialize)]", "JSON 硬编码", "二进制 dump"], "answer": 1, "feedback": "serde 生态 + derive 宏自动实现序列化。" }
+        { "type": "concept", "question": "Python 的 pickle 反序列化不可信数据的风险是？", "options": ["速度慢", "可执行任意代码（安全漏洞）", "格式错误", "无风险"], "answer": 1, "feedback": "pickle 反序列化可执行任意代码，绝不可用于不可信数据，应用 JSON。" },
+        { "type": "concept", "question": "Rust 中序列化结构体的标准方式是？", "options": ["二进制 dump", "手写 toString", "serde + #[derive(Serialize)]", "JSON 硬编码"], "answer": 2, "feedback": "serde 生态 + derive 宏自动实现序列化。" }
       ]
     },
     { "id": "io.cli-args", "module_id": "B11", "title": "命令行参数", "status": "published",
@@ -951,7 +951,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "命令行参数让程序无需改代码即可配置行为：位置参数（文件路径）、选项（--verbose、-o file）、子命令（git add）。原则：参数校验+帮助信息+合理默认值。手写解析 sys.argv 仅适合最简单场景，复杂 CLI 用参数解析库。",
       "lang_diff": "Python：sys.argv（手动）/ argparse / click / typer；JS：process.argv / commander / yargs；Java：main(String[] args) / picocli；C++：main(int argc, char* argv[]) / CLI11；Go：os.Args / flag 包 / cobra；Rust：std::env::args / clap。",
       "exercises": [
-        { "type": "concept", "question": "Python 中解析命令行参数的标准库是？", "options": ["sys", "argparse", "os", "getopt"], "answer": 1, "feedback": "argparse 提供声明式参数定义、类型转换与自动生成帮助。" },
+        { "type": "concept", "question": "Python 中解析命令行参数的标准库是？", "options": ["argparse", "os", "sys", "getopt"], "answer": 0, "feedback": "argparse 提供声明式参数定义、类型转换与自动生成帮助。" },
         { "type": "concept", "question": "Go 解析命令行选项的内置包是？", "options": ["flag", "args", "cli", "os"], "answer": 0, "feedback": "flag 包解析 -name value 形式的命令行选项。" }
       ]
     },
@@ -961,8 +961,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "配置不应硬编码：环境变量（容器/CI 友好）、配置文件（.env/.yaml/.toml）、命令行参数三级优先级。敏感信息（密钥）只放环境变量或密钥管理，绝不入库。按环境（dev/staging/prod）用不同配置，同一代码多环境运行。",
       "lang_diff": "Python：os.environ + python-dotenv / dynaconf；JS：process.env + dotenv / config；Java：application.properties / Spring 环境隔离；C++：std::getenv + 配置库；Go：os.Getenv + viper；Rust：std::env::var + config crate。",
       "exercises": [
-        { "type": "concept", "question": "数据库密码等敏感配置应放在？", "options": ["源码常量", "环境变量或密钥管理（不入库）", "配置文件入库", "注释"], "answer": 1, "feedback": "敏感信息绝不入库，用环境变量或专用密钥管理。" },
-        { "type": "concept", "question": "配置优先级一般规则是？", "options": ["配置文件最高", "命令行参数 > 环境变量 > 配置文件 > 默认值", "硬编码最高", "随机"], "answer": 1, "feedback": "越接近运行时指定优先级越高：参数 > 环境变量 > 文件 > 默认。" }
+        { "type": "concept", "question": "数据库密码等敏感配置应放在？", "options": ["环境变量或密钥管理（不入库）", "配置文件入库", "源码常量", "注释"], "answer": 0, "feedback": "敏感信息绝不入库，用环境变量或专用密钥管理。" },
+        { "type": "concept", "question": "配置优先级一般规则是？", "options": ["硬编码最高", "随机", "命令行参数 > 环境变量 > 配置文件 > 默认值", "配置文件最高"], "answer": 2, "feedback": "越接近运行时指定优先级越高：参数 > 环境变量 > 文件 > 默认。" }
       ]
     },
     { "id": "io.temp-permissions", "module_id": "B11", "title": "临时文件与文件权限", "status": "published",
@@ -971,8 +971,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "临时文件应用系统提供的安全创建（唯一名、自动清理、安全权限），避免手写路径造成冲突与符号链接攻击。文件权限（Unix rwx）控制读写执行：私密文件 0600、可执行 0755。跨平台注意权限模型差异。",
       "lang_diff": "Python：tempfile（NamedTemporaryFile/TemporaryDirectory）；JS：os.tmpdir + fs；Java：Files.createTempFile；C++：无标准（系统 API）；Go：os.CreateTemp/MkdirTemp；Rust：tempfile crate。权限：os.chmod / Files.setPosixFilePermissions。",
       "exercises": [
-        { "type": "concept", "question": "创建临时文件为何要用 tempfile 库而非手写路径？", "options": ["更快", "避免命名冲突与符号链接攻击", "省内存", "语法简单"], "answer": 1, "feedback": "专用库保证唯一名、安全权限与自动清理，手写路径有安全与冲突风险。" },
-        { "type": "concept", "question": "Unix 中私密配置文件（仅本人可读写）的权限应为？", "options": ["0777", "0600", "0644", "0755"], "answer": 1, "feedback": "0600 表示仅所有者可读写，适合私密配置。" }
+        { "type": "concept", "question": "创建临时文件为何要用 tempfile 库而非手写路径？", "options": ["避免命名冲突与符号链接攻击", "语法简单", "省内存", "更快"], "answer": 0, "feedback": "专用库保证唯一名、安全权限与自动清理，手写路径有安全与冲突风险。" },
+        { "type": "concept", "question": "Unix 中私密配置文件（仅本人可读写）的权限应为？", "options": ["0600", "0644", "0777", "0755"], "answer": 0, "feedback": "0600 表示仅所有者可读写，适合私密配置。" }
       ]
     },
     { "id": "io.encoding-crossplatform", "module_id": "B11", "title": "编码、换行与跨平台问题", "status": "published",
@@ -981,8 +981,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "跨平台三大坑：编码（统一用 UTF-8，显式指定）、换行（Unix \\n vs Windows \\r\\n，文本模式自动转换、二进制不转换）、路径分隔符（用路径库）。读写文件显式声明编码，避免依赖系统默认（Windows 默认可能非 UTF-8）。",
       "lang_diff": "Python：open(..., encoding='utf-8', newline='')；JS：默认 UTF-8；Java：Files.readString(path, UTF_8)；C++：文本/二进制模式影响换行转换；Go：string 即 UTF-8、bufio 处理换行；Rust：String UTF-8、手动处理 \\r\\n。",
       "exercises": [
-        { "type": "concept", "question": "Windows 与 Unix 文本文件换行符分别是？", "options": ["都 \\n", "\\r\\n 与 \\n", "\\n 与 \\r\\n", "都 \\r"], "answer": 1, "feedback": "Windows 用 \\r\\n（CRLF），Unix 用 \\n（LF）。" },
-        { "type": "concept", "question": "读写文本文件时避免乱码的关键是？", "options": ["用默认编码", "显式指定 UTF-8 编码", "转大写", "用二进制模式"], "answer": 1, "feedback": "显式声明 UTF-8，避免依赖系统默认编码（Windows 常为 GBK 等）。" }
+        { "type": "concept", "question": "Windows 与 Unix 文本文件换行符分别是？", "options": ["都 \\r", "\\n 与 \\r\\n", "都 \\n", "\\r\\n 与 \\n"], "answer": 3, "feedback": "Windows 用 \\r\\n（CRLF），Unix 用 \\n（LF）。" },
+        { "type": "concept", "question": "读写文本文件时避免乱码的关键是？", "options": ["转大写", "显式指定 UTF-8 编码", "用二进制模式", "用默认编码"], "answer": 1, "feedback": "显式声明 UTF-8，避免依赖系统默认编码（Windows 常为 GBK 等）。" }
       ]
     },
 
@@ -993,8 +993,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "类型参数（T、E、K、V）让函数/类型适配多种具体类型。约束（bound/where）限定 T 必须具备的能力（可比较、可克隆、实现某接口），否则泛型体内无法调用相应操作。约束是「能力契约」，比裸泛型更安全。",
       "lang_diff": "Python：TypeVar + bound（仅类型检查）；JS：TypeScript 泛型 <T extends X>；Java：<T extends Comparable<T>>；C++：template + concept（C++20）或 SFINAE；Go：[T comparable] 或接口约束；Rust：T: Ord + Clone（trait bound）。",
       "exercises": [
-        { "type": "concept", "question": "Rust 中要求泛型 T 可比较的约束写法是？", "options": ["T comparable", "T: Ord", "where T is Ord", "T extends Ord"], "answer": 1, "feedback": "T: Ord 是 trait bound，限定 T 必须实现 Ord。" },
-        { "type": "concept", "question": "Java 泛型约束的正确形式是？", "options": ["<T: Comparable>", "<T extends Comparable<T>>", "<T implements>", "T comparable"], "answer": 1, "feedback": "Java 用 extends 关键字表达类型上界约束。" }
+        { "type": "concept", "question": "Rust 中要求泛型 T 可比较的约束写法是？", "options": ["T: Ord", "T comparable", "T extends Ord", "where T is Ord"], "answer": 0, "feedback": "T: Ord 是 trait bound，限定 T 必须实现 Ord。" },
+        { "type": "concept", "question": "Java 泛型约束的正确形式是？", "options": ["T comparable", "<T: Comparable>", "<T extends Comparable<T>>", "<T implements>"], "answer": 2, "feedback": "Java 用 extends 关键字表达类型上界约束。" }
       ]
     },
     { "id": "generic.bounds", "module_id": "B12", "title": "接口 / Trait Bound", "status": "published",
@@ -1003,8 +1003,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "用接口/trait 作约束，泛型代码只依赖「类型能做什么」而非「类型是什么」。可组合多个约束（T 既可比较又可克隆）。这让泛型既通用又安全——调用方传入任何满足接口的类型即可。",
       "lang_diff": "Python：Protocol 作 bound；JS：T extends Interface（TS）；Java：T extends InterfaceA & InterfaceB；C++：concept 组合（requires）；Go：接口约束 interface{ String() string }；Rust：T: TraitA + TraitB。",
       "exercises": [
-        { "type": "concept", "question": "Rust 中组合多个 trait 约束的语法是？", "options": ["T: A, B", "T: A + B", "T: A & B", "T: (A B)"], "answer": 1, "feedback": "用 + 组合多个 trait bound。" },
-        { "type": "concept", "question": "Go 中要求泛型类型有 String() 方法的约束是？", "options": ["T string", "interface{ String() string }", "T.String", "comparable"], "answer": 1, "feedback": "用包含方法的接口作为类型约束。" }
+        { "type": "concept", "question": "Rust 中组合多个 trait 约束的语法是？", "options": ["T: A + B", "T: A,  B", "T: (A B)", "T: A & B"], "answer": 0, "feedback": "用 + 组合多个 trait bound。" },
+        { "type": "concept", "question": "Go 中要求泛型类型有 String() 方法的约束是？", "options": ["interface{ String() string }", "T.String", "comparable", "T string"], "answer": 0, "feedback": "用包含方法的接口作为类型约束。" }
       ]
     },
     { "id": "generic.inference", "module_id": "B12", "title": "泛型类型推断", "status": "published",
@@ -1013,8 +1013,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "调用泛型函数时，编译器常能从实参推断类型参数，省去显式标注（max(1, 2) 推断 T=int）。推断失败或歧义时需显式指定（parse::<i32>()、Collections.<String>emptyList()）。推断让泛型用起来像普通函数。",
       "lang_diff": "Python：无运行时推断（仅标注）；JS：TS 自动推断；Java：菱形 <> 推断（new ArrayList<>()）；C++：模板实参推断；Go：调用时推断（部分场景需显式）；Rust：通常推断，歧义时用 turbofish ::<T>。",
       "exercises": [
-        { "type": "concept", "question": "Rust 中显式指定泛型类型的语法是？", "options": ["f(int)", "f::<i32>()（turbofish）", "f<i32>", "f[i32]"], "answer": 1, "feedback": "turbofish ::<T> 在推断不足时显式指定类型参数。" },
-        { "type": "concept", "question": "Java 中 new ArrayList<>() 的 <> 作用是？", "options": ["语法错误", "菱形推断：从上下文推断类型参数", "指定为 Object", "泛型通配"], "answer": 1, "feedback": "菱形语法让编译器从赋值目标推断类型参数。" }
+        { "type": "concept", "question": "Rust 中显式指定泛型类型的语法是？", "options": ["f(int)", "f<i32>", "f::<i32>()（turbofish）", "f[i32]"], "answer": 2, "feedback": "turbofish ::<T> 在推断不足时显式指定类型参数。" },
+        { "type": "concept", "question": "Java 中 new ArrayList<>() 的 <> 作用是？", "options": ["指定为 Object", "泛型通配", "菱形推断：从上下文推断类型参数", "语法错误"], "answer": 2, "feedback": "菱形语法让编译器从赋值目标推断类型参数。" }
       ]
     },
     { "id": "generic.union-optional", "module_id": "B12", "title": "联合类型、枚举与可选值", "status": "published",
@@ -1023,8 +1023,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "联合类型：值是几种类型之一（int | string）；带标签的枚举（sum type）：每个变体可携带数据（Rust enum、Result）。可选类型（Option/Optional）是特殊的联合：Some(值) 或 None。模式匹配让处理联合类型安全且穷尽。",
       "lang_diff": "Python：Union/Optional（int | None，3.10+）与 match；JS：TypeScript 联合类型 string | number；Java：Optional<T>、sealed + record（受限联合）；C++：std::variant/optional；Go：无联合类型（接口或显式 struct + tag）；Rust：enum（最强：变体带数据 + match 穷尽）。",
       "exercises": [
-        { "type": "concept", "question": "Rust 中表达「值是 i32 或 String」的类型是？", "options": ["interface{}", "enum 联合类型", "any", "interface"], "answer": 1, "feedback": "Rust 的 enum 变体可携带不同类型数据。" },
-        { "type": "concept", "question": "Java 中表示「值可能不存在」的类型是？", "options": ["null", "Optional<T>", "Maybe", "Option"], "answer": 1, "feedback": "Optional<T> 显式表达可能缺失，鼓励处理空情况。" }
+        { "type": "concept", "question": "Rust 中表达「值是 i32 或 String」的类型是？", "options": ["interface", "any", "enum 联合类型", "interface{}"], "answer": 2, "feedback": "Rust 的 enum 变体可携带不同类型数据。" },
+        { "type": "concept", "question": "Java 中表示「值可能不存在」的类型是？", "options": ["Option", "Maybe", "null", "Optional<T>"], "answer": 3, "feedback": "Optional<T> 显式表达可能缺失，鼓励处理空情况。" }
       ]
     },
     { "id": "generic.variance", "module_id": "B12", "title": "协变、逆变与不变入门", "status": "published",
@@ -1033,8 +1033,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "Cat 是 Animal 子类，那 List<Cat> 是 List<Animal> 子类吗？协变（是，只读安全）、逆变（反向，只写安全）、不变（默认，两者都不）。Java 用 ? extends（协变/读）与 ? super（逆变/写）；PECS 原则：生产者 extends、消费者 super。",
       "lang_diff": "Python：类型标注层面的 variance（mypy）；JS：TS 结构化类型自然协变；Java：? extends T（协变）、? super T（逆变）；C++：模板默认不变；Go：无泛型型变；Rust：生命周期与类型的 variance（编译器推导）。",
       "exercises": [
-        { "type": "concept", "question": "Java 中 List<? extends Animal> 允许的操作是？", "options": ["添加 Cat", "读取为 Animal（协变，只读安全）", "添加 Animal", "修改元素"], "answer": 1, "feedback": "extends 协变：可读取为父类型，但不能添加（类型不确定）。" },
-        { "type": "concept", "question": "PECS 原则中「消费者」应用哪种通配？", "options": ["extends", "super", "无通配", "两者都"], "answer": 1, "feedback": "Producer Extends, Consumer Super：消费数据用 super。" }
+        { "type": "concept", "question": "Java 中 List<? extends Animal> 允许的操作是？", "options": ["修改元素", "添加 Animal", "添加 Cat", "读取为 Animal（协变，只读安全）"], "answer": 3, "feedback": "extends 协变：可读取为父类型，但不能添加（类型不确定）。" },
+        { "type": "concept", "question": "PECS 原则中「消费者」应用哪种通配？", "options": ["super", "无通配", "extends", "两者都"], "answer": 0, "feedback": "Producer Extends, Consumer Super：消费数据用 super。" }
       ]
     },
     { "id": "generic.erasure", "module_id": "B12", "title": "运行时泛型与擦除", "status": "published",
@@ -1043,8 +1043,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "类型擦除：泛型类型参数只存在于编译期，运行时被替换为上界或 Object（Java/JS）。后果：运行时无法 instanceof T、无法 new T()、泛型数组受限、重载不能仅靠泛型区分。编译期泛型（C++/Rust/Go）在运行时保留真实类型，无此限制。",
       "lang_diff": "Python：类型标注运行时可访问（__annotations__）但不强制；JS：TS 类型完全擦除；Java：擦除（运行时是原生类型）；C++：模板实例化保留类型；Go：泛型编译期实例化；Rust：单态化（保留类型）。",
       "exercises": [
-        { "type": "concept", "question": "Java 中 new T() 不允许的原因是？", "options": ["语法错误", "类型擦除后运行时不知 T 的具体类型", "性能", "安全"], "answer": 1, "feedback": "擦除使 T 在运行时不存在，需传 Class<T> 反射创建。" },
-        { "type": "concept", "question": "哪种泛型实现在运行时保留真实类型？", "options": ["Java", "TypeScript", "C++ 模板 / Rust 单态化", "Python"], "answer": 2, "feedback": "C++/Rust/Go 编译期实例化，运行时类型真实存在。" }
+        { "type": "concept", "question": "Java 中 new T() 不允许的原因是？", "options": ["类型擦除后运行时不知 T 的具体类型", "语法错误", "性能", "安全"], "answer": 0, "feedback": "擦除使 T 在运行时不存在，需传 Class<T> 反射创建。" },
+        { "type": "concept", "question": "哪种泛型实现在运行时保留真实类型？", "options": ["TypeScript", "Java", "C++ 模板 / Rust 单态化", "Python"], "answer": 2, "feedback": "C++/Rust/Go 编译期实例化，运行时类型真实存在。" }
       ]
     },
     { "id": "generic.monomorphization", "module_id": "B12", "title": "编译期单态化", "status": "published",
@@ -1053,8 +1053,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "单态化：编译器为每个用到的具体类型生成一份专门的泛型代码副本（max<i32>、max<f64> 各一份）。优势：零运行时开销、完全内联优化；代价：代码体积膨胀、编译变慢。这是 Rust/C++/Go 泛型高性能的原因。",
       "lang_diff": "C++：模板实例化（单态化）；Rust：单态化（默认，dyn Trait 则动态分派）；Go：泛型部分单态化（gcshape stenciling）；Java/Python/JS 无单态化（擦除/动态）。",
       "exercises": [
-        { "type": "concept", "question": "单态化的主要性能优势是？", "options": ["省内存", "零运行时开销 + 可内联优化", "编译快", "代码小"], "answer": 1, "feedback": "为每种类型生成专门代码，无运行时类型检查开销。" },
-        { "type": "concept", "question": "Rust 中放弃单态化改用动态分派的关键字是？", "options": ["static", "dyn（trait object）", "impl", "virtual"], "answer": 1, "feedback": "dyn Trait 用 trait object 做动态分派，牺牲性能换取灵活性。" }
+        { "type": "concept", "question": "单态化的主要性能优势是？", "options": ["省内存", "代码小", "编译快", "零运行时开销 + 可内联优化"], "answer": 3, "feedback": "为每种类型生成专门代码，无运行时类型检查开销。" },
+        { "type": "concept", "question": "Rust 中放弃单态化改用动态分派的关键字是？", "options": ["virtual", "static", "dyn（trait object）", "impl"], "answer": 2, "feedback": "dyn Trait 用 trait object 做动态分派，牺牲性能换取灵活性。" }
       ]
     },
     { "id": "generic.alias-newtype", "module_id": "B12", "title": "类型别名与新类型", "status": "published",
@@ -1063,8 +1063,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "类型别名：给复杂类型起短名（type UserId = int），仅别名不创造新类型（可互换）。新类型（newtype）：包装现有类型形成全新类型，编译器视为不同（UserId 不能当 int 用），用零成本换取类型安全（防止把用户 ID 当订单 ID 传参）。",
       "lang_diff": "Python：TypeAlias（UserId = int，仅别名）；JS：TS type UserId = number（别名）；Java：无别名（需包装类）；C++：using/typedef 别名；Go：type UserId int（新类型，不隐式转换）；Rust：type 别名 + struct UserId(i32) 新类型（newtype 模式）。",
       "exercises": [
-        { "type": "concept", "question": "Go 中 type UserId int 的效果是？", "options": ["仅别名可互换", "创建新类型，与 int 不隐式转换", "语法错误", "创建接口"], "answer": 1, "feedback": "Go 的命名类型是新类型，需显式转换，增强类型安全。" },
-        { "type": "concept", "question": "Rust 的 newtype 模式（struct UserId(i32)）主要价值是？", "options": ["省内存", "零成本类型安全（防止混用语义不同的同类型值）", "更快", "序列化"], "answer": 1, "feedback": "newtype 包装让编译器区分语义不同的同类型值，零运行时开销。" }
+        { "type": "concept", "question": "Go 中 type UserId int 的效果是？", "options": ["创建接口", "仅别名可互换", "创建新类型，与 int 不隐式转换", "语法错误"], "answer": 2, "feedback": "Go 的命名类型是新类型，需显式转换，增强类型安全。" },
+        { "type": "concept", "question": "Rust 的 newtype 模式（struct UserId(i32)）主要价值是？", "options": ["更快", "省内存", "零成本类型安全（防止混用语义不同的同类型值）", "序列化"], "answer": 2, "feedback": "newtype 包装让编译器区分语义不同的同类型值，零运行时开销。" }
       ]
     },
     { "id": "generic.when-not", "module_id": "B12", "title": "何时不应使用泛型", "status": "published",
@@ -1073,8 +1073,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "泛型不是免费的：增加理解成本、编译时间、错误信息复杂度。不该用泛型的信号：只有一两种类型用到、具体实现更直观、为「将来可能」提前抽象、约束复杂到读不懂。原则：先写具体实现，出现真实重复再抽象；简单优先。",
       "lang_diff": "通用原则。Rust 中过度泛型可用具体类型或 dyn Trait 简化；Go 社区强调「先具体后泛型」（1.18 才有泛型）；C++ 模板过度导致错误信息爆炸；Python 动态类型本就「泛型」，标注只为文档。",
       "exercises": [
-        { "type": "concept", "question": "何时应该引入泛型？", "options": ["一开始就泛型", "出现真实的跨类型重复后", "为了显得高级", "性能需要"], "answer": 1, "feedback": "先写具体实现，真实重复出现再抽象，避免过度设计。" },
-        { "type": "concept", "question": "泛型的主要代价不包括？", "options": ["理解成本", "编译时间", "运行时必然更快", "错误信息复杂"], "answer": 2, "feedback": "泛型不保证更快；代价是复杂度、编译时间与可读性。" }
+        { "type": "concept", "question": "何时应该引入泛型？", "options": ["为了显得高级", "出现真实的跨类型重复后", "性能需要", "一开始就泛型"], "answer": 1, "feedback": "先写具体实现，真实重复出现再抽象，避免过度设计。" },
+        { "type": "concept", "question": "泛型的主要代价不包括？", "options": ["错误信息复杂", "运行时必然更快", "理解成本", "编译时间"], "answer": 1, "feedback": "泛型不保证更快；代价是复杂度、编译时间与可读性。" }
       ]
     },
 
@@ -1085,8 +1085,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "进程：独立内存空间，隔离安全但开销大、通信靠 IPC；线程：共享内存，开销较小、通信方便但有数据竞争风险；协程/任务：用户态轻量调度，一个线程跑成千上万个，适合 IO 密集。选择：CPU 密集用进程/线程，IO 密集用协程/异步。",
       "lang_diff": "Python：multiprocessing（绕 GIL）、threading、asyncio；JS：单线程事件循环 + Web Worker/Worker Threads；Java：Thread + 虚拟线程（21+）；C++：std::thread/process；Go：goroutine（轻量，栈可增长）；Rust：std::thread + tokio 任务。",
       "exercises": [
-        { "type": "concept", "question": "IO 密集型任务最适合的并发模型是？", "options": ["多进程", "协程/异步任务", "单线程", "加锁线程"], "answer": 1, "feedback": "IO 等待时协程让出执行，单线程即可高效并发。" },
-        { "type": "concept", "question": "Python 中绕过 GIL 利用多核的方式是？", "options": ["threading", "multiprocessing", "asyncio", "单线程"], "answer": 1, "feedback": "GIL 限制线程并行，multiprocessing 用多进程利用多核。" }
+        { "type": "concept", "question": "IO 密集型任务最适合的并发模型是？", "options": ["单线程", "加锁线程", "协程/异步任务", "多进程"], "answer": 2, "feedback": "IO 等待时协程让出执行，单线程即可高效并发。" },
+        { "type": "concept", "question": "Python 中绕过 GIL 利用多核的方式是？", "options": ["asyncio", "multiprocessing", "单线程", "threading"], "answer": 1, "feedback": "GIL 限制线程并行，multiprocessing 用多进程利用多核。" }
       ]
     },
     { "id": "concurrency.sync-async", "module_id": "B13", "title": "同步与异步", "status": "published",
@@ -1095,8 +1095,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "同步：调用发起后阻塞等待结果，简单但 IO 时线程空转；异步：发起后立即返回「未来的结果」（Promise/Future），IO 完成时通过事件循环回调，单线程可并发数千 IO。异步不加速单个操作，但大幅提升 IO 并发吞吐。",
       "lang_diff": "Python：async/await + asyncio 事件循环；JS：Promise + 事件循环（天然异步）；Java：CompletableFuture / 虚拟线程；C++：std::async/future；Go：goroutine（同步写法、异步调度）；Rust：async/await + tokio 运行时。",
       "exercises": [
-        { "type": "concept", "question": "异步编程的主要优势是？", "options": ["单个操作更快", "IO 等待时不阻塞，单线程高并发", "代码简单", "无回调"], "answer": 1, "feedback": "异步让线程在 IO 等待时处理其他任务，提升并发吞吐。" },
-        { "type": "concept", "question": "JS 中表示「未来的结果」的对象是？", "options": ["Thread", "Promise", "Callback", "Event"], "answer": 1, "feedback": "Promise 代表异步操作的最终结果，配合 async/await 使用。" }
+        { "type": "concept", "question": "异步编程的主要优势是？", "options": ["单个操作更快", "无回调", "代码简单", "IO 等待时不阻塞，单线程高并发"], "answer": 3, "feedback": "异步让线程在 IO 等待时处理其他任务，提升并发吞吐。" },
+        { "type": "concept", "question": "JS 中表示「未来的结果」的对象是？", "options": ["Promise", "Callback", "Thread", "Event"], "answer": 0, "feedback": "Promise 代表异步操作的最终结果，配合 async/await 使用。" }
       ]
     },
     { "id": "concurrency.shared-message", "module_id": "B13", "title": "共享状态与消息传递", "status": "published",
@@ -1105,8 +1105,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "并发通信两路线：共享状态（多任务读写同一内存，需锁保护，易出竞争）与消息传递（通过 channel/队列发送数据，无共享即可变状态，天然安全）。Go 哲学「不要通过共享内存通信，要通过通信共享内存」倡导后者。",
       "lang_diff": "Python：queue.Queue（消息）/ 共享变量 + Lock；JS：单线程无共享问题、Worker 用 postMessage；Java：BlockingQueue / 共享 + synchronized；C++：mutex 保护共享 / 无内置 channel；Go：channel（消息传递首选）；Rust：mpsc channel / Arc<Mutex> 共享。",
       "exercises": [
-        { "type": "concept", "question": "Go 倡导的并发通信方式是？", "options": ["共享内存 + 锁", "channel 消息传递", "全局变量", "文件"], "answer": 1, "feedback": "「通过通信共享内存」：用 channel 传递数据避免共享可变状态。" },
-        { "type": "concept", "question": "Rust 中多线程安全共享可变状态的标准类型是？", "options": ["Rc<RefCell>", "Arc<Mutex<T>>", "Box<T>", "&mut T"], "answer": 1, "feedback": "Arc 原子引用计数共享所有权，Mutex 提供互斥访问。" }
+        { "type": "concept", "question": "Go 倡导的并发通信方式是？", "options": ["文件", "共享内存 + 锁", "channel 消息传递", "全局变量"], "answer": 2, "feedback": "「通过通信共享内存」：用 channel 传递数据避免共享可变状态。" },
+        { "type": "concept", "question": "Rust 中多线程安全共享可变状态的标准类型是？", "options": ["Arc<Mutex<T>>", "Rc<RefCell>", "&mut T", "Box<T>"], "answer": 0, "feedback": "Arc 原子引用计数共享所有权，Mutex 提供互斥访问。" }
       ]
     },
     { "id": "concurrency.locks", "module_id": "B13", "title": "锁、原子操作与条件变量", "status": "published",
@@ -1115,8 +1115,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "互斥锁（mutex）：同一时刻只允许一个任务进入临界区，保护共享数据。原子操作：无锁的不可分割操作（计数器增减），比锁轻量。条件变量：等待某条件成立的协调机制。原则：锁粒度尽量小、持锁时间尽量短、避免嵌套锁（死锁）。",
       "lang_diff": "Python：threading.Lock/RLock；JS：单线程无需锁（Worker 间 Atomics）；Java：synchronized/ReentrantLock/AtomicInteger；C++：std::mutex/atomic/condition_variable + lock_guard；Go：sync.Mutex/atomic；Rust：Mutex/AtomicI32（配合 RAII 自动解锁）。",
       "exercises": [
-        { "type": "concept", "question": "保护共享计数器最简单且无锁的方式是？", "options": ["加互斥锁", "原子操作（atomic increment）", "条件变量", "channel"], "answer": 1, "feedback": "原子操作对简单计数比互斥锁更轻量高效。" },
-        { "type": "concept", "question": "C++ 中确保锁自动释放的惯用类型是？", "options": ["手动 unlock", "std::lock_guard（RAII）", "原子变量", "递归锁"], "answer": 1, "feedback": "lock_guard 构造加锁、析构解锁，异常安全。" }
+        { "type": "concept", "question": "保护共享计数器最简单且无锁的方式是？", "options": ["原子操作（atomic increment）", "加互斥锁", "channel", "条件变量"], "answer": 0, "feedback": "原子操作对简单计数比互斥锁更轻量高效。" },
+        { "type": "concept", "question": "C++ 中确保锁自动释放的惯用类型是？", "options": ["std::lock_guard（RAII）", "原子变量", "递归锁", "手动 unlock"], "answer": 0, "feedback": "lock_guard 构造加锁、析构解锁，异常安全。" }
       ]
     },
     { "id": "concurrency.future-promise", "module_id": "B13", "title": "Future / Promise", "status": "published",
@@ -1125,8 +1125,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "Future/Promise 是「将来可得的结果」的占位符：创建时未完成，完成后可读值或错误。支持组合：并行（all/join）、串行（then/and_then）、竞速（race/select）。它把回调地狱变成可链式组合的异步管线。",
       "lang_diff": "Python：asyncio.Task/Future + gather；JS：Promise + all/then/allSettled；Java：CompletableFuture + allOf/thenApply；C++：std::future + std::async；Go：无原生（channel + WaitGroup 实现）；Rust：Future trait + join!/select!。",
       "exercises": [
-        { "type": "concept", "question": "JS 中并行等待多个 Promise 的方法是？", "options": ["Promise.race", "Promise.all", "Promise.then", "await 逐个"], "answer": 1, "feedback": "Promise.all 并行执行并等待全部完成；race 取最快。" },
-        { "type": "concept", "question": "Rust 中并发等待多个 future 的宏是？", "options": ["await", "join!", "spawn", "select!（取首个）"], "answer": 1, "feedback": "join! 并发执行并等待全部；select! 取最先完成者。" }
+        { "type": "concept", "question": "JS 中并行等待多个 Promise 的方法是？", "options": ["await 逐个", "Promise.all", "Promise.race", "Promise.then"], "answer": 1, "feedback": "Promise.all 并行执行并等待全部完成；race 取最快。" },
+        { "type": "concept", "question": "Rust 中并发等待多个 future 的宏是？", "options": ["select!（取首个）", "join!", "await", "spawn"], "answer": 1, "feedback": "join! 并发执行并等待全部；select! 取最先完成者。" }
       ]
     },
     { "id": "concurrency.cancel-timeout", "module_id": "B13", "title": "取消、超时与上下文", "status": "published",
@@ -1135,8 +1135,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "异步操作必须可取消、可超时，否则泄漏资源（goroutine 悬挂、连接占用）。上下文（context）携带截止时间/取消信号沿调用链传播，一层取消、全链停止。超时是防御性编程的基本功。",
       "lang_diff": "Python：asyncio.wait_for / 任务 cancel()；JS：AbortController + signal；Java：Future.get(timeout)/cancel；C++：std::future::wait_for；Go：context.WithTimeout/WithCancel（标准）；Rust：tokio::time::timeout、CancellationToken。",
       "exercises": [
-        { "type": "concept", "question": "Go 中传递取消与截止时间的标准类型是？", "options": ["channel", "context.Context", "sync.Mutex", "time.Timer"], "answer": 1, "feedback": "context 沿调用链传播取消信号与截止时间。" },
-        { "type": "concept", "question": "JS 中取消 fetch 请求的机制是？", "options": ["clearTimeout", "AbortController", "Promise.cancel", "return"], "answer": 1, "feedback": "AbortController 的 signal 传入 fetch，abort() 触发取消。" }
+        { "type": "concept", "question": "Go 中传递取消与截止时间的标准类型是？", "options": ["sync.Mutex", "channel", "context.Context", "time.Timer"], "answer": 2, "feedback": "context 沿调用链传播取消信号与截止时间。" },
+        { "type": "concept", "question": "JS 中取消 fetch 请求的机制是？", "options": ["Promise.cancel", "return", "clearTimeout", "AbortController"], "answer": 3, "feedback": "AbortController 的 signal 传入 fetch，abort() 触发取消。" }
       ]
     },
     { "id": "concurrency.races-deadlock", "module_id": "B13", "title": "数据竞争、死锁与活锁", "status": "published",
@@ -1145,8 +1145,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "数据竞争：多任务并发访问同一数据且至少一个写、无同步，结果不确定（UB）。死锁：多任务互相持有对方需要的锁，全部卡住。活锁：不断重试但无法推进。预防：固定加锁顺序、锁粒度最小、优先消息传递/不可变数据。",
       "lang_diff": "检测：Go -race 竞态检测器、Rust 编译期 Send/Sync 静态阻止、TSan（C++）。Python 因 GIL 竞争较少但仍有；Java 有 synchronized 与 jstack 诊断死锁。",
       "exercises": [
-        { "type": "concept", "question": "预防死锁的经典方法是？", "options": ["加更多锁", "固定全局加锁顺序", "无限重试", "忽略"], "answer": 1, "feedback": "所有线程按相同顺序获取锁，消除循环等待。" },
-        { "type": "concept", "question": "哪个语言在编译期静态防止数据竞争？", "options": ["Python", "Java", "Rust", "C++"], "answer": 2, "feedback": "Rust 的 Send/Sync 与借用检查在编译期阻止数据竞争。" }
+        { "type": "concept", "question": "预防死锁的经典方法是？", "options": ["固定全局加锁顺序", "忽略", "无限重试", "加更多锁"], "answer": 0, "feedback": "所有线程按相同顺序获取锁，消除循环等待。" },
+        { "type": "concept", "question": "哪个语言在编译期静态防止数据竞争？", "options": ["Rust", "C++", "Java", "Python"], "answer": 0, "feedback": "Rust 的 Send/Sync 与借用检查在编译期阻止数据竞争。" }
       ]
     },
     { "id": "concurrency.immutability", "module_id": "B13", "title": "线程安全与不可变数据", "status": "published",
@@ -1155,8 +1155,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "不可变数据创建后不改，多任务读取无需任何同步——天然线程安全。需要「修改」时创建新值（持久化数据结构）或用写时复制。这是函数式并发与 Rust 安全并发的思想基础：优先不可变，共享可变状态才需同步。",
       "lang_diff": "Python：tuple/frozenset 不可变可安全共享；JS：原始值不可变、Object.freeze；Java：record/不可变集合；C++：const 数据可安全共享；Go：值语义复制传递；Rust：&T 共享只读、&mut T 独占（编译期强制）。",
       "exercises": [
-        { "type": "concept", "question": "不可变数据在并发中的核心价值是？", "options": ["更快", "读取无需加锁，天然线程安全", "省内存", "易序列化"], "answer": 1, "feedback": "不可变数据无写竞争，任意多任务可安全并发读取。" },
-        { "type": "concept", "question": "Rust 中允许多个只读引用但排斥可变引用的规则是？", "options": ["任意共享", "多个 &T 或唯一 &mut T（不可共存）", "只能一个引用", "无限制"], "answer": 1, "feedback": "借用规则：共享只读或独占可变，编译期防止数据竞争。" }
+        { "type": "concept", "question": "不可变数据在并发中的核心价值是？", "options": ["易序列化", "省内存", "更快", "读取无需加锁，天然线程安全"], "answer": 3, "feedback": "不可变数据无写竞争，任意多任务可安全并发读取。" },
+        { "type": "concept", "question": "Rust 中允许多个只读引用但排斥可变引用的规则是？", "options": ["无限制", "多个 &T 或唯一 &mut T（不可共存）", "只能一个引用", "任意共享"], "answer": 1, "feedback": "借用规则：共享只读或独占可变，编译期防止数据竞争。" }
       ]
     },
 
@@ -1167,7 +1167,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "网络通信基于客户端/服务端模型：服务端监听端口等待连接，客户端主动发起。IP 定位主机、端口定位进程（0-65535，知名服务 <1024）。TCP 提供可靠的面向连接字节流，HTTP 等协议建立在 TCP 之上。localhost（127.0.0.1）指本机。",
       "lang_diff": "Python：socket / requests（客户端）、Flask/FastAPI（服务端）；JS：fetch / Node http 或 Express；Java：HttpClient / Spring；C++：socket / Boost.Asio；Go：net / net/http（标准库完整）；Rust：reqwest / tokio + axum。",
       "exercises": [
-        { "type": "concept", "question": "127.0.0.1 表示？", "options": ["网关", "本机回环地址（localhost）", "广播", "公网"], "answer": 1, "feedback": "127.0.0.1 是本机回环地址，用于本机测试服务。" },
+        { "type": "concept", "question": "127.0.0.1 表示？", "options": ["公网", "广播", "本机回环地址（localhost）", "网关"], "answer": 2, "feedback": "127.0.0.1 是本机回环地址，用于本机测试服务。" },
         { "type": "concept", "question": "HTTP 服务默认端口是？", "options": ["21", "80", "443", "8080"], "answer": 1, "feedback": "HTTP 默认 80，HTTPS 默认 443。" }
       ]
     },
@@ -1177,8 +1177,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "HTTP 方法表达操作语义：GET 读取（安全、幂等）、POST 创建/提交（非幂等）、PUT 整体替换（幂等）、PATCH 部分修改、DELETE 删除（幂等）。幂等：重复执行结果相同。选对方法让 API 语义清晰、可被缓存与安全重试。",
       "lang_diff": "方法语义与语言无关。客户端调用：requests.get/post、fetch(url, {method})、http.Get/Post、reqwest::get/post。服务端按方法路由。",
       "exercises": [
-        { "type": "concept", "question": "创建资源应该用哪个 HTTP 方法？", "options": ["GET", "POST", "PUT", "DELETE"], "answer": 1, "feedback": "POST 用于创建/提交；GET 只读、PUT 替换、DELETE 删除。" },
-        { "type": "concept", "question": "「幂等」的含义是？", "options": ["更快", "重复执行结果相同", "安全加密", "无状态"], "answer": 1, "feedback": "幂等操作重复执行副作用相同，可安全重试。" }
+        { "type": "concept", "question": "创建资源应该用哪个 HTTP 方法？", "options": ["PUT", "GET", "DELETE", "POST"], "answer": 3, "feedback": "POST 用于创建/提交；GET 只读、PUT 替换、DELETE 删除。" },
+        { "type": "concept", "question": "「幂等」的含义是？", "options": ["重复执行结果相同", "安全加密", "更快", "无状态"], "answer": 0, "feedback": "幂等操作重复执行副作用相同，可安全重试。" }
       ]
     },
     { "id": "net.status-codes", "module_id": "B14", "title": "状态码与错误处理", "status": "published",
@@ -1187,8 +1187,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "HTTP 状态码分五类：2xx 成功（200 OK、201 Created、204 No Content）、3xx 重定向（301/302/304）、4xx 客户端错误（400 参数错、401 未认证、403 无权限、404 不存在、429 限流）、5xx 服务端错误（500/502/503）。客户端应检查状态码而非假设成功。",
       "lang_diff": "Python：resp.status_code 判断（requests 不自动抛错，用 raise_for_status()）；JS：fetch 不抛 4xx/5xx，需检查 resp.ok；Java：HttpResponse.statusCode()；Go：resp.StatusCode；Rust：resp.status()。共同点：4xx/5xx 不自动抛异常，需显式检查。",
       "exercises": [
-        { "type": "concept", "question": "HTTP 404 表示？", "options": ["未认证", "资源不存在", "服务器错误", "限流"], "answer": 1, "feedback": "404 Not Found：请求的资源不存在。" },
-        { "type": "concept", "question": "JS fetch 对 404 响应会？", "options": ["自动 reject", "正常 resolve（需检查 resp.ok）", "抛异常", "重试"], "answer": 1, "feedback": "fetch 只在网络错误时 reject，HTTP 错误码需手动检查 resp.ok。" }
+        { "type": "concept", "question": "HTTP 404 表示？", "options": ["资源不存在", "未认证", "限流", "服务器错误"], "answer": 0, "feedback": "404 Not Found：请求的资源不存在。" },
+        { "type": "concept", "question": "JS fetch 对 404 响应会？", "options": ["抛异常", "自动 reject", "正常 resolve（需检查 resp.ok）", "重试"], "answer": 2, "feedback": "fetch 只在网络错误时 reject，HTTP 错误码需手动检查 resp.ok。" }
       ]
     },
     { "id": "net.headers-body", "module_id": "B14", "title": "请求头、查询参数与请求体", "status": "published",
@@ -1197,8 +1197,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "请求组成：请求行（方法+路径）、头（元信息：Content-Type 数据格式、Authorization 认证、Accept 期望格式）、查询参数（?key=value 过滤/分页）、请求体（POST/PUT 的数据）。GET 无请求体，数据放查询参数；POST/PUT 数据放请求体。",
       "lang_diff": "Python：requests.get(url, params={}, headers={}, json=data)；JS：fetch(url, {headers, body, method})；Java：HttpRequest.header/uri；Go：req.Header.Set/url.Values；Rust：reqwest Client .header().query().json()。",
       "exercises": [
-        { "type": "concept", "question": "传递认证令牌通常放在哪个请求头？", "options": ["Content-Type", "Authorization", "Accept", "Cookie"], "answer": 1, "feedback": "Authorization: Bearer <token> 传递认证凭证。" },
-        { "type": "concept", "question": "POST 提交 JSON 数据应设置的请求头是？", "options": ["Accept: json", "Content-Type: application/json", "X-Data: json", "Cookie"], "answer": 1, "feedback": "Content-Type 声明请求体的数据格式。" }
+        { "type": "concept", "question": "传递认证令牌通常放在哪个请求头？", "options": ["Accept", "Cookie", "Authorization", "Content-Type"], "answer": 2, "feedback": "Authorization: Bearer <token> 传递认证凭证。" },
+        { "type": "concept", "question": "POST 提交 JSON 数据应设置的请求头是？", "options": ["Accept: json", "X-Data: json", "Content-Type: application/json", "Cookie"], "answer": 2, "feedback": "Content-Type 声明请求体的数据格式。" }
       ]
     },
     { "id": "net.json-api", "module_id": "B14", "title": "JSON API", "status": "published",
@@ -1207,8 +1207,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "JSON 是 Web API 的事实标准数据格式：请求体发 JSON、响应体收 JSON。客户端：序列化对象发送、解析响应 JSON 为对象。要点：设置 Content-Type: application/json、处理嵌套结构、容错非法 JSON。",
       "lang_diff": "Python：requests 的 json= 参数与 resp.json()；JS：fetch + JSON.stringify / resp.json()；Java：HttpClient + Jackson/Gson；Go：json.Marshal/NewDecoder(resp.Body).Decode；Rust：reqwest 的 .json() 与 serde。",
       "exercises": [
-        { "type": "concept", "question": "Python requests 发送 JSON 数据的便捷参数是？", "options": ["data=", "json=", "body=", "params="], "answer": 1, "feedback": "json= 自动序列化并设置 Content-Type。" },
-        { "type": "concept", "question": "Go 中解析响应 JSON 到结构体的方式是？", "options": ["json.Parse", "json.NewDecoder(body).Decode(&v)", "resp.json()", "unmarshal"], "answer": 1, "feedback": "json.NewDecoder 流式解码响应体到结构体。" }
+        { "type": "concept", "question": "Python requests 发送 JSON 数据的便捷参数是？", "options": ["data=", "body=", "json=", "params="], "answer": 2, "feedback": "json= 自动序列化并设置 Content-Type。" },
+        { "type": "concept", "question": "Go 中解析响应 JSON 到结构体的方式是？", "options": ["unmarshal", "json.Parse", "resp.json()", "json.NewDecoder(body).Decode(&v)"], "answer": 3, "feedback": "json.NewDecoder 流式解码响应体到结构体。" }
       ]
     },
     { "id": "net.http-client", "module_id": "B14", "title": "同步与异步 HTTP 客户端", "status": "published",
@@ -1217,8 +1217,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "HTTP 客户端发起请求并处理响应。同步客户端：简单直接，IO 时阻塞当前线程；异步客户端：IO 等待时让出，单线程可并发数百请求。高频并发抓取/微服务调用应用异步客户端 + 连接复用（连接池）。",
       "lang_diff": "Python：requests（同步）/ httpx、aiohttp（异步）；JS：fetch（天然异步）/ axios；Java：HttpClient（同步 + async 版）；C++：libcurl / cpp-httplib；Go：net/http（并发靠 goroutine）；Rust：reqwest（异步 + blocking 版）。",
       "exercises": [
-        { "type": "concept", "question": "需要同时发起数百个 HTTP 请求时应选择？", "options": ["同步客户端循环", "异步客户端 + 连接池", "多进程", "串行逐个"], "answer": 1, "feedback": "异步客户端 IO 等待时让出，单线程即可高并发。" },
-        { "type": "concept", "question": "Python 中支持异步的 HTTP 客户端是？", "options": ["requests", "httpx / aiohttp", "urllib", "socket"], "answer": 1, "feedback": "httpx 与 aiohttp 支持 async/await 异步请求。" }
+        { "type": "concept", "question": "需要同时发起数百个 HTTP 请求时应选择？", "options": ["异步客户端 + 连接池", "同步客户端循环", "多进程", "串行逐个"], "answer": 0, "feedback": "异步客户端 IO 等待时让出，单线程即可高并发。" },
+        { "type": "concept", "question": "Python 中支持异步的 HTTP 客户端是？", "options": ["socket", "urllib", "requests", "httpx / aiohttp"], "answer": 3, "feedback": "httpx 与 aiohttp 支持 async/await 异步请求。" }
       ]
     },
     { "id": "net.rest", "module_id": "B14", "title": "REST 的基本约束", "status": "published",
@@ -1227,8 +1227,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "REST 用「资源」建模：URL 表示资源（/users/42 而非 /getUser?id=42），HTTP 方法表达操作（GET 读、POST 建、PUT 改、DELETE 删），状态码表达结果。无状态：每个请求自包含。好处：语义统一、可缓存、易理解。",
       "lang_diff": "REST 是架构风格与语言无关。实现框架：FastAPI/Flask（Python）、Express/NestJS（JS）、Spring Boot（Java）、Gin/net-http（Go）、Axum/Actix（Rust）。",
       "exercises": [
-        { "type": "concept", "question": "RESTful 风格的「获取用户 42」URL 是？", "options": ["/getUser?id=42", "/users/42", "/user/get/42", "/api?id=42"], "answer": 1, "feedback": "资源用名词复数路径表示，ID 作为路径段，方法表达操作。" },
-        { "type": "concept", "question": "REST 中「无状态」指？", "options": ["不存数据", "每个请求自包含，服务端不保存会话上下文", "无响应", "无认证"], "answer": 1, "feedback": "无状态：请求包含全部所需信息，不依赖服务端会话。" }
+        { "type": "concept", "question": "RESTful 风格的「获取用户 42」URL 是？", "options": ["/api?id=42", "/getUser?id=42", "/user/get/42", "/users/42"], "answer": 3, "feedback": "资源用名词复数路径表示，ID 作为路径段，方法表达操作。" },
+        { "type": "concept", "question": "REST 中「无状态」指？", "options": ["无响应", "无认证", "不存数据", "每个请求自包含，服务端不保存会话上下文"], "answer": 3, "feedback": "无状态：请求包含全部所需信息，不依赖服务端会话。" }
       ]
     },
     { "id": "net.websocket", "module_id": "B14", "title": "WebSocket 概念", "status": "published",
@@ -1237,8 +1237,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "WebSocket 在单个 TCP 连接上提供全双工（双向）持久通信：连接建立后客户端与服务端可随时互发消息，无需反复建连。适合实时场景：聊天、协同编辑、实时推送、游戏。与 HTTP 的请求-响应模式互补。",
       "lang_diff": "Python：websockets 库；JS：浏览器 WebSocket API / ws（Node）；Java：JSR-356 / Spring WebSocket；C++：Boost.Beast；Go：gorilla/websocket；Rust：tokio-tungstenite。",
       "exercises": [
-        { "type": "concept", "question": "WebSocket 相比 HTTP 轮询的核心优势是？", "options": ["更简单", "服务端可主动推送，全双工低延迟", "更安全", "无需连接"], "answer": 1, "feedback": "WebSocket 持久连接双向通信，服务端可主动推送，避免轮询开销。" },
-        { "type": "concept", "question": "实时聊天应用最适合用？", "options": ["HTTP GET 轮询", "WebSocket", "FTP", "SMTP"], "answer": 1, "feedback": "WebSocket 全双工低延迟，适合实时消息。" }
+        { "type": "concept", "question": "WebSocket 相比 HTTP 轮询的核心优势是？", "options": ["无需连接", "服务端可主动推送，全双工低延迟", "更简单", "更安全"], "answer": 1, "feedback": "WebSocket 持久连接双向通信，服务端可主动推送，避免轮询开销。" },
+        { "type": "concept", "question": "实时聊天应用最适合用？", "options": ["SMTP", "WebSocket", "FTP", "HTTP GET 轮询"], "answer": 1, "feedback": "WebSocket 全双工低延迟，适合实时消息。" }
       ]
     },
     { "id": "net.auth", "module_id": "B14", "title": "认证令牌与敏感信息", "status": "published",
@@ -1247,8 +1247,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "API 认证常用令牌（token）：客户端在请求头携带 Authorization: Bearer <token>。要点：令牌放环境变量而非硬编码；用 HTTPS 防止窃听；令牌有有效期需刷新；最小权限原则（只授予需要的权限）。",
       "lang_diff": "Python：os.environ 读令牌 + headers 传递；JS：process.env + fetch headers；Java：环境变量 + HttpRequest header；Go：os.Getenv + Header.Set；Rust：env::var + .bearer_auth()。HTTPS 是所有语言的必备前提。",
       "exercises": [
-        { "type": "concept", "question": "API 令牌应该存放在？", "options": ["源码硬编码", "环境变量或密钥管理", "注释", "README"], "answer": 1, "feedback": "凭证绝不入库，用环境变量或密钥管理服务。" },
-        { "type": "concept", "question": "传递 Bearer 令牌的请求头是？", "options": ["Content-Type", "Authorization", "X-Token", "Accept"], "answer": 1, "feedback": "Authorization: Bearer <token> 是标准认证头。" }
+        { "type": "concept", "question": "API 令牌应该存放在？", "options": ["注释", "环境变量或密钥管理", "README", "源码硬编码"], "answer": 1, "feedback": "凭证绝不入库，用环境变量或密钥管理服务。" },
+        { "type": "concept", "question": "传递 Bearer 令牌的请求头是？", "options": ["Authorization", "Accept", "Content-Type", "X-Token"], "answer": 0, "feedback": "Authorization: Bearer <token> 是标准认证头。" }
       ]
     },
     { "id": "net.timeout-retry", "module_id": "B14", "title": "超时、重试与幂等", "status": "published",
@@ -1257,8 +1257,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "网络请求必须设超时（连接/读取），否则故障时无限挂起。重试只适用于幂等请求（GET/PUT/DELETE 安全重试，POST 可能重复创建需幂等键）。策略：指数退避 + 抖动 + 最大次数 + 熔断。",
       "lang_diff": "Python：requests timeout= 参数、tenacity 重试；JS：AbortController 超时、fetch-retry；Java：HttpClient connectTimeout；Go：http.Client{Timeout}、context 超时；Rust：reqwest timeout()、tower retry。",
       "exercises": [
-        { "type": "concept", "question": "为什么 POST 请求重试需要谨慎？", "options": ["太慢", "POST 非幂等，重试可能重复创建资源", "不允许", "会崩溃"], "answer": 1, "feedback": "POST 非幂等，重复提交可能产生重复数据，需幂等键或服务端去重。" },
-        { "type": "concept", "question": "网络请求不设超时的后果是？", "options": ["更快", "故障时无限挂起耗尽资源", "更安全", "无影响"], "answer": 1, "feedback": "无超时在网络故障时会永久阻塞，耗尽连接与线程。" }
+        { "type": "concept", "question": "为什么 POST 请求重试需要谨慎？", "options": ["POST 非幂等，重试可能重复创建资源", "会崩溃", "太慢", "不允许"], "answer": 0, "feedback": "POST 非幂等，重复提交可能产生重复数据，需幂等键或服务端去重。" },
+        { "type": "concept", "question": "网络请求不设超时的后果是？", "options": ["无影响", "故障时无限挂起耗尽资源", "更安全", "更快"], "answer": 1, "feedback": "无超时在网络故障时会永久阻塞，耗尽连接与线程。" }
       ]
     },
 
@@ -1269,8 +1269,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "断言验证「实际输出 == 预期输出」。好用例：一个测试只验一件事、覆盖正常/边界/异常三类路径、用具体值而非模糊断言（assert result 不如 assert result == 42）。断言失败信息应能定位问题。",
       "lang_diff": "Python：assert expr（pytest 自动展开）；JS：expect(x).toBe(y)/toEqual；Java：assertEquals/assertTrue；C++：EXPECT_EQ/ASSERT_TRUE；Go：if got != want { t.Errorf }；Rust：assert_eq!/assert!。",
       "exercises": [
-        { "type": "concept", "question": "Rust 中比较两个值相等的断言宏是？", "options": ["assert!", "assert_eq!", "expect!", "check!"], "answer": 1, "feedback": "assert_eq!(a, b) 比较相等并输出差异。" },
-        { "type": "concept", "question": "好的测试断言应该？", "options": ["assert result 非空", "用具体预期值验证（== 42）", "只测正常路径", "一个测试验多件事"], "answer": 1, "feedback": "具体断言能精确定位问题，模糊断言掩盖错误。" }
+        { "type": "concept", "question": "Rust 中比较两个值相等的断言宏是？", "options": ["assert!", "expect!", "assert_eq!", "check!"], "answer": 2, "feedback": "assert_eq!(a, b) 比较相等并输出差异。" },
+        { "type": "concept", "question": "好的测试断言应该？", "options": ["只测正常路径", "用具体预期值验证（== 42）", "assert result 非空", "一个测试验多件事"], "answer": 1, "feedback": "具体断言能精确定位问题，模糊断言掩盖错误。" }
       ]
     },
     { "id": "test.boundary", "module_id": "B15", "title": "边界值与异常路径", "status": "published",
@@ -1279,8 +1279,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "bug 最爱藏在边界：空输入、0、1、最大值、负值、空集合、单元素。异常路径：非法输入、资源缺失、超时、并发竞争。设计用例时问自己：边界值测了吗？失败路径测了吗？只测「快乐路径」的测试等于没测。",
       "lang_diff": "边界与异常用例设计是通用方法。异常断言：pytest.raises、JS expect().toThrow、Java assertThrows、Go 检查 err != nil、Rust #[should_panic]。",
       "exercises": [
-        { "type": "concept", "question": "测试 divide 函数最应覆盖的边界是？", "options": ["10/2", "除数为 0", "1/1", "100/10"], "answer": 1, "feedback": "除零是关键边界，必须验证异常路径。" },
-        { "type": "concept", "question": "Python 中验证函数抛出异常的写法是？", "options": ["assert raises", "with pytest.raises(ValueError):", "try/except", "expect throw"], "answer": 1, "feedback": "pytest.raises 上下文验证抛出指定异常。" }
+        { "type": "concept", "question": "测试 divide 函数最应覆盖的边界是？", "options": ["除数为 0", "10/2", "100/10", "1/1"], "answer": 0, "feedback": "除零是关键边界，必须验证异常路径。" },
+        { "type": "concept", "question": "Python 中验证函数抛出异常的写法是？", "options": ["with pytest.raises(ValueError):", "expect throw", "try/except", "assert raises"], "answer": 0, "feedback": "pytest.raises 上下文验证抛出指定异常。" }
       ]
     },
     { "id": "test.parametrized", "module_id": "B15", "title": "参数化测试", "status": "published",
@@ -1289,8 +1289,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "参数化测试：把「测试逻辑」与「测试数据」分离——同一逻辑跑多组输入/预期，避免复制粘贴。新增用例只需加一行数据。表驱动测试（Go）是其极致体现：用例定义为数据表，循环执行。",
       "lang_diff": "Python：@pytest.mark.parametrize；JS：test.each / describe.each；Java：@ParameterizedTest + @ValueSource/@CsvSource；C++：GoogleTest 值参数化；Go：表驱动测试（[]struct 切片 + t.Run）；Rust：循环 + 用例向量（无内置参数化宏）。",
       "exercises": [
-        { "type": "concept", "question": "Go 中实现参数化测试的惯用方式是？", "options": ["@parametrize", "表驱动测试（用例切片 + t.Run）", "宏", "反射"], "answer": 1, "feedback": "Go 用结构体切片定义用例，t.Run 逐个执行子测试。" },
-        { "type": "concept", "question": "Python 中跑多组输入的 pytest 装饰器是？", "options": ["@test", "@pytest.mark.parametrize", "@fixture", "@data"], "answer": 1, "feedback": "@pytest.mark.parametrize 用一组参数多次运行同一测试。" }
+        { "type": "concept", "question": "Go 中实现参数化测试的惯用方式是？", "options": ["表驱动测试（用例切片 + t.Run）", "宏", "反射", "@parametrize"], "answer": 0, "feedback": "Go 用结构体切片定义用例，t.Run 逐个执行子测试。" },
+        { "type": "concept", "question": "Python 中跑多组输入的 pytest 装饰器是？", "options": ["@data", "@test", "@pytest.mark.parametrize", "@fixture"], "answer": 2, "feedback": "@pytest.mark.parametrize 用一组参数多次运行同一测试。" }
       ]
     },
     { "id": "test.fixtures", "module_id": "B15", "title": "测试夹具 Fixture", "status": "published",
@@ -1299,8 +1299,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "夹具（fixture）为测试准备前置状态（临时文件、数据库、对象）并在测试后清理（teardown）。要点：每个测试用独立夹具（不共享可变状态）、资源用后必清理、用临时目录/内存数据库避免污染。setup/teardown 或依赖注入式夹具。",
       "lang_diff": "Python：pytest fixture（@pytest.fixture + tmp_path）；JS：beforeEach/afterEach；Java：@BeforeEach/@AfterEach/@TempDir；C++：TEST_F 夹具类 SetUp/TearDown；Go：测试内手动准备/cleanup；Rust：测试函数内构造 + Drop 清理。",
       "exercises": [
-        { "type": "concept", "question": "Python pytest 中提供临时目录的内置夹具是？", "options": ["tmp_file", "tmp_path", "tempdir", "temp_dir"], "answer": 1, "feedback": "tmp_path 为每个测试提供独立临时目录，自动清理。" },
-        { "type": "concept", "question": "测试夹具的核心原则是？", "options": ["共享状态提速", "每测试独立环境、用完清理，保证隔离可重复", "越少越好", "只读不写"], "answer": 1, "feedback": "隔离的夹具避免测试间相互污染，保证可重复。" }
+        { "type": "concept", "question": "Python pytest 中提供临时目录的内置夹具是？", "options": ["tempdir", "temp_dir", "tmp_file", "tmp_path"], "answer": 3, "feedback": "tmp_path 为每个测试提供独立临时目录，自动清理。" },
+        { "type": "concept", "question": "测试夹具的核心原则是？", "options": ["共享状态提速", "只读不写", "每测试独立环境、用完清理，保证隔离可重复", "越少越好"], "answer": 2, "feedback": "隔离的夹具避免测试间相互污染，保证可重复。" }
       ]
     },
     { "id": "test.mocks", "module_id": "B15", "title": "Mock / Stub / Fake", "status": "published",
@@ -1309,7 +1309,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "测试替身替代真实外部依赖（网络、数据库、时钟）：Stub 返回固定答案；Mock 验证「是否被以某方式调用」；Fake 提供可用的简化实现（内存数据库）。要点：只 mock 自己拥有的边界；优先用依赖注入便于替换；避免过度 mock 导致测的是 mock 而非逻辑。",
       "lang_diff": "Python：unittest.mock（Mock/patch）；JS：vi.fn()/jest.mock；Java：Mockito；C++：GoogleMock；Go：接口注入 + 手写 fake；Rust：trait 注入 + mockall。",
       "exercises": [
-        { "type": "concept", "question": "验证「保存方法被调用了 1 次」应该用哪种替身？", "options": ["Stub", "Mock", "Fake", "真实对象"], "answer": 1, "feedback": "Mock 验证交互（调用次数/参数）；Stub 只提供固定返回。" },
+        { "type": "concept", "question": "验证「保存方法被调用了 1 次」应该用哪种替身？", "options": ["Mock", "Stub", "Fake", "真实对象"], "answer": 0, "feedback": "Mock 验证交互（调用次数/参数）；Stub 只提供固定返回。" },
         { "type": "concept", "question": "Go 中便于测试替换外部依赖的设计是？", "options": ["全局变量", "接口依赖注入", "硬编码", "反射"], "answer": 1, "feedback": "依赖接口而非具体实现，测试时注入 fake 实现。" }
       ]
     },
@@ -1319,8 +1319,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "测试金字塔：大量单元测试（快、隔离）+ 适量集成测试（验证模块间协作，如真实数据库）+ 少量端到端测试（完整流程，如浏览器自动化）。集成测试验证「零件装在一起能工作」，端到端验证「用户视角的功能」。越往上越慢越脆，数量应递减。",
       "lang_diff": "Python：pytest（单元）+ requests/Playwright（E2E）；JS：vitest + supertest（API）+ Playwright；Java：JUnit + Spring Test + REST Assured；C++：GoogleTest 各层；Go：testing + httptest；Rust：单元（#[test]）+ tests/ 目录集成测试。",
       "exercises": [
-        { "type": "concept", "question": "Rust 中集成测试文件应放在哪个目录？", "options": ["src/", "tests/", "integration/", "test/"], "answer": 1, "feedback": "tests/ 目录下的文件被 cargo test 作为集成测试编译运行。" },
-        { "type": "concept", "question": "测试金字塔中数量最多的应该是？", "options": ["端到端测试", "单元测试", "集成测试", "手动测试"], "answer": 1, "feedback": "单元测试快且隔离，应占主体；E2E 慢而脆，应最少。" }
+        { "type": "concept", "question": "Rust 中集成测试文件应放在哪个目录？", "options": ["test/", "integration/", "src/", "tests/"], "answer": 3, "feedback": "tests/ 目录下的文件被 cargo test 作为集成测试编译运行。" },
+        { "type": "concept", "question": "测试金字塔中数量最多的应该是？", "options": ["集成测试", "手动测试", "单元测试", "端到端测试"], "answer": 2, "feedback": "单元测试快且隔离，应占主体；E2E 慢而脆，应最少。" }
       ]
     },
     { "id": "test.logging", "module_id": "B15", "title": "日志级别与结构化日志", "status": "published",
@@ -1329,8 +1329,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "日志级别：DEBUG（调试细节）、INFO（关键流程）、WARN（可恢复异常）、ERROR（错误需处理）。生产环境用 INFO+，排查时临时开 DEBUG。结构化日志（JSON 键值对）比纯文本更易检索与聚合。日志要有上下文（请求 ID、用户、操作），但不记敏感信息。",
       "lang_diff": "Python：logging 模块（getLogger）；JS：console / winston / pino；Java：SLF4J + Logback；C++：spdlog；Go：log/slog（结构化）；Rust：tracing / log。级别与级别过滤是通用概念。",
       "exercises": [
-        { "type": "concept", "question": "生产环境默认日志级别通常是？", "options": ["DEBUG", "INFO", "TRACE", "ERROR"], "answer": 1, "feedback": "INFO 记录关键流程；DEBUG 仅排查时临时开启。" },
-        { "type": "concept", "question": "Go 的官方结构化日志包是？", "options": ["log", "log/slog", "fmt", "zap（第三方）"], "answer": 1, "feedback": "log/slog 是 Go 1.21+ 官方结构化日志包。" }
+        { "type": "concept", "question": "生产环境默认日志级别通常是？", "options": ["ERROR", "DEBUG", "TRACE", "INFO"], "answer": 3, "feedback": "INFO 记录关键流程；DEBUG 仅排查时临时开启。" },
+        { "type": "concept", "question": "Go 的官方结构化日志包是？", "options": ["log/slog", "log", "zap（第三方）", "fmt"], "answer": 0, "feedback": "log/slog 是 Go 1.21+ 官方结构化日志包。" }
       ]
     },
     { "id": "test.debugger", "module_id": "B15", "title": "断点调试与调用栈", "status": "published",
@@ -1339,8 +1339,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "定位 bug 两大利器：断点调试（暂停检查状态）与调用栈分析（从异常堆栈找根因）。读堆栈：从最底部（入口）到最顶部（出错点），找到「自己的代码」首次出现的位置——那通常是根因。异常信息 + 堆栈 + 断点三者结合最高效。",
       "lang_diff": "Python：pdb/traceback；JS：浏览器 DevTools / Node --inspect、Error.stack；Java：IDEA 调试器、printStackTrace；C++：gdb backtrace；Go：dlv、runtime.Stack；Rust：RUST_BACKTRACE=1、rust-gdb。",
       "exercises": [
-        { "type": "concept", "question": "读异常堆栈找根因的惯用方法是？", "options": ["只看第一行", "找自己代码首次出现的位置", "只看最后一行", "忽略堆栈"], "answer": 1, "feedback": "堆栈中「自己的代码」首次出现处通常是根因，而非库代码深处。" },
-        { "type": "concept", "question": "Rust 中查看 panic 完整调用栈的环境变量是？", "options": ["DEBUG=1", "RUST_BACKTRACE=1", "STACK=full", "TRACE"], "answer": 1, "feedback": "RUST_BACKTRACE=1 让 panic 打印完整调用栈。" }
+        { "type": "concept", "question": "读异常堆栈找根因的惯用方法是？", "options": ["只看第一行", "只看最后一行", "忽略堆栈", "找自己代码首次出现的位置"], "answer": 3, "feedback": "堆栈中「自己的代码」首次出现处通常是根因，而非库代码深处。" },
+        { "type": "concept", "question": "Rust 中查看 panic 完整调用栈的环境变量是？", "options": ["RUST_BACKTRACE=1", "TRACE", "DEBUG=1", "STACK=full"], "answer": 0, "feedback": "RUST_BACKTRACE=1 让 panic 打印完整调用栈。" }
       ]
     },
     { "id": "test.profiling", "module_id": "B15", "title": "性能剖析与基准测试", "status": "published",
@@ -1349,8 +1349,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "「过早优化是万恶之源」——先用剖析器（profiler）测量找热点，再优化。基准测试（benchmark）：测量代码耗时，需预热、多次取均值、隔离干扰。优化后必须复测对比，否则可能越改越慢。",
       "lang_diff": "Python：cProfile/timeit/py-spy；JS：console.time/Node --prof/DevTools；Java：JFR/JMC、JMH 基准；C++：perf/valgrind、Google Benchmark；Go：pprof + testing.B 基准（go test -bench）；Rust：criterion.rs/cargo bench。",
       "exercises": [
-        { "type": "concept", "question": "Go 中运行基准测试的命令是？", "options": ["go test", "go test -bench=.", "go run -bench", "go build"], "answer": 1, "feedback": "go test -bench=. 运行 Benchmark 开头的基准函数。" },
-        { "type": "concept", "question": "优化性能的第一步应该是？", "options": ["重写为汇编", "用剖析器测量找热点", "加缓存", "换语言"], "answer": 1, "feedback": "先测量定位瓶颈再优化，避免凭猜测做无效优化。" }
+        { "type": "concept", "question": "Go 中运行基准测试的命令是？", "options": ["go test -bench=.", "go run -bench", "go test", "go build"], "answer": 0, "feedback": "go test -bench=. 运行 Benchmark 开头的基准函数。" },
+        { "type": "concept", "question": "优化性能的第一步应该是？", "options": ["用剖析器测量找热点", "加缓存", "换语言", "重写为汇编"], "answer": 0, "feedback": "先测量定位瓶颈再优化，避免凭猜测做无效优化。" }
       ]
     },
     { "id": "test.coverage", "module_id": "B15", "title": "代码覆盖率的正确使用", "status": "published",
@@ -1359,8 +1359,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "覆盖率统计「哪些代码被测试执行到」：行覆盖、分支覆盖。价值在于发现「完全没测的区域」；但 100% 覆盖不代表无 bug（可能只执行没断言、断言不充分）。正确用法：用覆盖率找漏测，而非作为质量目标；关注关键路径的分支覆盖。",
       "lang_diff": "Python：coverage.py / pytest-cov；JS：vitest --coverage / c8；Java：JaCoCo；C++：gcov/lcov；Go：go test -cover（内置）；Rust：cargo-tarpaulin/grcov。",
       "exercises": [
-        { "type": "concept", "question": "100% 代码覆盖率意味着？", "options": ["没有 bug", "代码都被执行过（不代表断言充分/无 bug）", "测试完美", "可以上线"], "answer": 1, "feedback": "覆盖率只证明执行过，断言质量与用例设计才决定测试有效性。" },
-        { "type": "concept", "question": "Go 查看测试覆盖率的命令是？", "options": ["go test -v", "go test -cover", "go cover", "go build -cover"], "answer": 1, "feedback": "go test -cover 显示覆盖率，-coverprofile 生成报告。" }
+        { "type": "concept", "question": "100% 代码覆盖率意味着？", "options": ["没有 bug", "测试完美", "代码都被执行过（不代表断言充分/无 bug）", "可以上线"], "answer": 2, "feedback": "覆盖率只证明执行过，断言质量与用例设计才决定测试有效性。" },
+        { "type": "concept", "question": "Go 查看测试覆盖率的命令是？", "options": ["go cover", "go build -cover", "go test -cover", "go test -v"], "answer": 2, "feedback": "go test -cover 显示覆盖率，-coverprofile 生成报告。" }
       ]
     },
 
@@ -1371,8 +1371,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "数组：连续内存，随机访问 O(1)、中间插删 O(n)、缓存友好；链表：节点 + 指针，头尾插删 O(1)、随机访问 O(n)、需遍历。选择：按下标访问多用数组，频繁头尾增删用链表/双端队列。动态数组（vector/list）是数组的自动扩容版。",
       "lang_diff": "各语言标准库：Python list（动态数组）、collections.deque（双端）；JS Array；Java ArrayList/LinkedList；C++ vector/list/deque；Go slice（数组视图）；Rust Vec/VecDeque/LinkedList。",
       "exercises": [
-        { "type": "concept", "question": "按下标访问元素最快的结构是？", "options": ["链表", "数组", "哈希表", "树"], "answer": 1, "feedback": "数组连续内存 + 下标计算，O(1) 随机访问。" },
-        { "type": "concept", "question": "频繁在头部插入元素应选择？", "options": ["数组", "链表或双端队列", "动态数组", "栈"], "answer": 1, "feedback": "链表/双端队列头部插入 O(1)；数组头部插入 O(n)。" }
+        { "type": "concept", "question": "按下标访问元素最快的结构是？", "options": ["哈希表", "数组", "树", "链表"], "answer": 1, "feedback": "数组连续内存 + 下标计算，O(1) 随机访问。" },
+        { "type": "concept", "question": "频繁在头部插入元素应选择？", "options": ["动态数组", "栈", "链表或双端队列", "数组"], "answer": 2, "feedback": "链表/双端队列头部插入 O(1)；数组头部插入 O(n)。" }
       ]
     },
     { "id": "ds.stack-queue", "module_id": "B16", "title": "栈与队列", "status": "published",
@@ -1381,8 +1381,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "栈（LIFO）：括号匹配、函数调用栈、表达式求值、DFS、撤销；队列（FIFO）：任务调度、BFS、缓冲、消息队列。双端队列更灵活（滑动窗口）。识别：需要「后进的先处理」用栈，「先进的先处理」用队列。",
       "lang_diff": "Python：list 栈、collections.deque 队列；JS：数组模拟；Java：ArrayDeque（两用）；C++：std::stack/queue/deque；Go：slice 模拟；Rust：Vec 栈、VecDeque 队列。",
       "exercises": [
-        { "type": "concept", "question": "括号匹配应该用哪种结构？", "options": ["队列", "栈", "哈希表", "堆"], "answer": 1, "feedback": "栈后进先出，遇右括号弹左括号匹配。" },
-        { "type": "concept", "question": "BFS 遍历通常依赖哪种结构？", "options": ["栈", "队列", "树", "哈希表"], "answer": 1, "feedback": "BFS 按层推进，用队列 FIFO。" }
+        { "type": "concept", "question": "括号匹配应该用哪种结构？", "options": ["堆", "队列", "哈希表", "栈"], "answer": 3, "feedback": "栈后进先出，遇右括号弹左括号匹配。" },
+        { "type": "concept", "question": "BFS 遍历通常依赖哪种结构？", "options": ["哈希表", "栈", "树", "队列"], "answer": 3, "feedback": "BFS 按层推进，用队列 FIFO。" }
       ]
     },
     { "id": "ds.hash-table", "module_id": "B16", "title": "哈希表", "status": "published",
@@ -1391,8 +1391,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "哈希表用哈希函数把键映射到桶：平均 O(1) 查找/插入/删除。冲突处理：链地址（桶内链表）或开放寻址。负载因子过高需扩容重哈希。应用：去重、计数、缓存、索引、两数之和类问题。代价：无序、哈希函数质量影响性能。",
       "lang_diff": "Python dict/set；JS Map/Set/Object；Java HashMap/HashSet；C++ unordered_map/set；Go map；Rust HashMap/HashSet。均为哈希实现，O(1) 平均。",
       "exercises": [
-        { "type": "concept", "question": "哈希表查找的平均时间复杂度是？", "options": ["O(n)", "O(1)", "O(log n)", "O(n log n)"], "answer": 1, "feedback": "哈希映射直接定位，平均 O(1)。" },
-        { "type": "concept", "question": "「两数之和」最优解依赖的结构是？", "options": ["数组", "哈希表（边遍历边查补数）", "栈", "链表"], "answer": 1, "feedback": "用哈希表 O(1) 查 target-x 是否已见，O(n) 一次遍历。" }
+        { "type": "concept", "question": "哈希表查找的平均时间复杂度是？", "options": ["O(log n)", "O(n)", "O(1)", "O(n log n)"], "answer": 2, "feedback": "哈希映射直接定位，平均 O(1)。" },
+        { "type": "concept", "question": "「两数之和」最优解依赖的结构是？", "options": ["链表", "数组", "栈", "哈希表（边遍历边查补数）"], "answer": 3, "feedback": "用哈希表 O(1) 查 target-x 是否已见，O(n) 一次遍历。" }
       ]
     },
     { "id": "ds.tree-heap", "module_id": "B16", "title": "树、二叉搜索树与堆", "status": "published",
@@ -1401,8 +1401,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "树：层级结构，遍历有前/中/后序与层序。二叉搜索树（BST）：左 < 根 < 右，中序遍历有序，查找/插入 O(log n)（平衡时）。堆（优先队列）：父 ≥ 子（大顶堆），取最值 O(1)、插入/删除 O(log n)，适合 Top-K 与调度。",
       "lang_diff": "Python：heapq（堆）、无内置 BST（bisect 或第三方）；JS：无内置（手写/库）；Java：TreeMap/TreeSet（红黑树）、PriorityQueue（堆）；C++：std::map/set（红黑树）、priority_queue；Go：container/heap；Rust：BTreeMap/BTreeSet、BinaryHeap。",
       "exercises": [
-        { "type": "concept", "question": "快速获取最大 K 个元素应该用？", "options": ["排序取前 K", "堆（优先队列）", "链表", "队列"], "answer": 1, "feedback": "堆维护 K 个最大/最小，O(n log k)，优于全排序。" },
-        { "type": "concept", "question": "BST 中序遍历的结果是？", "options": ["随机", "升序", "降序", "层级"], "answer": 1, "feedback": "BST 左<根<右，中序遍历得到升序序列。" }
+        { "type": "concept", "question": "快速获取最大 K 个元素应该用？", "options": ["排序取前 K", "队列", "链表", "堆（优先队列）"], "answer": 3, "feedback": "堆维护 K 个最大/最小，O(n log k)，优于全排序。" },
+        { "type": "concept", "question": "BST 中序遍历的结果是？", "options": ["降序", "升序", "层级", "随机"], "answer": 1, "feedback": "BST 左<根<右，中序遍历得到升序序列。" }
       ]
     },
     { "id": "ds.graph", "module_id": "B16", "title": "图及其表示", "status": "published",
@@ -1411,8 +1411,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "图 = 顶点 + 边，建模关系网络（社交、路网、依赖）。表示：邻接表（每个顶点存邻居列表，省空间，常用）、邻接矩阵（二维数组，查边快但占空间）。有向图边有方向，带权图边有权值。树是特殊的图（无环连通）。",
       "lang_diff": "邻接表通用表示：Python dict[node, list]；JS Map/Object；Java Map<T, List<T>>；C++ unordered_map/vector<vector>；Go map[T][]T；Rust HashMap<T, Vec<T>>。",
       "exercises": [
-        { "type": "concept", "question": "表示稀疏图（边远少于顶点²）更省空间的方式是？", "options": ["邻接矩阵", "邻接表", "二维数组", "链表"], "answer": 1, "feedback": "邻接表只存实际存在的边，稀疏图省空间。" },
-        { "type": "concept", "question": "树与图的关系是？", "options": ["完全不同", "树是无环连通图", "图是树", "树有环"], "answer": 1, "feedback": "树是特殊的图：无环、连通、n 顶点 n-1 边。" }
+        { "type": "concept", "question": "表示稀疏图（边远少于顶点²）更省空间的方式是？", "options": ["邻接表", "链表", "邻接矩阵", "二维数组"], "answer": 0, "feedback": "邻接表只存实际存在的边，稀疏图省空间。" },
+        { "type": "concept", "question": "树与图的关系是？", "options": ["树有环", "树是无环连通图", "图是树", "完全不同"], "answer": 1, "feedback": "树是特殊的图：无环、连通、n 顶点 n-1 边。" }
       ]
     },
     { "id": "ds.search", "module_id": "B16", "title": "线性查找与二分查找", "status": "published",
@@ -1421,8 +1421,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "线性查找：逐个比较 O(n)，适用于无序/小数据；二分查找：有序数据每次减半 O(log n)，前提是已排序。二分实现注意边界（左右指针、中点防溢出、循环不变量）。变体：找第一个/最后一个满足条件的位置。",
       "lang_diff": "Python：bisect 模块（bisect_left/right）；JS：手写二分或 find；Java：Arrays.binarySearch/Collections.binarySearch；C++：std::binary_search/lower_bound；Go：sort.Search；Rust：slice::binary_search/partition_point。",
       "exercises": [
-        { "type": "concept", "question": "二分查找的前提是？", "options": ["数据量大", "数据已排序", "数据为数字", "无重复"], "answer": 1, "feedback": "二分依赖有序性每次排除一半，无序必须先排序。" },
-        { "type": "concept", "question": "二分查找的时间复杂度是？", "options": ["O(n)", "O(log n)", "O(n log n)", "O(1)"], "answer": 1, "feedback": "每次减半，O(log n)。" }
+        { "type": "concept", "question": "二分查找的前提是？", "options": ["无重复", "数据量大", "数据为数字", "数据已排序"], "answer": 3, "feedback": "二分依赖有序性每次排除一半，无序必须先排序。" },
+        { "type": "concept", "question": "二分查找的时间复杂度是？", "options": ["O(1)", "O(n log n)", "O(log n)", "O(n)"], "answer": 2, "feedback": "每次减半，O(log n)。" }
       ]
     },
     { "id": "ds.sort", "module_id": "B16", "title": "基本排序算法", "status": "published",
@@ -1431,8 +1431,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "排序算法：快排/归并/堆排 O(n log n)（通用高效）、插入/选择/冒泡 O(n²)（小规模可用）、计数/基数 O(n)（特定数据）。现代标准库排序是混合算法（Timsort、内省排序），稳定且自适应。理解原理即可，实际用库函数 + 自定义比较器。",
       "lang_diff": "Python：sorted/list.sort（Timsort，稳定）；JS：arr.sort（引擎混合，现稳定）；Java：Arrays.sort（双轴快排/Timsort）；C++：std::sort（内省排序）、stable_sort；Go：sort.Slice；Rust：sort（稳定）/sort_unstable。",
       "exercises": [
-        { "type": "concept", "question": "通用高效排序算法的时间复杂度是？", "options": ["O(n)", "O(n log n)", "O(n²)", "O(log n)"], "answer": 1, "feedback": "快排/归并/堆排都是 O(n log n)，是比较排序的理论下界。" },
-        { "type": "concept", "question": "Python 的 sorted() 使用的算法是？", "options": ["快排", "Timsort（归并+插入混合，稳定）", "堆排", "冒泡"], "answer": 1, "feedback": "Timsort 自适应利用已有序性，稳定高效。" }
+        { "type": "concept", "question": "通用高效排序算法的时间复杂度是？", "options": ["O(n log n)", "O(log n)", "O(n²)", "O(n)"], "answer": 0, "feedback": "快排/归并/堆排都是 O(n log n)，是比较排序的理论下界。" },
+        { "type": "concept", "question": "Python 的 sorted() 使用的算法是？", "options": ["快排", "冒泡", "Timsort（归并+插入混合，稳定）", "堆排"], "answer": 2, "feedback": "Timsort 自适应利用已有序性，稳定高效。" }
       ]
     },
     { "id": "ds.recursion-divide", "module_id": "B16", "title": "递归与分治", "status": "published",
@@ -1441,8 +1441,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "分治：把问题拆成同类子问题、递归求解、合并结果。三步：分解（divide）→ 解决（conquer）→ 合并（combine）。归并排序、快排、二分、大数乘法都是分治。分析复杂度用递归树/主定理：T(n) = aT(n/b) + f(n)。",
       "lang_diff": "分治是算法思想，实现与语言无关（递归函数）。归并排序/快排在各语言标准库底层广泛应用。",
       "exercises": [
-        { "type": "concept", "question": "归并排序的核心思想是？", "options": ["逐个插入", "分成两半递归排序再合并", "选基准分区", "建堆"], "answer": 1, "feedback": "分治：拆半 → 递归排 → 合并两个有序序列。" },
-        { "type": "concept", "question": "T(n) = 2T(n/2) + O(n) 的复杂度是？", "options": ["O(n)", "O(n log n)", "O(n²)", "O(log n)"], "answer": 1, "feedback": "每层 O(n)、共 log n 层，归并排序的复杂度。" }
+        { "type": "concept", "question": "归并排序的核心思想是？", "options": ["逐个插入", "建堆", "分成两半递归排序再合并", "选基准分区"], "answer": 2, "feedback": "分治：拆半 → 递归排 → 合并两个有序序列。" },
+        { "type": "concept", "question": "T(n) = 2T(n/2) + O(n) 的复杂度是？", "options": ["O(log n)", "O(n²)", "O(n log n)", "O(n)"], "answer": 2, "feedback": "每层 O(n)、共 log n 层，归并排序的复杂度。" }
       ]
     },
     { "id": "ds.backtracking", "module_id": "B16", "title": "回溯", "status": "published",
@@ -1451,8 +1451,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "回溯：系统地探索所有候选解，走不通就撤销（回退）换路。模板：做出选择 → 递归深入 → 撤销选择（恢复状态）。适用：全排列、子集、组合、N 皇后、数独、路径搜索。配合剪枝（提前排除不可能的分支）减少搜索量。",
       "lang_diff": "回溯是通用算法模板（递归 + 状态撤销），各语言实现一致。关键：用参数传递路径状态，递归返回前撤销修改（或传副本避免撤销）。",
       "exercises": [
-        { "type": "concept", "question": "回溯算法的核心三步是？", "options": ["排序-查找-合并", "选择-递归-撤销", "分治-合并-剪枝", "入栈-出栈-判断"], "answer": 1, "feedback": "做选择 → 递归 → 撤销选择，系统探索所有可能。" },
-        { "type": "concept", "question": "求解「数组的全排列」最适合用？", "options": ["贪心", "回溯", "动态规划", "二分"], "answer": 1, "feedback": "全排列需枚举所有排列，回溯逐个位置尝试并撤销。" }
+        { "type": "concept", "question": "回溯算法的核心三步是？", "options": ["入栈-出栈-判断", "排序-查找-合并", "分治-合并-剪枝", "选择-递归-撤销"], "answer": 3, "feedback": "做选择 → 递归 → 撤销选择，系统探索所有可能。" },
+        { "type": "concept", "question": "求解「数组的全排列」最适合用？", "options": ["回溯", "贪心", "二分", "动态规划"], "answer": 0, "feedback": "全排列需枚举所有排列，回溯逐个位置尝试并撤销。" }
       ]
     },
     { "id": "ds.greedy", "module_id": "B16", "title": "贪心", "status": "published",
@@ -1461,8 +1461,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "贪心：每步选当前最优，期望达到全局最优。适用条件：问题有「贪心选择性质」（局部最优能导向全局最优）+ 最优子结构。典型：区间调度（按结束时间排序选）、找零（大面额优先）、Huffman 编码。贪心不总是正确，需验证局部最优确实推出全局最优。",
       "lang_diff": "贪心是策略思想，实现通常 = 排序 + 一次遍历选择。各语言通用，关键是证明贪心选择的正确性。",
       "exercises": [
-        { "type": "concept", "question": "「区间调度选最多不重叠会议」的贪心策略是？", "options": ["按开始时间选", "按结束时间最早优先选", "随机选", "选最长的"], "answer": 1, "feedback": "按结束时间排序，选结束最早的，给后面留最多空间。" },
-        { "type": "concept", "question": "贪心算法成立的关键前提是？", "options": ["数据有序", "局部最优选择能导向全局最优", "使用递归", "时间复杂度高"], "answer": 1, "feedback": "贪心选择性质 + 最优子结构是贪心正确的前提，需验证。" }
+        { "type": "concept", "question": "「区间调度选最多不重叠会议」的贪心策略是？", "options": ["按结束时间最早优先选", "随机选", "选最长的", "按开始时间选"], "answer": 0, "feedback": "按结束时间排序，选结束最早的，给后面留最多空间。" },
+        { "type": "concept", "question": "贪心算法成立的关键前提是？", "options": ["数据有序", "使用递归", "时间复杂度高", "局部最优选择能导向全局最优"], "answer": 3, "feedback": "贪心选择性质 + 最优子结构是贪心正确的前提，需验证。" }
       ]
     },
     { "id": "ds.dp", "module_id": "B16", "title": "动态规划", "status": "published",
@@ -1471,8 +1471,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "动态规划：把问题分解为重叠子问题，存子问题答案避免重复计算。要素：最优子结构 + 重叠子问题。两种实现：自顶向下（递归 + 记忆化）、自底向上（填表迭代）。步骤：定义状态 → 写转移方程 → 定初始值 → 定计算顺序。经典：爬楼梯、背包、最长公共子序列。",
       "lang_diff": "DP 是算法思想，实现为数组/哈希表存子问题解。Python 可用 @cache 记忆化；其他语言手写数组迭代。空间可优化（滚动数组）。",
       "exercises": [
-        { "type": "concept", "question": "动态规划适用的两个关键特征是？", "options": ["有序 + 快速", "最优子结构 + 重叠子问题", "递归 + 循环", "贪心 + 剪枝"], "answer": 1, "feedback": "有最优子结构且子问题重叠，DP 存子问题解避免重复算。" },
-        { "type": "concept", "question": "「爬楼梯每次 1 或 2 阶，到第 n 阶有几种走法」的状态转移是？", "options": ["f(n) = f(n-1) + f(n-2)", "f(n) = f(n/2)", "f(n) = n", "f(n) = 2*f(n-1)"], "answer": 0, "feedback": "到 n 阶可从 n-1 走一步或 n-2 走两步，f(n)=f(n-1)+f(n-2)（斐波那契）。" }
+        { "type": "concept", "question": "动态规划适用的两个关键特征是？", "options": ["最优子结构 + 重叠子问题", "有序 + 快速", "贪心 + 剪枝", "递归 + 循环"], "answer": 0, "feedback": "有最优子结构且子问题重叠，DP 存子问题解避免重复算。" },
+        { "type": "concept", "question": "「爬楼梯每次 1 或 2 阶，到第 n 阶有几种走法」的状态转移是？", "options": ["f(n) = f(n/2)", "f(n) = f(n-1) + f(n-2)", "f(n) = 2*f(n-1)", "f(n) = n"], "answer": 1, "feedback": "到 n 阶可从 n-1 走一步或 n-2 走两步，f(n)=f(n-1)+f(n-2)（斐波那契）。" }
       ]
     },
     { "id": "ds.bfs-dfs", "module_id": "B16", "title": "BFS 与 DFS", "status": "published",
@@ -1481,8 +1481,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "DFS（深度优先）：一条路走到底再回退，用栈/递归，适合路径存在性、连通性、拓扑排序；BFS（广度优先）：逐层扩展，用队列，适合无权最短路、层序遍历。时间都是 O(V+E)。遍历需标记已访问避免死循环。",
       "lang_diff": "DFS 用递归或显式栈；BFS 用队列（deque/Queue/VecDeque）。图的邻接表遍历各语言一致。",
       "exercises": [
-        { "type": "concept", "question": "无权图的单源最短路径应该用？", "options": ["DFS", "BFS", "Dijkstra", "贪心"], "answer": 1, "feedback": "BFS 逐层扩展，首次到达即最短路径（无权图）。" },
-        { "type": "concept", "question": "DFS 遍历图时必须做什么避免死循环？", "options": ["排序", "标记已访问顶点", "加锁", "限制深度"], "answer": 1, "feedback": "标记 visited 防止重复访问导致无限循环。" }
+        { "type": "concept", "question": "无权图的单源最短路径应该用？", "options": ["DFS", "Dijkstra", "贪心", "BFS"], "answer": 3, "feedback": "BFS 逐层扩展，首次到达即最短路径（无权图）。" },
+        { "type": "concept", "question": "DFS 遍历图时必须做什么避免死循环？", "options": ["标记已访问顶点", "排序", "限制深度", "加锁"], "answer": 0, "feedback": "标记 visited 防止重复访问导致无限循环。" }
       ]
     },
     { "id": "ds.union-shortest", "module_id": "B16", "title": "并查集与最短路入门", "status": "published",
@@ -1491,8 +1491,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "并查集（Union-Find）：高效管理「元素属于哪一组」，支持合并（union）与查询（find 是否同组），路径压缩 + 按秩合并近 O(1)。应用：连通分量、Kruskal 最小生成树。最短路：无权图用 BFS，非负权图用 Dijkstra（贪心 + 优先队列）。",
       "lang_diff": "并查集无标准库，需手写（数组存父指针）。Dijkstra 用优先队列（heapq/PriorityQueue/priority_queue/BinaryHeap）。",
       "exercises": [
-        { "type": "concept", "question": "并查集主要解决什么问题？", "options": ["排序", "动态管理元素的分组与连通性", "查找最值", "哈希"], "answer": 1, "feedback": "并查集高效合并组与查询是否同组，用于连通性。" },
-        { "type": "concept", "question": "非负权图的单源最短路经典算法是？", "options": ["BFS", "Dijkstra", "DFS", "并查集"], "answer": 1, "feedback": "Dijkstra 用贪心 + 优先队列求非负权最短路。" }
+        { "type": "concept", "question": "并查集主要解决什么问题？", "options": ["动态管理元素的分组与连通性", "排序", "哈希", "查找最值"], "answer": 0, "feedback": "并查集高效合并组与查询是否同组，用于连通性。" },
+        { "type": "concept", "question": "非负权图的单源最短路经典算法是？", "options": ["并查集", "BFS", "Dijkstra", "DFS"], "answer": 2, "feedback": "Dijkstra 用贪心 + 优先队列求非负权最短路。" }
       ]
     },
 
@@ -1503,8 +1503,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "好命名：见名知意（userCount 而非 n）、变量用名词、函数用动词、布尔用 is/has。排版：一致的缩进与行长。每个语言有官方风格指南，用格式化器强制执行，把风格争议交给工具。命名与风格的一致性比个人偏好更重要。",
       "lang_diff": "Python：PEP 8（snake_case）；JS：camelCase + Standard/Airbnb 风格；Java：camelCase 类用 PascalCase（Google Java Style）；C++：Google Style / snake_case 或 camelCase；Go：gofmt + 短变量名习惯；Rust：rustfmt + snake_case。",
       "exercises": [
-        { "type": "concept", "question": "Python 变量命名的官方风格是？", "options": ["camelCase", "snake_case", "PascalCase", "kebab-case"], "answer": 1, "feedback": "PEP 8 规定变量与函数用 snake_case。" },
-        { "type": "concept", "question": "布尔变量推荐的命名前缀是？", "options": ["data/list", "is/has/can", "get/set", "temp/tmp"], "answer": 1, "feedback": "is/has/can 前缀让布尔语义一目了然。" }
+        { "type": "concept", "question": "Python 变量命名的官方风格是？", "options": ["camelCase", "kebab-case", "snake_case", "PascalCase"], "answer": 2, "feedback": "PEP 8 规定变量与函数用 snake_case。" },
+        { "type": "concept", "question": "布尔变量推荐的命名前缀是？", "options": ["data/list", "temp/tmp", "get/set", "is/has/can"], "answer": 3, "feedback": "is/has/can 前缀让布尔语义一目了然。" }
       ]
     },
     { "id": "eng.responsibility", "module_id": "B17", "title": "函数和模块的职责边界", "status": "published",
@@ -1513,8 +1513,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "单一职责：一个函数/模块只负责一件事、只有一个修改理由。信号：函数超过几十行、参数过多、需要「并且/然后」描述、模块既要管数据又要管展示。拆分原则：按变化方向分离（数据/逻辑/展示/IO），高层调用低层。",
       "lang_diff": "SRP 是通用设计原则。Rust/Go 的小包哲学天然促进职责分离；Python/JS 灵活更需自律；Java 类职责分离（Controller/Service/Repository 分层）。",
       "exercises": [
-        { "type": "concept", "question": "「这个函数既读文件又解析又发网络请求」的问题是？", "options": ["太慢", "职责过多，应拆分", "语法错误", "内存泄漏"], "answer": 1, "feedback": "单一职责：拆为读文件、解析、请求三个函数，各测各的。" },
-        { "type": "concept", "question": "函数职责过大的常见信号不包括？", "options": ["几十行以内", "需要「并且」描述功能、参数过多、上百行", "单一返回值", "命名清晰"], "answer": 1, "feedback": "「并且/然后」描述、过长、参数多都是职责过大的信号。" }
+        { "type": "concept", "question": "「这个函数既读文件又解析又发网络请求」的问题是？", "options": ["内存泄漏", "语法错误", "职责过多，应拆分", "太慢"], "answer": 2, "feedback": "单一职责：拆为读文件、解析、请求三个函数，各测各的。" },
+        { "type": "concept", "question": "函数职责过大的常见信号不包括？", "options": ["命名清晰", "几十行以内", "需要「并且」描述功能、参数过多、上百行", "单一返回值"], "answer": 2, "feedback": "「并且/然后」描述、过长、参数多都是职责过大的信号。" }
       ]
     },
     { "id": "eng.refactor", "module_id": "B17", "title": "重复代码与重构", "status": "published",
@@ -1523,8 +1523,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "重复是万恶之源：同一段逻辑多处出现，改一处漏一处即 bug。重构：在不改变外部行为的前提下改善内部结构。安全重构的前提是有测试兜底——先写测试、小步修改、每步验证。手法：提取函数、提取变量、内联、搬移、改名。",
       "lang_diff": "IDE 重构工具：Java IDEA 最强（安全重命名/提取）、VS Code 各语言插件支持基本重构。Go/Rust 的简单语法让重构更直接。测试覆盖是重构安全网，与语言无关。",
       "exercises": [
-        { "type": "concept", "question": "安全重构的首要前提是？", "options": ["速度快", "有测试兜底", "代码少", "用 IDE"], "answer": 1, "feedback": "测试是重构的安全网，保证行为不变。" },
-        { "type": "concept", "question": "消除重复代码的常用手法是？", "options": ["复制粘贴", "提取公共函数/模块", "加注释", "增加参数"], "answer": 1, "feedback": "提取公共函数/模块让逻辑只有一份，改一处全生效。" }
+        { "type": "concept", "question": "安全重构的首要前提是？", "options": ["代码少", "有测试兜底", "用 IDE", "速度快"], "answer": 1, "feedback": "测试是重构的安全网，保证行为不变。" },
+        { "type": "concept", "question": "消除重复代码的常用手法是？", "options": ["复制粘贴", "增加参数", "加注释", "提取公共函数/模块"], "answer": 3, "feedback": "提取公共函数/模块让逻辑只有一份，改一处全生效。" }
       ]
     },
     { "id": "eng.docs", "module_id": "B17", "title": "文档注释与 API 文档", "status": "published",
@@ -1533,8 +1533,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "好注释解释「为什么」而非「做什么」（代码已说明做什么）。公开 API 必须有文档注释：用途、参数、返回值、异常、示例。各语言有文档标准（docstring/Javadoc/rustdoc），可自动生成 API 文档网站。注释与代码同步更新，过时的注释比没有更糟。",
       "lang_diff": "Python：docstring + Sphinx/pydoc；JS：JSDoc + TypeDoc；Java：Javadoc；C++：Doxygen；Go：包注释 + godoc（注释即文档）；Rust：/// 文档注释 + cargo doc（可含可运行示例测试）。",
       "exercises": [
-        { "type": "concept", "question": "好注释应该解释什么？", "options": ["代码做什么", "为什么这样做（意图与权衡）", "逐行翻译", "变量类型"], "answer": 1, "feedback": "代码表达做什么，注释解释为什么与设计权衡。" },
-        { "type": "concept", "question": "Rust 中生成 API 文档的命令是？", "options": ["cargo build", "cargo doc", "cargo doc --open", "rustdoc only"], "answer": 2, "feedback": "cargo doc 生成文档，--open 直接打开。" }
+        { "type": "concept", "question": "好注释应该解释什么？", "options": ["代码做什么", "变量类型", "逐行翻译", "为什么这样做（意图与权衡）"], "answer": 3, "feedback": "代码表达做什么，注释解释为什么与设计权衡。" },
+        { "type": "concept", "question": "Rust 中生成 API 文档的命令是？", "options": ["rustdoc only", "cargo doc", "cargo doc --open", "cargo build"], "answer": 2, "feedback": "cargo doc 生成文档，--open 直接打开。" }
       ]
     },
     { "id": "eng.project-layout", "module_id": "B17", "title": "项目目录结构", "status": "published",
@@ -1543,8 +1543,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "目录结构是项目的地图：源码与测试分离、按功能/层组织模块、配置与脚本归位。好的结构让新人秒懂「代码在哪」「怎么跑」。遵循生态标准布局（src/、tests/、cmd/、internal/），不要自创怪结构。",
       "lang_diff": "Python：src/pkg/ + tests/ + pyproject.toml；JS：src/ + package.json；Java：src/main/java + src/test/java（Maven）；C++：include/ + src/ + CMakeLists.txt；Go：cmd/ + internal/ + pkg/（标准布局）；Rust：src/ + tests/ + Cargo.toml。",
       "exercises": [
-        { "type": "concept", "question": "Go 项目的标准源码组织目录是？", "options": ["src/", "cmd/ + internal/ + pkg/", "code/", "main/"], "answer": 1, "feedback": "Go 标准布局：cmd 入口、internal 私有包、pkg 公共库。" },
-        { "type": "concept", "question": "Java Maven 项目的测试代码目录是？", "options": ["src/test", "src/test/java", "tests/", "test/"], "answer": 1, "feedback": "Maven 约定 src/test/java 放测试，src/main/java 放源码。" }
+        { "type": "concept", "question": "Go 项目的标准源码组织目录是？", "options": ["cmd/ + internal/ + pkg/", "code/", "main/", "src/"], "answer": 0, "feedback": "Go 标准布局：cmd 入口、internal 私有包、pkg 公共库。" },
+        { "type": "concept", "question": "Java Maven 项目的测试代码目录是？", "options": ["src/test", "tests/", "test/", "src/test/java"], "answer": 3, "feedback": "Maven 约定 src/test/java 放测试，src/main/java 放源码。" }
       ]
     },
     { "id": "eng.config", "module_id": "B17", "title": "配置分层", "status": "published",
@@ -1553,8 +1553,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "配置分层：默认值 < 配置文件 < 环境变量 < 命令行参数（后者覆盖前者）。好处：本地开发用文件、生产用环境变量、临时调试用参数。配置应有 schema 校验（启动即报错而非运行中崩溃），并有清晰的优先级文档。",
       "lang_diff": "Python：dynaconf/pydantic-settings；JS：config 包/环境隔离；Java：Spring profiles + 外部化配置；Go：viper；Rust：config crate + clap。分层覆盖是通用模式。",
       "exercises": [
-        { "type": "concept", "question": "配置优先级的通用顺序是？", "options": ["文件最高", "命令行参数 > 环境变量 > 配置文件 > 默认值", "默认值最高", "随机"], "answer": 1, "feedback": "越接近运行时指定优先级越高，便于临时覆盖。" },
-        { "type": "concept", "question": "配置校验的最佳实践是？", "options": ["运行时用到才检查", "启动时用 schema 校验，尽早暴露错误", "不校验", "注释说明"], "answer": 1, "feedback": "启动即校验配置，fail fast，避免运行中才崩溃。" }
+        { "type": "concept", "question": "配置优先级的通用顺序是？", "options": ["随机", "文件最高", "默认值最高", "命令行参数 > 环境变量 > 配置文件 > 默认值"], "answer": 3, "feedback": "越接近运行时指定优先级越高，便于临时覆盖。" },
+        { "type": "concept", "question": "配置校验的最佳实践是？", "options": ["启动时用 schema 校验，尽早暴露错误", "不校验", "注释说明", "运行时用到才检查"], "answer": 0, "feedback": "启动即校验配置，fail fast，避免运行中才崩溃。" }
       ]
     },
     { "id": "eng.build-test-release", "module_id": "B17", "title": "构建、测试与发布脚本", "status": "published",
@@ -1563,7 +1563,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "把构建、测试、发布固化为脚本/命令（npm scripts、Makefile、cargo、CI 配置）：一键执行、团队统一、可复现。避免「在我机器上能跑」——流程自动化后人人一致。脚本应幂等（重复执行结果相同）且有明确失败反馈。",
       "lang_diff": "Python：Makefile/tox/nox、uv；JS：package.json scripts；Java：mvn/gradle 生命周期；C++：CMake + CTest；Go：go build/test（内置）+ Makefile；Rust：cargo build/test（内置）。",
       "exercises": [
-        { "type": "concept", "question": "JS 项目定义构建/测试脚本的标准位置是？", "options": ["README", "package.json 的 scripts", "Makefile", ".env"], "answer": 1, "feedback": "package.json scripts 定义 npm run build/test 等命令。" },
+        { "type": "concept", "question": "JS 项目定义构建/测试脚本的标准位置是？", "options": [".env", "package.json 的 scripts", "Makefile", "README"], "answer": 1, "feedback": "package.json scripts 定义 npm run build/test 等命令。" },
         { "type": "concept", "question": "构建脚本「幂等」意味着？", "options": ["更快", "重复执行结果相同", "无输出", "无依赖"], "answer": 1, "feedback": "幂等脚本重复跑不产生副作用差异，安全可重入。" }
       ]
     },
@@ -1573,8 +1573,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "持续集成：每次提交/PR 自动运行构建、lint、测试，及时发现问题。基本流水线：检出代码 → 安装依赖 → lint/格式检查 → 构建 → 测试 → （可选）构建产物。好处：问题早发现、保证主分支始终可用、评审有质量底线。",
       "lang_diff": "CI 平台：GitHub Actions / GitLab CI / Jenkins。各语言在 CI 中跑各自工具链：pytest、npm test、mvn test、cargo test、go test。缓存依赖加速。",
       "exercises": [
-        { "type": "concept", "question": "CI 流水线的典型步骤顺序是？", "options": ["发布-测试-构建", "检出-依赖-lint-构建-测试", "测试-检出", "构建-检出"], "answer": 1, "feedback": "先检出与装依赖，再质量检查、构建、测试。" },
-        { "type": "concept", "question": "CI 的核心价值是？", "options": ["替代测试", "每次提交自动验证，早发现并防止主分支劣化", "加快开发", "省服务器"], "answer": 1, "feedback": "CI 让每次变更自动验证，保证主分支始终健康。" }
+        { "type": "concept", "question": "CI 流水线的典型步骤顺序是？", "options": ["构建-检出", "检出-依赖-lint-构建-测试", "发布-测试-构建", "测试-检出"], "answer": 1, "feedback": "先检出与装依赖，再质量检查、构建、测试。" },
+        { "type": "concept", "question": "CI 的核心价值是？", "options": ["每次提交自动验证，早发现并防止主分支劣化", "省服务器", "加快开发", "替代测试"], "answer": 0, "feedback": "CI 让每次变更自动验证，保证主分支始终健康。" }
       ]
     },
     { "id": "eng.supply-chain", "module_id": "B17", "title": "依赖与供应链安全", "status": "published",
@@ -1583,8 +1583,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "第三方依赖是便利也是风险：恶意包、已知漏洞（CVE）、依赖混淆。防护：锁文件固定版本、定期跑安全审计（pip-audit/npm audit/cargo audit）、只装必要依赖、审查新增依赖、用私有源防依赖混淆。供应链攻击（如 event-stream 事件）警示依赖需可信。",
       "lang_diff": "Python：pip-audit/Safety；JS：npm audit/Snyk；Java：OWASP Dependency-Check；Go：govulncheck；Rust：cargo audit。GitHub Dependabot 自动提更新 PR。",
       "exercises": [
-        { "type": "concept", "question": "防护依赖安全的基本措施是？", "options": ["装最新版即可", "锁文件 + 定期安全审计 + 最小化依赖", "禁用网络", "不用依赖"], "answer": 1, "feedback": "锁版本、审计漏洞、只装必要依赖，三层防护。" },
-        { "type": "concept", "question": "Rust 检查依赖已知漏洞的工具是？", "options": ["cargo build", "cargo audit", "cargo test", "clippy"], "answer": 1, "feedback": "cargo audit 检查依赖是否有已知安全漏洞。" }
+        { "type": "concept", "question": "防护依赖安全的基本措施是？", "options": ["不用依赖", "锁文件 + 定期安全审计 + 最小化依赖", "装最新版即可", "禁用网络"], "answer": 1, "feedback": "锁版本、审计漏洞、只装必要依赖，三层防护。" },
+        { "type": "concept", "question": "Rust 检查依赖已知漏洞的工具是？", "options": ["cargo audit", "cargo build", "cargo test", "clippy"], "answer": 0, "feedback": "cargo audit 检查依赖是否有已知安全漏洞。" }
       ]
     },
     { "id": "eng.performance-measure", "module_id": "B17", "title": "性能优化的测量原则", "status": "published",
@@ -1593,8 +1593,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "性能优化铁律：先测量定位瓶颈，再优化，最后复测验证。凭直觉优化常越改越慢。基准要可复现（固定环境、多次取均值、隔离干扰）。关注真正影响用户的指标（延迟 P99、吞吐），而非微优化。优化后必须有数据证明改进。",
       "lang_diff": "剖析工具：Python py-spy/cProfile；JS DevTools/--prof；Java JFR/JMC；C++ perf/VTune；Go pprof；Rust perf/criterion。基准库见 test.profiling。",
       "exercises": [
-        { "type": "concept", "question": "性能优化的正确顺序是？", "options": ["优化-测量", "测量瓶颈 → 优化 → 复测验证", "先加缓存", "重写"], "answer": 1, "feedback": "先测量找热点，优化后必须复测，否则可能越改越慢。" },
-        { "type": "concept", "question": "评估服务性能更应关注的指标是？", "options": ["平均延迟", "P99 延迟与吞吐（尾部延迟）", "代码行数", "CPU 型号"], "answer": 1, "feedback": "P99 反映最坏体验，平均延迟会掩盖尾部问题。" }
+        { "type": "concept", "question": "性能优化的正确顺序是？", "options": ["测量瓶颈 → 优化 → 复测验证", "优化-测量", "先加缓存", "重写"], "answer": 0, "feedback": "先测量找热点，优化后必须复测，否则可能越改越慢。" },
+        { "type": "concept", "question": "评估服务性能更应关注的指标是？", "options": ["CPU 型号", "P99 延迟与吞吐（尾部延迟）", "平均延迟", "代码行数"], "answer": 1, "feedback": "P99 反映最坏体验，平均延迟会掩盖尾部问题。" }
       ]
     },
     { "id": "eng.cross-platform", "module_id": "B17", "title": "跨平台兼容性", "status": "published",
@@ -1603,8 +1603,8 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
       "core": "跨平台三大坑：路径分隔符（用路径库）、换行符（文本模式统一）、行尾与编码（UTF-8）。此外还有：文件系统大小写敏感（Linux 敏感、macOS/Windows 不敏感）、环境差异（shell、权限）。用 CI 在多平台跑测试，避免「在 Mac 能跑 Windows 挂」。",
       "lang_diff": "Python/JS/Java 跨平台天然好（抽象层）；Go/Rust 交叉编译方便但需注意系统调用；C++ 平台差异最大（编译器/ABI/系统 API）。路径与换行用库抽象，避免手写平台判断。",
       "exercises": [
-        { "type": "concept", "question": "跨平台路径拼接的正确做法是？", "options": ["硬编码 '/'", "用语言的路径库（pathlib/path/filepath）", "判断 OS 拼字符串", "用 '\\\\'"], "answer": 1, "feedback": "路径库自动处理分隔符差异，硬编码不可移植。" },
-        { "type": "concept", "question": "验证跨平台兼容性的可靠方式是？", "options": ["只在自己机器测", "CI 在 Windows/macOS/Linux 多平台跑测试", "读文档", "问同事"], "answer": 1, "feedback": "多平台 CI 真实暴露平台差异问题，单平台测试不够。" }
+        { "type": "concept", "question": "跨平台路径拼接的正确做法是？", "options": ["硬编码 '/'", "用语言的路径库（pathlib/path/filepath）", "用 '\\\\'", "判断 OS 拼字符串"], "answer": 1, "feedback": "路径库自动处理分隔符差异，硬编码不可移植。" },
+        { "type": "concept", "question": "验证跨平台兼容性的可靠方式是？", "options": ["问同事", "只在自己机器测", "CI 在 Windows/macOS/Linux 多平台跑测试", "读文档"], "answer": 2, "feedback": "多平台 CI 真实暴露平台差异问题，单平台测试不够。" }
       ]
     }
   ]
