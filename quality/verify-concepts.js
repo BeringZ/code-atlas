@@ -37,14 +37,29 @@ function available(cmd) {
   catch { return false; }
 }
 
+// 提取前置声明（import / #include / use）到包装外层（I5-A：六语言样板带 import 时的修正）
+function extractPrelude(lang, code) {
+  const lines = code.split('\n');
+  const isPre = (l) => {
+    const s = l.trim();
+    if (lang === 'java') return s.startsWith('import ');
+    if (lang === 'cpp') return s.startsWith('#include');
+    if (lang === 'rust') return s.startsWith('use ') && s.includes('::');
+    return false;
+  };
+  return { prelude: lines.filter(isPre).join('\n'), body: lines.filter((l) => !isPre(l)).join('\n') };
+}
+
 // 每语言：minimal_code → 可运行包装
 function wrap(lang, code) {
+  const { prelude, body } = extractPrelude(lang, code);
+  const indent = (s) => s.split('\n').map((l) => '    ' + l).join('\n');
   if (lang === 'python') return code;
   if (lang === 'javascript') return code;
-  if (lang === 'java') return `public class Main {\n    public static void main(String[] args) {\n${code.split('\n').map((l) => '        ' + l).join('\n')}\n    }\n}`;
-  if (lang === 'cpp') return `#include <iostream>\n#include <string>\nint main() {\n${code.split('\n').map((l) => '    ' + l).join('\n')}\n    std::cout << std::endl;\n    return 0;\n}`;
-  if (lang === 'go') return `package main\n\nimport (\n    "fmt"\n    "unicode/utf8"\n)\n\nfunc main() {\n${code.split('\n').map((l) => '    ' + l).join('\n')}\n}`;
-  if (lang === 'rust') return `fn main() {\n${code.split('\n').map((l) => '    ' + l).join('\n')}\n}`;
+  if (lang === 'java') return `${prelude}\npublic class Main {\n    public static void main(String[] args) {\n${indent(body)}\n    }\n}`;
+  if (lang === 'cpp') return `${prelude}\n#include <iostream>\n#include <string>\nint main() {\n${indent(body)}\n    std::cout << std::endl;\n    return 0;\n}`;
+  if (lang === 'go') return `package main\n\nimport (\n    "fmt"\n    "unicode/utf8"\n)\n\nfunc main() {\n${indent(body)}\n}`;
+  if (lang === 'rust') return `${prelude}\nfn main() {\n${indent(body)}\n}`;
   return null;
 }
 const EXT = { python: 'py', javascript: 'mjs', java: 'java', cpp: 'cpp', go: 'go', rust: 'rs' };
@@ -59,7 +74,9 @@ const RUNNER = {
 
 console.log(`验证 L4 概念：${concepts.map((c) => c.id).join(', ')}`);
 for (const c of concepts) {
-  const expectCP = (c.acceptanceTests || []).find((t) => /codePoints/.test(t.assert));
+  // 泛化断言（I5-A）：取第一条验收测试的期望值（支持数字 codePoints 与字符串 result）
+  const at = (c.acceptanceTests || [])[0];
+  const expectVal = at ? String(at.expect) : null;
   for (const lang of ['python', 'javascript', 'java', 'cpp', 'go', 'rust']) {
     const v = c.variants && c.variants[lang];
     if (!v || !v.minimal_code) { console.log(`  ⚠ ${lang}: 缺 minimal_code`); skip++; continue; }
@@ -67,9 +84,9 @@ for (const c of concepts) {
     fs.writeFileSync(file, wrap(lang, v.minimal_code));
     try {
       const out = RUNNER[lang](file);
-      const hasCP = !expectCP || out.includes(String(expectCP.expect));
-      if (hasCP) { pass++; console.log(`  ✓ ${lang.padEnd(10)} 输出=${JSON.stringify(out.trim().split('\n').join(' / '))}`); }
-      else { fail++; console.log(`  ✗ ${lang} 输出 ${JSON.stringify(out)} 不含预期码点 ${expectCP.expect}`); }
+      const hasVal = !expectVal || out.includes(expectVal);
+      if (hasVal) { pass++; console.log(`  ✓ ${lang.padEnd(10)} 输出=${JSON.stringify(out.trim().split('\n').join(' / '))}`); }
+      else { fail++; console.log(`  ✗ ${lang} 输出 ${JSON.stringify(out)} 不含预期 ${expectVal}`); }
     } catch (e) {
       if (/GO_MISSING/.test(e.message)) { skip++; console.log(`  — go: 本机未安装，CI 矩阵负责`); }
       else { fail++; console.log(`  ✗ ${lang} 运行失败: ${String(e.message).split('\n').slice(0, 4).join(' ')}`); }

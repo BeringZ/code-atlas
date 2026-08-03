@@ -197,14 +197,366 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "read", "question": "Rust 中 '42'.parse::<i32>() 的返回类型是？", "options": ["报错", "i32", "Option<i32>", "Result<i32,  ParseIntError>"], "answer": 3, "feedback": "parse 返回 Result，用 ? 或 match 处理失败。" }
       ]
     },
-    { "id": "value.nullability", "module_id": "B02", "title": "空值、缺失值与可选类型", "status": "published",
-      "objectives": ["安全处理「值可能不存在」", "理解可选类型对空指针的消除"],
-      "prerequisites": ["value.primitive-types"],
-      "core": "「值不存在」是程序最常见的失败。null/None/nil 表达缺失，但直接访问会引发空指针。可选类型（Option/Maybe）把「可能缺失」编码进类型，强制调用方处理两种情况；Rust 的 Option 从类型层面消灭了空指针。",
-      "lang_diff": "Python：None（if x is None）；JS：null/undefined（?. 可选链、?? 空值合并）；Java：null（Optional<T> 包装）；C++：nullptr（std::optional）；Go：nil（指针/接口零值，v, ok :=）；Rust：Option<T>（Some/None，无 null）。",
+                {
+      "id": "value.nullability",
+      "module_id": "B02",
+      "title": "空值、缺失值与可选类型",
+      "status": "published",
+      "level": "L4",
+      "objectives": [
+        "区分 null / undefined / None / nil / nullptr / Option 的语义差异",
+        "安全处理「值可能不存在」的六种语言惯用法",
+        "理解可选类型如何在类型层面消灭空指针解引用"
+      ],
+      "prerequisites": [
+        "value.primitive-types"
+      ],
+      "core": "「值不存在」是最常见的运行期失败源。六语言表示缺失的方式不同：Python 的 None、JS 的 null 与 undefined、Java 的 null、C++ 的 nullptr、Go 的 nil、Rust 的 Option<T>。关键认知分层：① 哨兵值（null/None/nil）——隐式缺失，访问即崩溃或未定义行为；② 可选类型（Option/Optional/可选链）——把「可能缺失」编码进类型或语法，强制/引导调用方处理缺失分支；③ 惯用法——dict.get / ?. ?? / getOrDefault / find / ok 双值 / unwrap_or。语言差距最大处：Rust 用类型系统消灭空指针（Option 不能直接当值用），而 C 系语言把 null 当普通值传递，危险由运行时承担。",
+      "summary": "六语言缺失值语义分两类：哨兵值（None/null/nil/nullptr）与可选类型（Option/Optional/?.）；Rust 从类型层面消灭空指针。",
+      "commonTask": {
+        "input": "从映射 data = {name: \"Ada\"} 读取缺失键 age：存在则输出值，缺失则输出 missing",
+        "expectedOutput": {
+          "result": "missing"
+        }
+      },
+      "comparisonDimensions": [
+        "null-representation",
+        "type-checking",
+        "failure-mode",
+        "idiomatic-style",
+        "runtime-cost"
+      ],
+      "lang_diff": "Python：None 单例，惯用 if x is None / dict.get(key, default)；JS：null 与 undefined 双值，?. 可选链 + ?? 空值合并；Java：null 可赋给任何引用，Optional<T> 显式包装（getOrDefault / orElse）；C++：nullptr，std::optional<T> 携带 has_value/value_or；Go：nil 接口与切片，map 读取返回双值 v, ok；Rust：Option<T> 枚举（Some/None），unwrap_or / ? 操作符，禁止直接当值使用。",
+      "variants": {
+        "python": {
+          "version": "3.13",
+          "minimal_code": "data = {\"name\": \"Ada\"}\nprint(data.get(\"age\", \"missing\"))  # missing（get 带默认值）",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ],
+          "syntax_notes": [
+            "None 是单例，判空用 is None 而非 == None",
+            "dict.get(key, default) 返回默认值避免 KeyError"
+          ],
+          "semantic_notes": [
+            "缺失由 KeyError 显式抛出，或 get 静默返回默认",
+            "变量可为 None 但无类型标记（TypedDict/Optional 仅注解）"
+          ],
+          "idioms": [
+            "访问可能缺失的键用 d.get(k, 默认)",
+            "链式访问用 try/except 或 walrus 判断"
+          ],
+          "pitfalls": [
+            "用 == None 判断（应与 is None）",
+            "get 默认值被误当真实数据"
+          ]
+        },
+        "javascript": {
+          "version": "ES2024",
+          "minimal_code": "const data = { name: \"Ada\" };\nconsole.log(data.age ?? \"missing\"); // missing（?? 空值合并）",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ],
+          "syntax_notes": [
+            "null 与 undefined 都是缺失哨兵（双值）",
+            "?. 可选链短路，?? 只在 null/undefined 时取右"
+          ],
+          "semantic_notes": [
+            "?? 与 || 不同：|| 对 0/'' 也取右",
+            "对象访问缺失返回 undefined（非异常）"
+          ],
+          "idioms": [
+            "可选链 data?.user?.name",
+            "空值合并 data.age ?? 'missing'"
+          ],
+          "pitfalls": [
+            "用 || 代替 ?? 吞掉 0/'' 等合法值",
+            "解构嵌套对象忽略 undefined"
+          ]
+        },
+        "java": {
+          "version": "21+",
+          "minimal_code": "import java.util.Map;\nMap<String, String> data = Map.of(\"name\", \"Ada\");\nSystem.out.println(data.getOrDefault(\"age\", \"missing\")); // missing",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "call",
+              "start": 3,
+              "end": 3
+            }
+          ],
+          "syntax_notes": [
+            "null 可赋给任意引用类型",
+            "Optional<T> 是容器，鼓励显式处理缺失"
+          ],
+          "semantic_notes": [
+            "null 解引用抛 NullPointerException（运行期）",
+            "Map.get 缺失返回 null；getOrDefault 免判空"
+          ],
+          "idioms": [
+            "orElse/orElseGet 提供默认值",
+            "Objects.requireNonNull 防御式检查"
+          ],
+          "pitfalls": [
+            "未判空直接 .method() 抛 NPE",
+            "Optional 本身可为 null（应为 Optional.empty()）"
+          ]
+        },
+        "cpp": {
+          "version": "C++20",
+          "minimal_code": "#include <map>\nstd::map<std::string,std::string> data = {{\"name\",\"Ada\"}};\nauto it = data.find(\"age\");\nstd::cout << (it != data.end() ? it->second : \"missing\");",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "iterate",
+              "start": 2,
+              "end": 3
+            }
+          ],
+          "syntax_notes": [
+            "nullptr 是空指针字面量",
+            "std::optional<T> 携带 has_value()/value_or()"
+          ],
+          "semantic_notes": [
+            "解引用 nullptr 是未定义行为（可能崩溃可能静默）",
+            "map::find 返回迭代器，end() 表示缺失"
+          ],
+          "idioms": [
+            "用 iterator != end() 判存在",
+            "optional 用 value_or(default) 免分支"
+          ],
+          "pitfalls": [
+            "解引用前忘判空（UB）",
+            "operator[] 会插入默认值（改动了容器）"
+          ]
+        },
+        "go": {
+          "version": "1.23+",
+          "minimal_code": "package main\nimport \"fmt\"\nfunc main() {\n  data := map[string]string{\"name\": \"Ada\"}\n  v, ok := data[\"age\"]\n  if !ok { v = \"missing\" }\n  fmt.Println(v)\n}",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "call",
+              "start": 5,
+              "end": 7
+            }
+          ],
+          "syntax_notes": [
+            "nil 可用于接口/切片/map/指针",
+            "map 读取返回双值 v, ok（comma ok 惯用法）"
+          ],
+          "semantic_notes": [
+            "nil map 读取安全但写入 panic",
+            "接口 nil 与类型化 nil 陷阱（nil 接口含类型指针 ≠ nil）"
+          ],
+          "idioms": [
+            "v, ok := m[k]; if !ok { ... }",
+            "error 值用 if err != nil"
+          ],
+          "pitfalls": [
+            "对 nil 接口断言方法 panic",
+            "map 未初始化时写入崩溃"
+          ]
+        },
+        "rust": {
+          "version": "2024 Edition",
+          "minimal_code": "use std::collections::HashMap;\nlet mut data = HashMap::new();\ndata.insert(\"name\", \"Ada\");\nlet v = data.get(\"age\").unwrap_or(&\"missing\");\nprintln!(\"{}\", v);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "call",
+              "start": 5,
+              "end": 5
+            }
+          ],
+          "syntax_notes": [
+            "Option<T> 是枚举（Some/None），不是哨兵值",
+            "? 操作符在 None 时提前返回"
+          ],
+          "semantic_notes": [
+            "Option 不能当 T 用——类型层面消灭空指针",
+            "unwrap() 遇 None 会 panic（显式崩溃）"
+          ],
+          "idioms": [
+            "unwrap_or/unwrap_or_else 提供默认",
+            "链式 Option 用 map/and_then 组合"
+          ],
+          "pitfalls": [
+            "滥用 unwrap() 在 None 时 panic",
+            "unwrap_or 与 unwrap_or_else 的求值时机差异"
+          ]
+        }
+      },
+      "errors": [
+        {
+          "code": "// Java\nString name = data.get(\"name\").toUpperCase();",
+          "message": "NullPointerException：data.get(\"name\") 返回 null 时调用 toUpperCase()",
+          "cause": "Map.get 缺失返回 null，未判空直接解引用",
+          "fix": "用 getOrDefault 或 Optional.ofNullable(...).orElse(...) 显式处理缺失"
+        },
+        {
+          "code": "# JavaScript\nconst name = data.name || \"default\";",
+          "message": "data.name 为 0 或空字符串时被 || 吞掉，返回 default",
+          "cause": "|| 对 falsy 值（0/''/false）也取右，而缺失语义应只在 null/undefined 时取右",
+          "fix": "用 ?? 空值合并：data.name ?? \"default\""
+        },
+        {
+          "code": "// Go\nvar m map[string]int\nm[\"x\"] = 1",
+          "message": "panic: assignment to entry in nil map",
+          "cause": "nil map 未初始化就写入",
+          "fix": "先 m = make(map[string]int) 再写入"
+        },
+        {
+          "code": "// Rust\nlet v = data.get(\"age\").unwrap();",
+          "message": "panic: called `Option::unwrap()` on a `None` value",
+          "cause": "键缺失时 get 返回 None，unwrap 直接崩溃",
+          "fix": "用 unwrap_or / unwrap_or_else / match 处理 None 分支"
+        },
+        {
+          "code": "# Python\nif value == None:",
+          "message": "== None 应改为 is None（None 是单例，身份比较更语义化）",
+          "cause": "自定义 __eq__ 可能使 == None 产生意外结果",
+          "fix": "if value is None"
+        }
+      ],
+      "transferExercises": [
+        {
+          "type": "migrate",
+          "question": "Python 的 data.get(\"age\", \"missing\") 语义迁移到 Go，最贴近的写法是？",
+          "options": [
+            "v := data[\"age\"]",
+            "data[\"age\"] || \"missing\"",
+            "if data[\"age\"] == nil",
+            "v, ok := data[\"age\"]; if !ok { v = \"missing\" }"
+          ],
+          "answer": 3,
+          "feedback": "Go 的 comma-ok 惯用法（v, ok := m[k]）与 dict.get 等价；直接下标读取缺失返回零值而非缺失信号。"
+        },
+        {
+          "type": "migrate",
+          "question": "JavaScript 的 data?.user?.name 可选链语义迁移到 Rust，最贴近的是？",
+          "options": [
+            "data.get(\"user\").map(|u| u.name)",
+            "match data.user { _ => data.user.name }",
+            "data.user.name?",
+            "data.user.name"
+          ],
+          "answer": 0,
+          "feedback": "Option::map 组合缺失链：任一环节缺失整个表达式为 None，与可选链短路语义一致。"
+        },
+        {
+          "type": "migrate",
+          "question": "Java 中 Optional.ofNullable(x).orElse(d) 的语义是什么？",
+          "options": [
+            "x 为 null 时返回 null",
+            "x 为 null 时抛异常",
+            "x 为 null 时返回 d，否则返回 x",
+            "总是返回 d"
+          ],
+          "answer": 2,
+          "feedback": "ofNullable 允许 x 为 null，orElse 在缺失时返回默认值 d——这是 Java 版的「空值合并」。"
+        }
+      ],
+      "acceptanceTests": [
+        {
+          "input": "读取缺失键 age（data={name:Ada}）",
+          "assert": "result == \"missing\"",
+          "expect": "missing"
+        },
+        {
+          "input": "读取存在键 name",
+          "assert": "result == \"Ada\"",
+          "expect": "Ada"
+        }
+      ],
       "exercises": [
-        { "type": "concept", "question": "Rust 中表示「值可能不存在」的类型是？", "options": ["nil", "Maybe", "null", "Option<T>"], "answer": 3, "feedback": "Option<T> 用 Some/None 强制处理，消除空指针。" },
-        { "type": "read", "question": "JS 中安全访问可能为空对象属性的操作符是？", "options": ["||", ".", "?.", "??"], "answer": 2, "feedback": "?. 可选链在对象为 null/undefined 时短路返回 undefined。" }
+        {
+          "type": "concept",
+          "question": "六语言缺失值哨兵中，哪一个在类型层面「消灭」了空指针解引用？",
+          "options": [
+            "Rust Option<T>",
+            "C++ nullptr",
+            "Java null",
+            "Go nil"
+          ],
+          "answer": 0,
+          "feedback": "Rust 的 Option<T> 是枚举类型，None 不能当 T 直接使用——编译器强制处理缺失分支。"
+        },
+        {
+          "type": "read",
+          "question": "JavaScript 中 data.name ?? \"default\" 与 data.name || \"default\" 对 data.name = 0 的结果分别是什么？",
+          "options": [
+            "都是 \"default\"",
+            "?? 返回 \"default\"，|| 返回 0",
+            "?? 返回 0，|| 返回 \"default\"",
+            "都是 0"
+          ],
+          "answer": 2,
+          "feedback": "?? 只在 null/undefined 时取右，0 是合法值原样返回；|| 对 0 视为 falsy 取右。"
+        },
+        {
+          "type": "debug",
+          "question": "以下哪段代码在键缺失时会崩溃或产生错误结果？",
+          "options": [
+            "Go: v, ok := m[\"k\"]; if !ok { v = \"缺\" }",
+            "Java: m.getOrDefault(\"k\", \"缺\")",
+            "Python: d.get(\"k\", \"缺\")",
+            "C++: auto it = m.find(\"k\"); it->second  // 未判 it != end()"
+          ],
+          "answer": 3,
+          "feedback": "C++ find 返回 end() 迭代器时解引用是未定义行为，必须先判 it != m.end()。"
+        },
+        {
+          "type": "migrate",
+          "question": "Rust 的 data.get(\"age\").unwrap_or(&\"missing\") 迁移到 Java，最贴近的等价写法是？",
+          "options": [
+            "data.compute(\"age\", ...)",
+            "data.getOrDefault(\"age\", \"missing\")",
+            "data.get(\"age\")",
+            "Optional.ofNullable(data.get(\"age\")).orElse(\"missing\")"
+          ],
+          "answer": 1,
+          "feedback": "Map.getOrDefault 是 Java 里与 unwrap_or 语义最贴近的一行式（键缺失返回默认值）。"
+        }
+      ],
+      "deep_dive": "可选类型与哨兵值的本质区别在于「缺失是否可被编译器检查」。Rust 的 Option<T> 是代数数据类型：None 与 Some(T) 是构造子，模式匹配强制穷尽两种可能；C 系（Java/Go/C++）的 null/nil 是「可空引用」——类型系统不区分「有值」与「可能为空」，危险性由运行时承担（NPE/UB）。JS 的双值（null/undefined）源于历史：undefined 是「未初始化」，null 是「显式空」。Go 的 nil 可出现在接口/切片/map/指针，语义各不相同（nil 切片可安全 range，nil map 写入 panic）。工程建议：公共 API 边界用可选类型（Option/Optional），内部热点路径可用判空哨兵但必须统一约定。「空对象模式」（Null Object）把缺失建模为无操作对象，是哨兵值之外的第三种思路。",
+      "next": [
+        "error.try-catch",
+        "collection.map"
       ]
     },
     { "id": "value.scope-lifetime", "module_id": "B02", "title": "作用域、生命周期与遮蔽", "status": "published",
