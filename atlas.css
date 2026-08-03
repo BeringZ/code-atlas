@@ -704,3 +704,13 @@ a { color: inherit; }
 /* ===== 内容成熟度标签（计划书 · 真实成熟度展示） ===== */
 .meta-tag.maturity { background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent); }
 .progress-summary { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; }
+
+/* ===== 六语言语义差异矩阵（工作流 I 结构化比较） ===== */
+.cmp-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+.cmp-table { width: 100%; border-collapse: collapse; font-size: 12.5px; min-width: 720px; }
+.cmp-table th, .cmp-table td { padding: 10px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+.cmp-table thead th { background: var(--surface-soft); font-size: 11px; letter-spacing: .04em; white-space: nowrap; }
+.cmp-table thead th:first-child, .cmp-table tbody th { color: var(--text); font-weight: 800; white-space: nowrap; background: var(--surface-soft); }
+.cmp-table tbody tr:last-child td, .cmp-table tbody tr:last-child th { border-bottom: none; }
+.cmp-table td { color: var(--muted); line-height: 1.7; }
+.cmp-table td.dim-na { color: var(--muted); opacity: .4; }
