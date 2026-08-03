@@ -1,0 +1,38 @@
+name: Quality Gate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  code-atlas:
+    name: Code Atlas · 数据质检 + 六语言运行验证
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: 安装 C++ 编译器
+        run: sudo apt-get update && sudo apt-get install -y g++
+
+      - name: 数据质检（位点/依赖环/答案分布/合并链路）
+        run: node quality/check-data.js
+
+      - name: L4 六语言运行验证（同题输出断言）
+        run: node quality/verify-concepts.js
