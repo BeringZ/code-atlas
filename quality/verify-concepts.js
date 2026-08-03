@@ -23,7 +23,7 @@ vm.createContext(sandbox);
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), sandbox, { filename: f });
 });
 const D2 = sandbox.window.CODE_ATLAS_2;
-const concepts = D2.concepts.filter((c) => c.level === 'L4');
+const concepts = D2.concepts.filter((c) => c.level === 'L3' || c.level === 'L4');
 if (!concepts.length) { console.log('无 L4 概念，跳过'); process.exit(0); }
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ca-verify-'));
@@ -72,7 +72,7 @@ const RUNNER = {
   rust: (f) => { run('rustc', ['-O', f, '-o', path.join(tmp, 'rs.out')], tmp); return run(path.join(tmp, 'rs.out'), [], tmp); },
 };
 
-console.log(`验证 L4 概念：${concepts.map((c) => c.id).join(', ')}`);
+console.log(`验证 L3+ 概念：${concepts.map((c) => c.id).join(', ')}`);
 for (const c of concepts) {
   // 泛化断言（I5-A）：取第一条验收测试的期望值（支持数字 codePoints 与字符串 result）
   const at = (c.acceptanceTests || [])[0];
