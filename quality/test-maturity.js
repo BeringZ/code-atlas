@@ -34,17 +34,19 @@ const PLACEHOLDER = /\.\.\.|\u2026|省略|TODO/;
 
 console.log('—— 显式 level 数据事实化 ——');
 const explicit = D2.concepts.filter((c) => c.level === 'L3' || c.level === 'L4');
-check('显式 L3/L4 共 6 个（2 L3 + 4 L4）', explicit.length === 6, `实际 ${explicit.length}`);
+check('显式 L3/L4 共 12 个（7 L3 + 5 L4）', explicit.length === 12, `实际 ${explicit.length}`);
 check('L3 含 try-catch（此前显式）', D2.concepts.some((c) => c.id === 'error.try-catch' && c.level === 'L3'));
-check('L3 含 spawn-await（本次示范升级）', D2.concepts.some((c) => c.id === 'concurrency.spawn-await' && c.level === 'L3'));
+check('L3 含 spawn-await（I7 示范升级）', D2.concepts.some((c) => c.id === 'concurrency.spawn-await' && c.level === 'L3'));
 check('L4 含 mutability/conversion/nullability/unicode', ['value.mutability', 'value.conversion', 'value.nullability', 'string.unicode'].every((id) => D2.concepts.some((c) => c.id === id && c.level === 'L4')));
 
-console.log('—— 伪代码不得标 L3（虚标修复）——');
+console.log('—— I8-A：5 个候选概念可运行化升 L3（虚标修复后真升级）——');
 const pseudoIds = ['value.binding', 'control.conditionals', 'function.parameter-passing', 'collection.iteration', 'error.exception-vs-result'];
 const pseudo = D2.concepts.filter((c) => pseudoIds.includes(c.id));
-check('5 个伪代码概念均未显式标 L3', pseudo.every((c) => c.level !== 'L3'), `实际 ${pseudo.filter((c) => c.level === 'L3').map((c) => c.id).join(',') || '无'}`);
-const pseudoHasPlaceholder = pseudo.some((c) => Object.values(c.variants || {}).some((v) => v && v.minimal_code && PLACEHOLDER.test(v.minimal_code)));
-check('至少 1 个伪代码概念含省略号占位符（被检测样本）', pseudoHasPlaceholder);
+check('5 个候选概念全部显式升 L3', pseudo.every((c) => c.level === 'L3'), `实际 ${pseudo.filter((c) => c.level !== 'L3').map((c) => c.id).join(',') || '无'}`);
+check('六语言 minimal_code 齐全且无占位符', pseudo.every((c) => LANG6.every((l) => c.variants && c.variants[l] && c.variants[l].minimal_code && !PLACEHOLDER.test(c.variants[l].minimal_code))));
+check('语义块齐全', pseudo.every((c) => LANG6.every((l) => c.variants[l].semantic_blocks && c.variants[l].semantic_blocks.length > 0)));
+check('conditionals 同题输出 B（if/elif 分支）', /score = 75/.test(pseudo.find((c) => c.id === 'control.conditionals').variants.python.minimal_code));
+check('exception-vs-result 含异常/错误处理', /ZeroDivisionError|throw|Error|error/.test(pseudo.find((c) => c.id === 'error.exception-vs-result').variants.python.minimal_code));
 
 console.log('—— spawn-await 示范升级（六语言可运行）——');
 const sa = D2.concepts.find((c) => c.id === 'concurrency.spawn-await');
