@@ -44,6 +44,7 @@ window.CODE_ATLAS_2 = {
       "objectives": ["区分「声明变量」与「给变量重新赋值」", "理解可变与不可变绑定的差异及各自适用场景", "能在六种语言中写出等价的绑定与赋值"],
       "prerequisites": ["runtime.minimal-program"],
       "core": "变量是「名字到值」的绑定。关键认知：不同语言对「绑定是否可被重新指向新值」有不同默认。Python/JavaScript/Java/C++/Go 的变量默认可变，可直接重新赋值；Rust 默认不可变（let 绑定的变量不能重新赋值，需 let mut）。此外还有一层：变量指向的「值/对象本身」是否可变（如 const 对象、final 字段、C++ const 引用），与「绑定是否可变」是两个正交概念。初学阶段先把两件事分开：① 名字能否指向新值（重新绑定）；② 名字指向的值能否被修改（突变）。",
+      "comparisonDimensions": ["type-checking", "failure-mode", "idiomatic-style", "runtime-cost", "mutability"],
       "variants": {
         "python": {
           "version": "3.13",
@@ -122,6 +123,7 @@ window.CODE_ATLAS_2 = {
       "objectives": ["用条件分支把业务规则写成可读的执行路径", "对比 if/else 与 switch/match 的适用场景", "理解模式匹配比 if 链更强的表达能力"],
       "prerequisites": ["expr.comparison", "expr.logic-shortcircuit"],
       "core": "条件分支让程序根据布尔条件选择执行路径。if/else 是通用形式；当判断「同一值的多种取值」时，switch（Java/Go/C++/JS）与 match（Rust/Python 3.10+）更聚焦。模式匹配的进阶价值在于：不仅匹配值，还能解构结构（如 Option/Result/元组），且编译器（Rust）能检查穷尽性。选择依据：条件复杂用 if；单一值多分支用 switch/match；需要解构或穷尽性保证用 match。",
+      "comparisonDimensions": ["type-checking", "failure-mode", "idiomatic-style", "runtime-cost", "mutability"],
       "variants": {
         "python": {
           "version": "3.13",
@@ -200,6 +202,7 @@ window.CODE_ATLAS_2 = {
       "objectives": ["预测函数内重新绑定和修改对象对调用方的影响", "避免「按值/按引用」的口号化误判", "能对比六种语言的实际传递语义"],
       "prerequisites": ["value.binding", "function.declare-call", "value.semantics"],
       "core": "调用函数时，参数如何进入函数体？核心问题是：函数内「重新绑定参数名」和「修改参数指向的对象」分别对调用方有什么影响。所有语言在底层都做「值传递」，但「值」是什么取决于变量语义：基本类型传值副本；对象/引用类型传的是「引用值」的副本——两者共享同一对象，因此修改对象对调用方可见，而重新绑定参数名只影响函数内。Rust 特殊：默认移动所有权（move），或借用（& 不可变 / &mut 可变），编译器限制别名与并发修改。",
+      "comparisonDimensions": ["type-checking", "failure-mode", "idiomatic-style", "runtime-cost", "mutability"],
       "variants": {
         "python": {
           "version": "3.13",
@@ -280,6 +283,7 @@ window.CODE_ATLAS_2 = {
       "objectives": ["区分索引遍历、迭代器遍历与流式遍历", "理解迭代协议在六语言中的对应物", "能按场景选择遍历方式并注意修改集合的风险"],
       "prerequisites": ["collection.array-list", "collection.map"],
       "core": "遍历集合是最高频操作。三种范式：① 索引遍历（for i in range(len(a))），适合需要下标；② 迭代器/foreach（for x in a），最常用，语言内部封装迭代协议（Python __iter__、JS Symbol.iterator、Java Iterable、Rust IntoIterator、Go range）；③ 流式/声明式遍历（map/filter/forEach），聚焦「做什么」而非「怎么做」。注意：遍历时修改集合（增删）在各语言行为不同——Java 抛 ConcurrentModificationException，Python 也报错或跳项，Go 对 map 遍历中删除安全但规则特殊，Rust 的借用规则直接禁止。",
+      "comparisonDimensions": ["type-checking", "failure-mode", "idiomatic-style", "runtime-cost", "mutability"],
       "variants": {
         "python": {
           "version": "3.13",
@@ -358,6 +362,7 @@ window.CODE_ATLAS_2 = {
       "objectives": ["对比异常（throw/try-catch）与错误值（Result/error）两种错误模型", "理解各语言默认的错误处理惯用法", "能设计错误传播与用户友好提示"],
       "prerequisites": ["function.declare-call", "error.kinds"],
       "core": "程序失败有两种主流表达：① 异常：抛出对象沿调用栈传播，遇 try/catch 捕获（Python/JS/Java/C++）；② 错误值：函数返回 Result<T,E>（Rust）或 (T, error)（Go），调用方显式检查。异常适合「失败是罕见异常」的业务代码；错误值适合「失败是常态」的 IO/系统代码，强制调用方处理。Java 区分受检/非受检异常；C++ 异常通常只用于真正异常场景；Rust 用 ? 运算符优雅传播错误。",
+      "comparisonDimensions": ["type-checking", "failure-mode", "idiomatic-style", "runtime-cost", "mutability"],
       "variants": {
         "python": {
           "version": "3.13",
@@ -437,6 +442,7 @@ window.CODE_ATLAS_2 = {
       "objectives": ["理解线程/协程/任务三种并发单元", "能创建并等待多个任务完成", "认识结果收集与错误处理的方式"],
       "prerequisites": ["concurrency.models", "concurrency.sync-async"],
       "core": "「并发执行 + 汇合结果」是并发编程的入门必修。核心组件：① 并发单元（线程：Java/C++/Go goroutine；协程/任务：Python asyncio、JS Promise、Rust async）；② 等待机制（join、await、WaitGroup）；③ 结果收集（返回值、channel、Future）。要点：创建任务只是起点，必须显式等待（join/await）否则任务可能未完成即退出；共享结果要小心竞争。",
+      "comparisonDimensions": ["type-checking", "failure-mode", "idiomatic-style", "runtime-cost", "mutability"],
       "variants": {
         "python": {
           "version": "3.13",
