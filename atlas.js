@@ -7,13 +7,15 @@ window.CodeAtlas2 = (() => {
   function markConceptLevels() {
     const D2 = window.CODE_ATLAS_2;
     if (!D2 || !D2.concepts) return;
+    // I7-B：level 改为数据事实——启发式不再改写 level，仅收集候选供提示
+    D2.l3Candidates = [];
     D2.concepts.forEach((c) => {
       if (c.level !== undefined) return;
       const v = c.variants || {};
       const hasVariants = Object.keys(v).length > 0;
       const hasSemanticBlocks = Object.values(v).some((x) => x && x.semantic_blocks && x.semantic_blocks.length);
       const hasDeep = !!(c.deep_dive || (c.errors && c.errors.length));
-      c.level = hasVariants && (hasSemanticBlocks || hasDeep) ? "L3" : "L2";
+      if (hasVariants && (hasSemanticBlocks || hasDeep)) D2.l3Candidates.push(c.id);
     });
   }
   function maturityStats() {
