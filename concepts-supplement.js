@@ -2795,14 +2795,320 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "concept", "question": "JS 中取消 fetch 请求的机制是？", "options": ["Promise.cancel", "return", "clearTimeout", "AbortController"], "answer": 3, "feedback": "AbortController 的 signal 传入 fetch，abort() 触发取消。" }
       ]
     },
-    { "id": "concurrency.races-deadlock", "module_id": "B13", "title": "数据竞争、死锁与活锁", "status": "published",
-      "objectives": ["识别数据竞争", "预防死锁与活锁"],
-      "prerequisites": ["concurrency.locks", "concurrency.shared-message"],
+                {
+      "id": "concurrency.races-deadlock",
+      "module_id": "B13",
+      "title": "数据竞争、死锁与活锁",
+      "status": "published",
+      "objectives": [
+        "识别数据竞争",
+        "预防死锁与活锁"
+      ],
+      "prerequisites": [
+        "concurrency.locks",
+        "concurrency.shared-message"
+      ],
       "core": "数据竞争：多任务并发访问同一数据且至少一个写、无同步，结果不确定（UB）。死锁：多任务互相持有对方需要的锁，全部卡住。活锁：不断重试但无法推进。预防：固定加锁顺序、锁粒度最小、优先消息传递/不可变数据。",
       "lang_diff": "检测：Go -race 竞态检测器、Rust 编译期 Send/Sync 静态阻止、TSan（C++）。Python 因 GIL 竞争较少但仍有；Java 有 synchronized 与 jstack 诊断死锁。",
       "exercises": [
-        { "type": "concept", "question": "预防死锁的经典方法是？", "options": ["固定全局加锁顺序", "忽略", "无限重试", "加更多锁"], "answer": 0, "feedback": "所有线程按相同顺序获取锁，消除循环等待。" },
-        { "type": "concept", "question": "哪个语言在编译期静态防止数据竞争？", "options": ["Rust", "C++", "Java", "Python"], "answer": 0, "feedback": "Rust 的 Send/Sync 与借用检查在编译期阻止数据竞争。" }
+        {
+          "id": "rd-q1",
+          "type": "quiz",
+          "question": "两线程无锁并发执行 counter += 1（各 100 次），最终值最可能是？",
+          "options": [
+            "小于 200（丢失更新）",
+            "恰好 200",
+            "大于 200",
+            "编译错误"
+          ],
+          "answer": 0,
+          "feedback": "counter += 1 非原子：读-改-写之间被其他线程打断会丢失更新，结果 ≤ 200。"
+        },
+        {
+          "id": "rd-q2",
+          "type": "quiz",
+          "question": "死锁的本质是？",
+          "options": [
+            "任务执行太慢",
+            "多任务互相持有对方所需资源且不释放",
+            "CPU 太少",
+            "内存不足"
+          ],
+          "answer": 1,
+          "feedback": "死锁 = 循环等待：每个任务持有一把别人需要的锁，全部阻塞。"
+        },
+        {
+          "id": "rd-q3",
+          "type": "quiz",
+          "question": "Rust 里把 Mutex 直接 move 进两个线程会？",
+          "options": [
+            "运行时死锁",
+            "数据竞争",
+            "编译失败（所有权/线程安全静态检查）",
+            "正常执行"
+          ],
+          "answer": 2,
+          "feedback": "Rust 编译期阻止非线程安全共享（需 Arc 引用计数包装），把竞争消灭在编译期。"
+        },
+        {
+          "id": "rd-q4",
+          "type": "quiz",
+          "question": "JS 为什么没有数据竞争问题？",
+          "options": [
+            "JS 编译器自动加锁",
+            "JS 不允许共享变量",
+            "Node 用协程",
+            "事件循环单线程，无共享内存并发"
+          ],
+          "answer": 3,
+          "feedback": "JS 是单线程事件循环，回调/异步都在同一线程串行执行，天然无共享内存竞争。"
+        }
+      ],
+      "level": "L4",
+      "commonTask": "同一任务：两个线程各自对共享计数器递增 100 次，用锁/原子/互斥正确保护共享状态，最终输出 200。JS 因事件循环单线程天然无数据竞争（无需锁）。这演示「共享状态必须同步访问」的跨语言共识。",
+      "comparisonDimensions": [
+        "sharing-mechanism",
+        "lock-model",
+        "compile-time-guarantee",
+        "runtime-checking",
+        "default-concurrency"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "import threading\n\ncounter = 0\nlock = threading.Lock()\n\ndef worker():\n    global counter\n    for _ in range(100):\n        with lock:\n            counter += 1\n\nt1 = threading.Thread(target=worker)\nt2 = threading.Thread(target=worker)\nt1.start()\nt2.start()\nt1.join()\nt2.join()\nprint(counter)",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 3,
+              "end": 5
+            },
+            {
+              "role": "define",
+              "start": 7,
+              "end": 10
+            },
+            {
+              "role": "spawn",
+              "start": 12,
+              "end": 13
+            },
+            {
+              "role": "join",
+              "start": 14,
+              "end": 15
+            },
+            {
+              "role": "print",
+              "start": 16,
+              "end": 16
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "let counter = 0;\nfor (let i = 0; i < 200; i++) counter++;\nconsole.log(counter);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "iterate",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "import java.util.concurrent.atomic.AtomicInteger;\nAtomicInteger counter = new AtomicInteger(0);\nRunnable worker = () -> { for (int i = 0; i < 100; i++) counter.incrementAndGet(); };\nThread t1 = new Thread(worker);\nThread t2 = new Thread(worker);\nt1.start();\nt2.start();\ntry { t1.join(); t2.join(); } catch (InterruptedException e) {}\nSystem.out.println(counter.get());",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "define",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "spawn",
+              "start": 4,
+              "end": 6
+            },
+            {
+              "role": "join",
+              "start": 7,
+              "end": 8
+            },
+            {
+              "role": "print",
+              "start": 9,
+              "end": 9
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <thread>\n#include <atomic>\nstd::atomic<int> counter(0);\nauto worker = [&]() { for (int i = 0; i < 100; i++) counter++; };\nstd::thread t1(worker), t2(worker);\nt1.join();\nt2.join();\nstd::cout << counter.load();",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "define",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "spawn",
+              "start": 5,
+              "end": 5
+            },
+            {
+              "role": "join",
+              "start": 6,
+              "end": 7
+            },
+            {
+              "role": "print",
+              "start": 8,
+              "end": 8
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "counter := 0\nch := make(chan int, 1)\nworker := func() { for i := 0; i < 100; i++ { ch <- 1; counter++; <-ch } }\ndone := make(chan bool)\ngo func() { worker(); done <- true }()\ngo func() { worker(); done <- true }()\n<-done\n<-done\nfmt.Println(counter)",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "define",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "spawn",
+              "start": 5,
+              "end": 6
+            },
+            {
+              "role": "join",
+              "start": 7,
+              "end": 8
+            },
+            {
+              "role": "print",
+              "start": 9,
+              "end": 9
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "use std::sync::{Arc, Mutex};\nuse std::thread;\nlet counter = Arc::new(Mutex::new(0));\nlet mut handles = vec![];\nfor _ in 0..2 {\n    let c = Arc::clone(&counter);\n    handles.push(thread::spawn(move || {\n        for _ in 0..100 {\n            let mut g = c.lock().unwrap();\n            *g += 1;\n        }\n    }));\n}\nfor h in handles { h.join().unwrap(); }\nprintln!(\"{}\", *counter.lock().unwrap());",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 3,
+              "end": 4
+            },
+            {
+              "role": "spawn",
+              "start": 5,
+              "end": 13
+            },
+            {
+              "role": "join",
+              "start": 14,
+              "end": 14
+            },
+            {
+              "role": "print",
+              "start": 15,
+              "end": 15
+            }
+          ]
+        }
+      },
+      "errors": [
+        "无锁竞争（Python/Java/C++）：counter += 1 非原子，两线程并发时丢失更新，结果 < 200——数据竞争是未定义行为",
+        "锁顺序不一致死锁：线程 A 持锁1求锁2，线程 B 持锁2求锁1，互相等待永不释放",
+        "Go 忘记 wg.Done()：主 goroutine 永久阻塞——计数/同步原语必须成对",
+        "Rust 不用 Arc 共享所有权：把 Mutex 直接 move 进两个线程编译失败——编译期阻止共享（Send/Sync 静态保证）",
+        "检查-然后-执行（TOCTOU）：先检查再操作非原子，检查后状态被并发修改"
+      ],
+      "acceptanceTests": [
+        {
+          "name": "输出受保护计数",
+          "assert": "output contains 200",
+          "expect": "200"
+        },
+        {
+          "name": "六语言输出一致",
+          "assert": "all languages emit 200",
+          "expect": "200"
+        },
+        {
+          "name": "程序可运行",
+          "assert": "program compiles and runs",
+          "expect": "0"
+        },
+        {
+          "name": "JS 单线程对比",
+          "assert": "javascript demonstrates no-lock single-thread",
+          "expect": "200"
+        }
+      ],
+      "transferExercises": [
+        {
+          "id": "rd-tr1",
+          "type": "transfer",
+          "question": "死锁成立的四个必要条件中，预防「循环等待」的常见策略是？",
+          "options": [
+            "全局固定加锁顺序",
+            "减少线程数",
+            "增大锁粒度",
+            "使用更多锁"
+          ],
+          "answer": 0,
+          "feedback": "固定加锁顺序打破循环等待；锁粒度应尽量小而非大。"
+        },
+        {
+          "id": "rd-tr2",
+          "type": "transfer",
+          "question": "检测数据竞争最可靠的工具/机制是？",
+          "options": [
+            "多跑几次程序",
+            "竞态检测器（Go -race / TSan）与 Rust 编译期 Send/Sync",
+            "加 sleep 延长执行",
+            "代码审查"
+          ],
+          "answer": 1,
+          "feedback": "竞态检测器与编译期类型系统才能真实暴露竞争；sleep 只会掩盖问题。"
+        },
+        {
+          "id": "rd-tr3",
+          "type": "transfer",
+          "question": "避免共享状态竞争的架构性方案是？",
+          "options": [
+            "共享大对象并频繁加锁",
+            "用全局变量",
+            "消息传递（channel/queue）与不可变数据",
+            "扩大锁保护范围"
+          ],
+          "answer": 2,
+          "feedback": "消息传递与不可变数据从结构上消除竞争，优于细粒度加锁。"
+        }
       ]
     },
     { "id": "concurrency.immutability", "module_id": "B13", "title": "线程安全与不可变数据", "status": "published",
