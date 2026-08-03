@@ -3262,6 +3262,218 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "concept", "question": "跨平台路径拼接的正确做法是？", "options": ["硬编码 '/'", "用语言的路径库（pathlib/path/filepath）", "用 '\\\\'", "判断 OS 拼字符串"], "answer": 1, "feedback": "路径库自动处理分隔符差异，硬编码不可移植。" },
         { "type": "concept", "question": "验证跨平台兼容性的可靠方式是？", "options": ["问同事", "只在自己机器测", "CI 在 Windows/macOS/Linux 多平台跑测试", "读文档"], "answer": 2, "feedback": "多平台 CI 真实暴露平台差异问题，单平台测试不够。" }
       ]
+    },
+        {
+      "id": "expr.float-precision",
+      "module_id": "B03",
+      "title": "浮点精度与 IEEE 754",
+      "status": "published",
+      "level": "L4",
+      "objectives": [
+        "理解二进制浮点无法精确表示十进制小数",
+        "学会安全比较浮点数（epsilon / 十进制类型）",
+        "识别金额、循环条件中的精度丢失陷阱"
+      ],
+      "prerequisites": [
+        "expr.arithmetic",
+        "value.conversion"
+      ],
+      "core": "IEEE 754 用二进制分数表示实数，0.1 这类十进制小数无法被有限二进制精确表示，因此 0.1+0.2≠0.3（实际为 0.30000000000000004）。这不是语言 bug，而是所有二进制浮点（double/f64/float64/number）的共同语义。安全策略：比较用差值的 epsilon 容差；精确场景（金额）用十进制类型（decimal/BigDecimal/decimal128）或整数分。",
+      "lang_diff": "六语言浮点核心类型：Python float（双精度）、JS number（双精度）、Java double、C++ double、Go float64、Rust f64（默认字面量）。C++ std::cout 默认只打印 6 位有效数字，需 setprecision(17) 才能看到完整误差。",
+      "commonTask": "同一任务：计算并输出 0.1 + 0.2 的完整结果。六语言在 IEEE 754 双精度下输出完全一致：0.30000000000000004。",
+      "comparisonDimensions": [
+        "binary-radix",
+        "precision-digits",
+        "equality-safety",
+        "rounding-mode",
+        "decimal-exactness"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "print(0.1 + 0.2)",
+          "semantic_blocks": [
+            {
+              "role": "calc",
+              "start": 1,
+              "end": 1
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "console.log(0.1 + 0.2);",
+          "semantic_blocks": [
+            {
+              "role": "calc",
+              "start": 1,
+              "end": 1
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "System.out.println(0.1 + 0.2);",
+          "semantic_blocks": [
+            {
+              "role": "calc",
+              "start": 1,
+              "end": 1
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <iomanip>\nstd::cout << std::setprecision(17) << (0.1 + 0.2);",
+          "semantic_blocks": [
+            {
+              "role": "calc",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "fmt.Println(0.1 + 0.2)",
+          "semantic_blocks": [
+            {
+              "role": "calc",
+              "start": 1,
+              "end": 1
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "println!(\"{}\", 0.1 + 0.2);",
+          "semantic_blocks": [
+            {
+              "role": "calc",
+              "start": 1,
+              "end": 1
+            }
+          ]
+        }
+      },
+      "errors": [
+        "相等误判：if (0.1 + 0.2 == 0.3) 恒为 false——直接用 == 比较浮点运算结果是头号陷阱",
+        "金额误差累积：循环累加 0.01 一百次得 1.0000000000000007，财务场景必须用十进制类型",
+        "循环不终止：while (x != 1.0) x += 0.1 因浮点步长永远不等于目标而可能死循环",
+        "大数吞小数：16777216.0 + 1.0 == 16777216.0 为 true——双精度 24 位尾数之外被舍入",
+        "显示误导：C++ std::cout 默认 6 位有效数字，0.1+0.2 显示为 0.3 掩盖真实误差"
+      ],
+      "acceptanceTests": [
+        {
+          "name": "输出完整误差值",
+          "assert": "output contains 0.30000000000000004",
+          "expect": "0.30000000000000004"
+        },
+        {
+          "name": "六语言输出一致",
+          "assert": "all languages emit identical IEEE754 value",
+          "expect": "0.30000000000000004"
+        },
+        {
+          "name": "程序可运行",
+          "assert": "program compiles and runs",
+          "expect": "0"
+        },
+        {
+          "name": "无隐式格式化截断",
+          "assert": "not truncated to 0.3",
+          "expect": "0.30000000000000004"
+        }
+      ],
+      "transferExercises": [
+        {
+          "id": "fp-tr1",
+          "type": "transfer",
+          "question": "金额累加（0.01 一百次）的正确做法是？",
+          "options": [
+            "用十进制类型（decimal/BigDecimal）或整数分",
+            "继续用 double 但少累加几次",
+            "用 float 单精度",
+            "用 == 比较累加结果"
+          ],
+          "answer": 0,
+          "feedback": "金额必须十进制精确类型或整数分；二进制浮点误差会随累加放大。"
+        },
+        {
+          "id": "fp-tr2",
+          "type": "transfer",
+          "question": "两个浮点数 a、b 的相等判断，安全写法是？",
+          "options": [
+            "a == b",
+            "Math.abs(a-b) < 1e-9",
+            "a === b",
+            "(a-b) == 0"
+          ],
+          "answer": 1,
+          "feedback": "用差值的 epsilon 容差比较；== 或差值为 0 都会因表示误差误判。"
+        },
+        {
+          "id": "fp-tr3",
+          "type": "transfer",
+          "question": "0.1 + 0.2 == 0.3 在 Python/JS/Java/C++/Go/Rust 中结果一致吗？",
+          "options": [
+            "不一致，各语言结果不同",
+            "一致，全部为 true",
+            "一致，全部为 false",
+            "只有 C++ 为 true"
+          ],
+          "answer": 2,
+          "feedback": "六语言都遵循 IEEE 754 双精度，0.1+0.2=0.30000000000000004，与 0.3 不相等——跨语言完全一致。"
+        }
+      ],
+      "exercises": [
+        {
+          "id": "fp-q1",
+          "type": "quiz",
+          "question": "0.1 + 0.2 在 IEEE 754 双精度下的结果是？",
+          "options": [
+            "0.30000000000000004",
+            "0.3",
+            "0.29999999999999998",
+            "0.31"
+          ],
+          "answer": 0,
+          "feedback": "二进制无法精确表示 0.1，0.1+0.2=0.30000000000000004，与 0.3 不相等。"
+        },
+        {
+          "id": "fp-q2",
+          "type": "quiz",
+          "question": "为什么 0.1 + 0.2 != 0.3？",
+          "options": [
+            "语言实现有 bug",
+            "十进制小数无法被有限二进制精确表示",
+            "编译器优化错误",
+            "只有 Python 会这样"
+          ],
+          "answer": 1,
+          "feedback": "IEEE 754 二进制浮点表示，0.1 是无限循环二进制小数，舍入后产生误差——所有双精度语言同理。"
+        },
+        {
+          "id": "fp-q3",
+          "type": "quiz",
+          "question": "C++ std::cout << (0.1 + 0.2) 默认显示 0.3 的原因是？",
+          "options": [
+            "运算结果确实是 0.3",
+            "double 精度更高",
+            "cout 默认 6 位有效数字截断了误差",
+            "编译器四舍五入"
+          ],
+          "answer": 2,
+          "feedback": "cout 默认精度 6 位有效数字，把 0.30000000000000004 显示成 0.3——需 setprecision(17) 查看真实值。"
+        },
+        {
+          "id": "fp-q4",
+          "type": "quiz",
+          "question": "财务金额累加的最佳实践是？",
+          "options": [
+            "用 double 并最后四舍五入",
+            "用 float",
+            "用 long double",
+            "用整数分或十进制类型（decimal/BigDecimal）"
+          ],
+          "answer": 3,
+          "feedback": "金额必须精确十进制表示，二进制浮点误差在累加中放大不可接受。"
+        }
+      ]
     }
   ]
 };
