@@ -122,6 +122,96 @@
       </div>`;
   }
 
+  // ===== 同题任务（工作流 H 第 4 层：六语言同题输入输出协议） =====
+  function renderCommonTask(c) {
+    if (!c.commonTask) return "";
+    const io = c.commonTask.expectedOutput || {};
+    const rows = Object.entries(io).map(([k, v]) => `<span class="meta-tag">${k} = ${v}</span>`).join("");
+    return `
+      <div class="section-block">
+        <div class="section-heading"><div><span class="eyebrow">Same-task protocol</span><h2>同题任务 · 统一输入输出</h2></div></div>
+        <div class="diff-card" style="padding:16px 18px">
+          <p style="margin:0 0 10px;color:var(--muted);font-size:13px;line-height:1.9"><b style="color:var(--text)">输入：</b>${A.esc(c.commonTask.input)}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px">${rows}</div>
+        </div>
+      </div>`;
+  }
+
+  // ===== 结构化差异矩阵（工作流 I：维度 × 语言，替代单段 lang_diff 文本） =====
+  function renderComparisonMatrix(c) {
+    if (!c.comparisonDimensions || !c.comparisonDimensions.length) return "";
+    const dims = c.comparisonDimensions;
+    const langs = D2.languages;
+    const dimLabel = {
+      "unicode-representation": "Unicode 表示",
+      "type-checking": "静态/动态检查",
+      "failure-mode": "失败模式",
+      "idiomatic-style": "惯用写法",
+      "runtime-cost": "运行时代价",
+      "mutability": "可变性",
+      "memory-model": "内存模型",
+      "error-propagation": "错误传播",
+      "ownership": "所有权"
+    };
+    const cells = dims.map((dim) => `
+      <tr>
+        <th>${dimLabel[dim] || dim}</th>
+        ${langs.map((l) => {
+          const v = c.variants && c.variants[l.id];
+          const txt = v && v.comparison && v.comparison[dim];
+          return `<td class="${txt ? "" : "dim-na"}">${txt ? A.esc(txt) : "—"}</td>`;
+        }).join("")}
+      </tr>`).join("");
+    return `
+      <div class="section-block">
+        <div class="section-heading"><div><span class="eyebrow">Comparison matrix</span><h2>六语言语义差异矩阵</h2></div></div>
+        <div class="cmp-scroll">
+          <table class="cmp-table">
+            <thead><tr><th>维度</th>${langs.map((l) => `<th style="color:${l.color}">${l.name}</th>`).join("")}</tr></thead>
+            <tbody>${cells}</tbody>
+          </table>
+        </div>
+      </div>`;
+  }
+
+  // ===== 跨语言迁移练习（工作流 H 第 7 层） =====
+  function renderTransferExercises(c) {
+    if (!c.transferExercises || !c.transferExercises.length) return "";
+    return `
+      <div class="section-block">
+        <div class="section-heading"><div><span class="eyebrow">Transfer</span><h2>跨语言迁移练习</h2></div></div>
+        ${c.transferExercises.map((ex, i) => `
+          <div class="exercise-card" data-answer="${ex.answer}" data-feedback="${A.esc(ex.feedback)}">
+            <span class="ex-type">迁移</span>
+            <h4>${A.esc(ex.question)}</h4>
+            <div class="exercise-options">
+              ${ex.options.map((opt, oi) => `
+                <button class="exercise-option" data-opt="${oi}">
+                  <span class="ex-opt-key">${String.fromCharCode(65 + oi)}</span>
+                  <span>${A.esc(opt)}</span>
+                </button>`).join("")}
+            </div>
+            <div class="exercise-feedback hidden"></div>
+          </div>`).join("")}
+      </div>`;
+  }
+
+  // ===== 综合验收（工作流 H 第 8 层 + L4 硬性要求） =====
+  function renderAcceptanceTests(c) {
+    if (!c.acceptanceTests || !c.acceptanceTests.length) return "";
+    return `
+      <div class="section-block">
+        <div class="section-heading"><div><span class="eyebrow">Acceptance</span><h2>综合验收 · 可运行断言</h2></div></div>
+        <div class="diff-card" style="padding:16px 18px">
+          ${c.acceptanceTests.map((t) => `
+            <p style="margin:0 0 8px;color:var(--muted);font-size:13px;font-family:ui-monospace,Menlo,monospace">
+              <span class="meta-tag" style="background:color-mix(in srgb,var(--success) 12%,transparent);color:var(--success)">${A.esc(t.input)}</span>
+              &nbsp;${A.esc(t.assert)}&nbsp;→&nbsp;<b style="color:var(--text)">${A.esc(t.expect)}</b>
+            </p>`).join("")}
+        </div>
+      </div>`;
+  }
+
   // ===== 错误案例 =====
   function renderErrors(c) {
     if (!c.errors || !c.errors.length) return "";
@@ -226,7 +316,7 @@
         </div>`;
     }
 
-    mainHtml += renderErrors(c) + renderExercises(c);
+    mainHtml += renderCommonTask(c) + renderComparisonMatrix(c) + renderErrors(c) + renderTransferExercises(c) + renderAcceptanceTests(c) + renderExercises(c);
 
     // 深入机制 + 总结迁移
     mainHtml += `
