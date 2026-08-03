@@ -1330,15 +1330,241 @@ window.CODE_ATLAS_2 = {
         { "type": "concept", "question": "pyenv local 的作用是？", "options": ["在项目目录锁定版本", "更新 pip", "删除版本", "安装 Python"], "answer": 0, "feedback": "pyenv local 生成 .python-version 锁定该项目使用的版本。" }
       ]
     },
-    {
-      "id": "value.semantics", "module_id": "B02", "title": "值语义、引用语义与对象身份", "status": "published",
-      "objectives": ["区分值语义与引用语义", "理解对象身份（identity）与相等性"],
-      "prerequisites": ["value.binding"],
+            {
+      "id": "value.semantics",
+      "module_id": "B02",
+      "title": "值语义、引用语义与对象身份",
+      "status": "published",
+      "objectives": [
+        "区分值语义与引用语义",
+        "理解对象身份（identity）与相等性"
+      ],
+      "prerequisites": [
+        "value.binding"
+      ],
       "core": "值语义：变量存值本身，复制产生独立副本（int、struct）。引用语义：变量存对象的地址，复制共享同一对象。判断「== 比较的是值还是身份」是各语言常见困惑：Python/JS/Java 的对象 == 默认比较身份（需 equals/===），C++ 的 == 由类型定义，Rust 需 derive(PartialEq)。",
       "lang_diff": "Python：== 调用 __eq__，is 比较身份；JS：=== 原始值按值、对象按引用（对象比较需手动）；Java：== 基本类型按值、对象按引用，equals 需重写；C++：== 默认逐成员（可重载），复制是深拷贝；Go：== 对可比较类型按值，slice/map 不可比较；Rust：== 需实现 PartialEq（derive 可得），String 按内容。",
       "exercises": [
-        { "type": "concept", "question": "Java 中比较两个 String 内容应使用？", "options": ["===", "==", "equals()", "compare"], "answer": 2, "feedback": "== 比较引用身份，equals() 比较内容。" },
-        { "type": "read", "question": "C++ 中 int a=1,b=1; a==b 的结果？", "options": ["编译错误", "false（身份）", "true（值）", "未定义"], "answer": 2, "feedback": "C++ 内置类型 == 按值比较；类类型由重载决定。" }
+        {
+          "id": "vs-q1",
+          "type": "quiz",
+          "question": "Python 中 a=[1]; b=a; b.append(2) 后 a 是？",
+          "options": [
+            "[1,2]（b 是 a 的引用）",
+            "[1]（拷贝）",
+            "报错",
+            "空列表"
+          ],
+          "answer": 0,
+          "feedback": "列表是引用语义，b=a 复制引用，append 影响同一对象。"
+        },
+        {
+          "id": "vs-q2",
+          "type": "quiz",
+          "question": "Java 中两个内容相同的新 String 用 == 比较结果是？",
+          "options": [
+            "true（比较内容）",
+            "false（比较身份，需 equals）",
+            "编译错误",
+            "取决于长度"
+          ],
+          "answer": 1,
+          "feedback": "Java 对象 == 比较引用身份；内容比较必须用 equals。"
+        },
+        {
+          "id": "vs-q3",
+          "type": "quiz",
+          "question": "Rust 中 String 传给函数后原变量？",
+          "options": [
+            "仍可用（自动拷贝）",
+            "变为 null",
+            "不可再用（所有权移动）",
+            "报错但可恢复"
+          ],
+          "answer": 2,
+          "feedback": "String 非 Copy，传参发生所有权移动，原变量失效；需借用或 clone。"
+        },
+        {
+          "id": "vs-q4",
+          "type": "quiz",
+          "question": "C++ 大对象按值传参的性能问题是？",
+          "options": [
+            "引用计数开销",
+            "自动加锁",
+            "无问题",
+            "整份拷贝的开销"
+          ],
+          "answer": 3,
+          "feedback": "按值传递触发拷贝构造，大对象开销大；应传 const 引用。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：函数/代码块内对整型参数赋值 99 不影响外部变量（值语义），对列表追加元素影响外部（引用语义）；输出外部整型值与列表长度，统一为：1 2。",
+      "comparisonDimensions": [
+        "copy-behavior",
+        "mutation-visibility",
+        "equality-meaning",
+        "sharing-cost",
+        "immutability-default"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "def f(x, lst):\n    x = 99\n    lst.append(2)\n\na = 1\nlst = [1]\nf(a, lst)\nprint(a, len(lst))",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 3
+            },
+            {
+              "role": "declare",
+              "start": 5,
+              "end": 6
+            },
+            {
+              "role": "call",
+              "start": 7,
+              "end": 7
+            },
+            {
+              "role": "print",
+              "start": 8,
+              "end": 8
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "function f(x, arr) { x = 99; arr.push(2); }\nlet a = 1;\nconst arr = [1];\nf(a, arr);\nconsole.log(a, arr.length);",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 3
+            },
+            {
+              "role": "call",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "print",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "java.util.List<Integer> lst = new java.util.ArrayList<>(java.util.List.of(1));\nint a = 1;\nint x = a; x = 99;\nlst.add(2);\nSystem.out.println(a + \" \" + lst.size());",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "copy",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "mutate",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "print",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <vector>\nstd::vector<int> lst = {1};\nint a = 1;\nint x = a; x = 99;\nlst.push_back(2);\nstd::cout << a << \" \" << lst.size();",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 3
+            },
+            {
+              "role": "copy",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "mutate",
+              "start": 5,
+              "end": 5
+            },
+            {
+              "role": "print",
+              "start": 6,
+              "end": 6
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "lst := []int{1}\na := 1\nx := a; x = 99\nlst = append(lst, 2)\nfmt.Println(a, len(lst))",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "copy",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "mutate",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "print",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "let a = 1;\nlet mut lst = vec![1];\nlet x = a;\nlst.push(2);\nprintln!(\"{} {}\", a, lst.len());",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "copy",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "mutate",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "print",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        }
+      },
+      "errors": [
+        "引用共享陷阱（Python/JS）：b = a 后修改 b 的元素，a 同步变化——复制引用而非数据",
+        "Java == 比较身份：两个内容相同的 String 用 == 可能 false（常量池 vs new），应 equals",
+        "C++ 值传递拷贝开销：大对象按值传递产生整份拷贝，应 const 引用",
+        "Go slice 传递：append 可能触发扩容导致外部 slice 不变——值语义与引用语义混合",
+        "Rust 所有权移动：String 传参后原变量不可用（move），需 clone 或借用"
       ]
     },
     {
@@ -1385,15 +1611,211 @@ window.CODE_ATLAS_2 = {
         { "type": "concept", "question": "Go 中 range 遍历 string 的迭代单位是？", "options": ["字节", "字符数组", "码元", "UTF-8 码点（rune）"], "answer": 3, "feedback": "range 对 string 按 rune（码点）迭代。" }
       ]
     },
-    {
-      "id": "collection.map", "module_id": "B07", "title": "映射 / 字典 / 哈希表", "status": "published",
-      "objectives": ["理解键值对集合的语义", "掌握常见操作与遍历"],
-      "prerequisites": ["collection.array-list"],
+            {
+      "id": "collection.map",
+      "module_id": "B07",
+      "title": "映射 / 字典 / 哈希表",
+      "status": "published",
+      "objectives": [
+        "理解键值对集合的语义",
+        "掌握常见操作与遍历"
+      ],
+      "prerequisites": [
+        "collection.array-list"
+      ],
       "core": "映射（map/dict）以键查找值，平均 O(1)。要点：键需可哈希（不可变）；键不存在时的行为（报错 vs 默认值）；遍历顺序。不同语言在「取不存在的键」上差异明显。",
       "lang_diff": "Python：dict[key] 不存在抛 KeyError，get() 返回默认；JS：Map 是专用类型（对象属性作 map 有原型污染风险），get 不存在返回 undefined；Java：HashMap.get 不存在返回 null（containsKey 判断）；C++：std::map 的 operator[] 不存在时插入默认值；Go：m[k] 不存在返回零值，用 v, ok := m[k] 判断；Rust：HashMap.get 返回 Option<&V>。",
       "exercises": [
-        { "type": "concept", "question": "Python dict[key] 键不存在时？", "options": ["抛 KeyError", "插入默认值", "返回空", "返回 None"], "answer": 0, "feedback": "直接下标访问不存在键抛 KeyError；用 get 提供默认。" },
-        { "type": "read", "question": "Rust HashMap 的 get 返回类型是？", "options": ["Option<&V>", "V", "默认值", "Result"], "answer": 0, "feedback": "get 返回 Option，强制处理缺失情况。" }
+        {
+          "id": "cm-q1",
+          "type": "quiz",
+          "question": "Python d[\"x\"] 键不存在时？",
+          "options": [
+            "返回 None",
+            "返回空串",
+            "静默创建",
+            "抛 KeyError"
+          ],
+          "answer": 3,
+          "feedback": "dict 下标访问缺失键抛 KeyError；需 get(key, default)。"
+        },
+        {
+          "id": "cm-q2",
+          "type": "quiz",
+          "question": "JS 中对象属性作映射的隐患是？",
+          "options": [
+            "性能好无需 Map",
+            "不支持字符串键",
+            "原型链污染（__proto__ 等）",
+            "无法遍历"
+          ],
+          "answer": 2,
+          "feedback": "普通对象继承 Object.prototype，特殊键名有污染风险；专用 Map 更安全。"
+        },
+        {
+          "id": "cm-q3",
+          "type": "quiz",
+          "question": "Go 中并发读写 map 会？",
+          "options": [
+            "自动加锁",
+            "运行时 panic（fatal error）",
+            "数据竞争但无害",
+            "编译错误"
+          ],
+          "answer": 1,
+          "feedback": "Go map 非并发安全，并发写触发 fatal error；需 sync.RWMutex 保护。"
+        },
+        {
+          "id": "cm-q4",
+          "type": "quiz",
+          "question": "Rust 中 m[\"x\"] 键不存在时？",
+          "options": [
+            "panic（索引越界）",
+            "返回 None",
+            "返回默认值",
+            "编译错误"
+          ],
+          "answer": 0,
+          "feedback": "Index 访问缺失键 panic；需 get() 返回 Option。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：创建键值映射 {a:1, b:2}，更新 a 为 3，然后按键读取输出，统一为：3 2（与遍历顺序无关）。",
+      "comparisonDimensions": [
+        "missing-key-behavior",
+        "ordering",
+        "hashability",
+        "lookup-cost",
+        "mutation-api"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "d = {\"a\": 1, \"b\": 2}\nd[\"a\"] = 3\nprint(d[\"a\"], d[\"b\"])",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "update",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "lookup",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const m = new Map([[\"a\", 1], [\"b\", 2]]);\nm.set(\"a\", 3);\nconsole.log(m.get(\"a\"), m.get(\"b\"));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "update",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "lookup",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "import java.util.*;\nMap<String, Integer> m = new HashMap<>();\nm.put(\"a\", 1);\nm.put(\"b\", 2);\nm.put(\"a\", 3);\nSystem.out.println(m.get(\"a\") + \" \" + m.get(\"b\"));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "update",
+              "start": 3,
+              "end": 5
+            },
+            {
+              "role": "lookup",
+              "start": 6,
+              "end": 6
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <map>\n#include <string>\nstd::map<std::string, int> m;\nm[\"a\"] = 1;\nm[\"b\"] = 2;\nm[\"a\"] = 3;\nstd::cout << m[\"a\"] << \" \" << m[\"b\"];",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "update",
+              "start": 4,
+              "end": 6
+            },
+            {
+              "role": "lookup",
+              "start": 7,
+              "end": 7
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "m := map[string]int{\"a\": 1, \"b\": 2}\nm[\"a\"] = 3\nfmt.Println(m[\"a\"], m[\"b\"])",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "update",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "lookup",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "use std::collections::HashMap;\nlet mut m = HashMap::new();\nm.insert(\"a\", 1);\nm.insert(\"b\", 2);\nm.insert(\"a\", 3);\nprintln!(\"{} {}\", m[\"a\"], m[\"b\"]);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "update",
+              "start": 3,
+              "end": 5
+            },
+            {
+              "role": "lookup",
+              "start": 6,
+              "end": 6
+            }
+          ]
+        }
+      },
+      "errors": [
+        "缺失键崩溃：d[\"x\"] 在 Python 抛 KeyError、Rust 索引越界 panic——应先检查或 get 默认值",
+        "JS 对象作 map：属性名与原型冲突（__proto__/constructor），对象遍历含继承属性——应用 Map",
+        "可变键哈希：Python/JS 用 list 作键报错（unhashable）——键必须不可变",
+        "Go map 并发写 panic：并发读写需 sync.RWMutex，否则 fatal error",
+        "Java HashMap 遍历无序：依赖顺序的代码在 HashMap 上不可移植——需 LinkedHashMap"
       ]
     },
     {
