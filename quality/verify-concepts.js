@@ -45,6 +45,7 @@ function extractPrelude(lang, code) {
     if (lang === 'java') return s.startsWith('import ');
     if (lang === 'cpp') return s.startsWith('#include');
     if (lang === 'rust') return s.startsWith('use ') && s.includes('::');
+    if (lang === 'go') return s.startsWith('import '); // I12-B：Go 标准库 import 提取
     return false;
   };
   return { prelude: lines.filter(isPre).join('\n'), body: lines.filter((l) => !isPre(l)).join('\n') };
@@ -58,7 +59,7 @@ function wrap(lang, code) {
   if (lang === 'javascript') return code;
   if (lang === 'java') return `${prelude}\npublic class Main {\n    public static void main(String[] args) {\n${indent(body)}\n    }\n}`;
   if (lang === 'cpp') return `${prelude}\n#include <iostream>\n#include <string>\nint main() {\n${indent(body)}\n    std::cout << std::endl;\n    return 0;\n}`;
-  if (lang === 'go') return `package main\n\nimport (\n    "fmt"\n    "unicode/utf8"\n)\n\nfunc main() {\n${indent(body)}\n}`;
+  if (lang === 'go') return `package main\n\nimport (\n    "fmt"\n    "unicode/utf8"${prelude ? '\n    ' + prelude.split('\n').map((l) => l.trim()).join('\n    ') : ''}\n)\n\nfunc main() {\n${indent(body)}\n}`;
   if (lang === 'rust') return `${prelude}\nfn main() {\n${indent(body)}\n}`;
   return null;
 }
