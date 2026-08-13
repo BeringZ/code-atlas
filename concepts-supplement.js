@@ -1190,14 +1190,244 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "read", "question": "Rust 中内层 let x = x + 1 与外层 x 的关系是？", "options": ["外层删除", "修改外层", "编译错误", "创建新绑定遮蔽外层（不修改外层）"], "answer": 3, "feedback": "shadow 创建新绑定遮蔽同名变量，外层不变。" }
       ]
     },
-    { "id": "value.numeric-edge", "module_id": "B02", "title": "溢出、精度与特殊数值", "status": "published",
-      "objectives": ["认识数值计算的边界情况", "处理溢出与非精确值"],
-      "prerequisites": ["value.primitive-types"],
+            {
+      "id": "value.numeric-edge",
+      "module_id": "B02",
+      "title": "溢出、精度与特殊数值",
+      "status": "published",
+      "objectives": [
+        "认识数值计算的边界情况",
+        "处理溢出与非精确值"
+      ],
+      "prerequisites": [
+        "value.primitive-types"
+      ],
       "core": "数值计算有边界：整数溢出（定宽类型超出范围回绕或报错）、浮点不精确（二进制无法精确表示 0.1）、特殊值（NaN、Infinity、-0.0）。定宽整数运算要考虑溢出策略（回绕/检查/饱和），浮点比较需用容差而非 ==。",
       "lang_diff": "Python：int 无溢出（任意精度）、float 有精度限制；JS：Number 安全整数 2^53、NaN/Infinity；Java：int 溢出回绕、double 有 NaN；C++：溢出是 UB（signed）；Go：int 溢出回绕；Rust：debug 溢出 panic、release 回绕（wrapping_* 显式）。",
       "exercises": [
-        { "type": "concept", "question": "JS 中能安全表示的最大整数是？", "options": ["2^64", "2^32", "2^53（Number.MAX_SAFE_INTEGER）", "无限制"], "answer": 2, "feedback": "超过 2^53 精度丢失，应用 BigInt。" },
-        { "type": "concept", "question": "浮点数相等比较应该用？", "options": ["容差比较 |a-b| < ε", "==", "字符串比较", "类型转换后比较"], "answer": 0, "feedback": "浮点不精确，相等比较需用容差。" }
+        {
+          "id": "ne-q1",
+          "type": "quiz",
+          "question": "Java 中 2147483647 + 1 的结果是？",
+          "options": [
+            "-2147483648（int32 回绕）",
+            "2147483648",
+            "抛异常",
+            "0"
+          ],
+          "answer": 0,
+          "feedback": "int 是 32 位定宽，超过最大值回绕到最小值——这正是溢出陷阱。"
+        },
+        {
+          "id": "ne-q2",
+          "type": "quiz",
+          "question": "C++ 有符号整数溢出的性质是？",
+          "options": [
+            "定义明确必回绕",
+            "未定义行为（UB），编译器可任意优化",
+            "必抛异常",
+            "自动转大类型"
+          ],
+          "answer": 1,
+          "feedback": "C++ 有符号溢出是 UB，结果不可依赖——检测应提前用 limits 预判。"
+        },
+        {
+          "id": "ne-q3",
+          "type": "quiz",
+          "question": "NaN 与任何值（包括自己）比较的结果是？",
+          "options": [
+            "恒为 true",
+            "取决于类型",
+            "恒为 false（NaN != NaN）",
+            "编译错误"
+          ],
+          "answer": 2,
+          "feedback": "IEEE 754 规定 NaN 与任何值（含自身）都不相等，判断 NaN 用 isNaN 函数。"
+        },
+        {
+          "id": "ne-q4",
+          "type": "quiz",
+          "question": "Python int 为什么没有溢出问题？",
+          "options": [
+            "自动转 float",
+            "用 long 但会截断",
+            "溢出抛异常",
+            "任意精度（无限位）"
+          ],
+          "answer": 3,
+          "feedback": "Python int 任意精度自动扩展，无定宽回绕；但模拟 int32 语义时需手动边界检查。"
+        }
+      ],
+      "level": "L4",
+      "commonTask": "同一任务：检查 2147483647 + 1 是否溢出 int32 并输出检测结果。Python/JS 手动模拟 int32 边界判断，Java 用 Math.addExact（溢出抛异常），C++/Go 用边界预判，Rust 用 checked_add 返回 Option。统一输出：overflow detected。",
+      "comparisonDimensions": [
+        "integer-width",
+        "overflow-policy",
+        "detection-api",
+        "special-values",
+        "precision-model"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "def check(a, b):\n    r = a + b\n    if r > 2147483647 or r < -2147483648:\n        print(\"overflow detected\")\n    else:\n        print(\"ok\")\n\ncheck(2147483647, 1)",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 6
+            },
+            {
+              "role": "call",
+              "start": 8,
+              "end": 8
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "function check(a, b) {\n    const r = a + b;\n    if (r > 2147483647 || r < -2147483648) console.log(\"overflow detected\");\n    else console.log(\"ok\");\n}\ncheck(2147483647, 1);",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 5
+            },
+            {
+              "role": "call",
+              "start": 6,
+              "end": 6
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "try {\n    int r = Math.addExact(2147483647, 1);\n    System.out.println(\"ok\");\n} catch (ArithmeticException e) {\n    System.out.println(\"overflow detected\");\n}",
+          "semantic_blocks": [
+            {
+              "role": "try",
+              "start": 1,
+              "end": 3
+            },
+            {
+              "role": "catch",
+              "start": 4,
+              "end": 5
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <limits>\nint a = 2147483647, b = 1;\nif (b > 0 && a > std::numeric_limits<int>::max() - b) std::cout << \"overflow detected\";\nelse std::cout << \"ok\";",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "branch",
+              "start": 3,
+              "end": 4
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "a, b := 2147483647, 1\nif b > 0 && a > 2147483647-b { fmt.Println(\"overflow detected\") } else { fmt.Println(\"ok\") }",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "branch",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "let a: i32 = 2147483647;\nlet b: i32 = 1;\nmatch a.checked_add(b) {\n    Some(_) => println!(\"ok\"),\n    None => println!(\"overflow detected\"),\n}",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "match",
+              "start": 3,
+              "end": 5
+            }
+          ]
+        }
+      },
+      "errors": [
+        "定宽回绕：Java/C++/Go 中 2147483647+1 回绕为 -2147483648，金额/计数场景产生严重错误",
+        "C++ 有符号溢出是 UB：编译器可做任意优化，结果不可依赖（-O2 下可能\"正确\"掩盖问题）",
+        "JS 超出安全整数：2^53 以上 Number 精度丢失，大整数应用应使用 BigInt",
+        "NaN 传染：任何含 NaN 的运算结果都是 NaN，与 NaN 比较恒 false（NaN != NaN）",
+        "Rust debug 溢出 panic：release 模式却静默回绕——两模式行为不一致需显式策略"
+      ],
+      "acceptanceTests": [
+        {
+          "name": "检测到溢出",
+          "assert": "output contains overflow detected",
+          "expect": "overflow detected"
+        },
+        {
+          "name": "六语言检测语义一致",
+          "assert": "all languages detect int32 overflow",
+          "expect": "overflow detected"
+        },
+        {
+          "name": "程序可运行",
+          "assert": "program compiles and runs",
+          "expect": "0"
+        },
+        {
+          "name": "Rust 用 checked_add",
+          "assert": "rust uses checked arithmetic",
+          "expect": "overflow detected"
+        }
+      ],
+      "transferExercises": [
+        {
+          "id": "ne-tr1",
+          "type": "transfer",
+          "question": "JS 中 2^53 以上的整数运算隐患是？",
+          "options": [
+            "会抛出异常",
+            "自动转字符串",
+            "Number 超出安全整数精度丢失，应使用 BigInt",
+            "完全安全"
+          ],
+          "answer": 2,
+          "feedback": "Number 是双精度 53 位尾数，超过 2^53 相邻整数无法区分；大整数用 BigInt。"
+        },
+        {
+          "id": "ne-tr2",
+          "type": "transfer",
+          "question": "Java 中检测 int 加法溢出的安全 API 是？",
+          "options": [
+            "Math.addExact（溢出抛 ArithmeticException）",
+            "直接 a+b",
+            "Integer.MAX_VALUE+1 判断",
+            "用 long 强转"
+          ],
+          "answer": 0,
+          "feedback": "Math.addExact 溢出时抛异常，可捕获处理；直接运算静默回绕。"
+        },
+        {
+          "id": "ne-tr3",
+          "type": "transfer",
+          "question": "Rust 中明确允许回绕的加法是？",
+          "options": [
+            "普通 +（panic）",
+            "wrapping_add（语义明确不回绕报警）",
+            "checked_add",
+            "saturating_add"
+          ],
+          "answer": 1,
+          "feedback": "wrapping_add 显式选择回绕语义；checked_add 返回 Option；saturating_add 饱和到边界。"
+        }
       ]
     },
 
@@ -3892,14 +4122,209 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
     },
 
     // ================= B15 测试、调试与可观测性 =================
-    { "id": "test.assertions", "module_id": "B15", "title": "断言与测试用例设计", "status": "published",
-      "objectives": ["写出有效的断言", "设计覆盖关键路径的用例"],
-      "prerequisites": ["test.structure"],
+            {
+      "id": "test.assertions",
+      "module_id": "B15",
+      "title": "断言与测试用例设计",
+      "status": "published",
+      "objectives": [
+        "写出有效的断言",
+        "设计覆盖关键路径的用例"
+      ],
+      "prerequisites": [
+        "test.structure"
+      ],
       "core": "断言验证「实际输出 == 预期输出」。好用例：一个测试只验一件事、覆盖正常/边界/异常三类路径、用具体值而非模糊断言（assert result 不如 assert result == 42）。断言失败信息应能定位问题。",
       "lang_diff": "Python：assert expr（pytest 自动展开）；JS：expect(x).toBe(y)/toEqual；Java：assertEquals/assertTrue；C++：EXPECT_EQ/ASSERT_TRUE；Go：if got != want { t.Errorf }；Rust：assert_eq!/assert!。",
       "exercises": [
-        { "type": "concept", "question": "Rust 中比较两个值相等的断言宏是？", "options": ["assert!", "expect!", "assert_eq!", "check!"], "answer": 2, "feedback": "assert_eq!(a, b) 比较相等并输出差异。" },
-        { "type": "concept", "question": "好的测试断言应该？", "options": ["只测正常路径", "用具体预期值验证（== 42）", "assert result 非空", "一个测试验多件事"], "answer": 1, "feedback": "具体断言能精确定位问题，模糊断言掩盖错误。" }
+        {
+          "id": "as-q1",
+          "type": "quiz",
+          "question": "C/C++ 中 release 构建（NDEBUG）对 assert 的影响是？",
+          "options": [
+            "assert 变慢",
+            "assert 必抛异常",
+            "assert 被移除，含副作用的表达式不执行",
+            "无影响"
+          ],
+          "answer": 2,
+          "feedback": "NDEBUG 时 assert 编译为空，其中的函数调用副作用也消失——别在断言里调用关键函数。"
+        },
+        {
+          "id": "as-q2",
+          "type": "quiz",
+          "question": "断言与错误处理的分工是？",
+          "options": [
+            "两者等价",
+            "断言用于用户输入",
+            "错误处理验不变量",
+            "断言验不变量（程序员错误），错误处理管可预期失败（IO/输入）"
+          ],
+          "answer": 3,
+          "feedback": "断言防程序员错误（不变量），异常/错误返回处理运行时可预期失败，各司其职。"
+        },
+        {
+          "id": "as-q3",
+          "type": "quiz",
+          "question": "Python 中 assert 在 -O 优化下的行为是？",
+          "options": [
+            "assert 被移除",
+            "报错",
+            "必失败",
+            "变慢"
+          ],
+          "answer": 0,
+          "feedback": "python -O 移除 assert 语句，含副作用的表达式不执行——同 C NDEBUG 陷阱。"
+        },
+        {
+          "id": "as-q4",
+          "type": "quiz",
+          "question": "更精确的断言写法是？",
+          "options": [
+            "assert result（只验真值）",
+            "assert result == 5（具体期望值）",
+            "assert result != null（太泛）",
+            "assert true"
+          ],
+          "answer": 1,
+          "feedback": "断言具体期望值失败时信息明确；只验真值无法区分「0 vs false vs null」的错误。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：断言 2+2==4 成立（失败则中止），断言通过后输出统一为：pass。",
+      "comparisonDimensions": [
+        "assert-syntax",
+        "failure-behavior",
+        "message-inclusion",
+        "check-mode",
+        "framework-integration"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "assert 2 + 2 == 4\nprint(\"pass\")",
+          "semantic_blocks": [
+            {
+              "role": "assert",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "print",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "if (2 + 2 !== 4) throw new Error(\"assertion failed\");\nconsole.log(\"pass\");",
+          "semantic_blocks": [
+            {
+              "role": "assert",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "print",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "if (2 + 2 != 4) throw new AssertionError(\"assertion failed\");\nSystem.out.println(\"pass\");",
+          "semantic_blocks": [
+            {
+              "role": "assert",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "print",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <cassert>\nassert(2 + 2 == 4);\nstd::cout << \"pass\";",
+          "semantic_blocks": [
+            {
+              "role": "assert",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "if 2+2 != 4 { panic(\"assertion failed\") }\nfmt.Println(\"pass\")",
+          "semantic_blocks": [
+            {
+              "role": "assert",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "print",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "assert!(2 + 2 == 4);\nprintln!(\"pass\");",
+          "semantic_blocks": [
+            {
+              "role": "assert",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "print",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        }
+      },
+      "errors": [
+        "过度使用断言替代错误处理：断言用于不变量，用户输入/IO 错误应显式处理",
+        "断言副作用：assert(f() != 0) 中 f() 在 release 构建被移除（C/C++ NDEBUG），副作用丢失",
+        "测试不验具体值：assert(result) 只验真值，应断言具体期望（assert result == 5）",
+        "一个测试断言多件事：失败时无法定位哪个环节出错",
+        "依赖测试执行顺序：断言间共享可变状态，单个测试无法独立运行"
+      ],
+      "transferExercises": [
+        {
+          "id": "as-tr1",
+          "type": "transfer",
+          "question": "Go 测试中断言失败的推荐方式？",
+          "options": [
+            "t.Errorf/t.Fatalf（testing 包内）",
+            "panic 直接",
+            "os.Exit",
+            "log.Fatal"
+          ],
+          "answer": 0,
+          "feedback": "testing 包用 t.Errorf（继续）或 t.Fatalf（终止）报告，测试框架统一收集。"
+        },
+        {
+          "id": "as-tr2",
+          "type": "transfer",
+          "question": "边界值测试应覆盖哪些输入？",
+          "options": [
+            "只测正常值",
+            "随机大数",
+            "最小值/最大值/临界值/空值",
+            "只看文档"
+          ],
+          "answer": 2,
+          "feedback": "边界断言覆盖 off-by-one 与极端输入，是高风险缺陷多发区。"
+        }
       ]
     },
     { "id": "test.boundary", "module_id": "B15", "title": "边界值与异常路径", "status": "published",
