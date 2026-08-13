@@ -1589,15 +1589,220 @@ window.CODE_ATLAS_2 = {
         { "type": "read", "question": "Rust 中 loop { ... break 42 } 的 break 作用是？", "options": ["继续循环", "仅退出", "报错", "退出并返回 42 作为循环表达式值"], "answer": 3, "feedback": "Rust 的 loop 是表达式，break value 可携带返回值。" }
       ]
     },
-    {
-      "id": "function.closure", "module_id": "B05", "title": "闭包与捕获", "status": "published",
-      "objectives": ["理解闭包捕获外部变量", "识别闭包在回调与工厂中的用途"],
-      "prerequisites": ["function.lambda", "value.semantics"],
+            {
+      "id": "function.closure",
+      "module_id": "B05",
+      "title": "闭包与捕获",
+      "status": "published",
+      "objectives": [
+        "理解闭包捕获外部变量",
+        "识别闭包在回调与工厂中的用途"
+      ],
+      "prerequisites": [
+        "function.lambda",
+        "value.semantics"
+      ],
       "core": "闭包 = 函数 + 捕获的词法环境。内层函数能访问并（按语言规则）修改外层变量，即使外层已返回。捕获方式影响行为：按值快照还是按引用共享；是否允许修改捕获变量。",
       "lang_diff": "Python：默认引用捕获，读外层自由变量，写需 nonlocal；JS：闭包按引用共享（循环变量陷阱曾用 var/let 区分）；Java：lambda 只能捕获 effectively final 变量；C++：[=] 按值 / [&] 按引用显式声明捕获；Go：闭包共享变量（Go 1.22 后循环变量语义修正）；Rust：Fn/FnMut/FnOnce 按捕获方式自动选择。",
       "exercises": [
-        { "type": "concept", "question": "Java lambda 捕获的局部变量要求？", "options": ["必须可变", "必须 static", "任意", "必须 effectively final"], "answer": 3, "feedback": "Java lambda 只能捕获不重新赋值的变量（effectively final）。" },
-        { "type": "read", "question": "Python 闭包内要给外层变量赋值需使用？", "options": ["yield", "nonlocal", "global", "lambda"], "answer": 1, "feedback": "nonlocal 声明后才能在闭包内修改外层函数变量。" }
+        {
+          "id": "cl-q1",
+          "type": "quiz",
+          "question": "JS 中 var 循环变量被闭包共享的修复是？",
+          "options": [
+            "用 let（块级作用域每个迭代独立绑定）",
+            "用 var 就够",
+            "用 const 也不行",
+            "无解"
+          ],
+          "answer": 0,
+          "feedback": "let 每次迭代创建独立绑定；var 只有函数级作用域，闭包共享最终值。"
+        },
+        {
+          "id": "cl-q2",
+          "type": "quiz",
+          "question": "Java lambda 捕获并修改局部变量的限制是？",
+          "options": [
+            "完全禁止 lambda",
+            "局部变量必须 effectively final，不可直接修改",
+            "只能捕获参数",
+            "无限制"
+          ],
+          "answer": 1,
+          "feedback": "Java lambda 捕获的局部变量必须 effectively final；修改需用数组或 AtomicInteger 容器。"
+        },
+        {
+          "id": "cl-q3",
+          "type": "quiz",
+          "question": "C++ [count = 0] mutable 的含义是？",
+          "options": [
+            "按引用捕获外部 count",
+            "不可变捕获",
+            "捕获初始化 + 允许闭包内修改副本",
+            "拷贝外部变量"
+          ],
+          "answer": 2,
+          "feedback": "捕获初始化在闭包内建 count=0 副本，mutable 允许修改该副本，不影响外部。"
+        },
+        {
+          "id": "cl-q4",
+          "type": "quiz",
+          "question": "Rust 中 move 闭包的特征是？",
+          "options": [
+            "共享借用",
+            "只读捕获",
+            "自动拷贝",
+            "捕获的变量所有权移入闭包，原变量失效"
+          ],
+          "answer": 3,
+          "feedback": "move 强制按值捕获并转移所有权，闭包可跨线程传递（需 Send）。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：创建计数器闭包——外层函数返回捕获 count 变量的内层函数，两次调用分别输出 1、2，统一为：1 2。",
+      "comparisonDimensions": [
+        "capture-by-value",
+        "capture-by-reference",
+        "mutation-allowed",
+        "lifetime",
+        "allocation"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "def make_counter():\n    count = 0\n    def inc():\n        nonlocal count\n        count += 1\n        return count\n    return inc\n\nc = make_counter()\nprint(c(), c())",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 7
+            },
+            {
+              "role": "call",
+              "start": 9,
+              "end": 10
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "function makeCounter() {\n    let count = 0;\n    return () => ++count;\n}\nconst c = makeCounter();\nconsole.log(c(), c());",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 4
+            },
+            {
+              "role": "call",
+              "start": 5,
+              "end": 6
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "int[] count = {0};\njava.util.function.IntSupplier inc = () -> ++count[0];\nSystem.out.println(inc.getAsInt() + \" \" + inc.getAsInt());",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "define",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "call",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "auto inc = [count = 0]() mutable { return ++count; };\nstd::cout << inc() << \" \" << inc();",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "inc := func() func() int {\n    count := 0\n    return func() int { count++; return count }\n}()\nfmt.Println(inc(), inc())",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 4
+            },
+            {
+              "role": "call",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "let mut count = 0;\nlet mut inc = || { count += 1; count };\nprintln!(\"{} {}\", inc(), inc());",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "define",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "call",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        }
+      },
+      "errors": [
+        "循环变量捕获（JS 经典陷阱）：var i 在循环里创建的闭包全部共享最终 i，需 let 或 IIFE",
+        "捕获按值快照：C++ [x] 捕获在创建时拷贝，之后外层修改不影响闭包内副本",
+        "Java lambda 不能捕获可变局部变量：直接捕获 count 编译失败，需数组/AtomicInteger hack",
+        "Rust 闭包移动捕获：move || 拿走所有权，之后原变量不可用",
+        "闭包内存泄漏：长期存活闭包持有大对象引用，GC 无法回收"
+      ],
+      "transferExercises": [
+        {
+          "id": "cl-tr1",
+          "type": "transfer",
+          "question": "Go 闭包捕获循环变量 i 的经典陷阱及修复是？",
+          "options": [
+            "Go 无闭包",
+            "闭包共享 i，用 i := i 或传参创建副本",
+            "用 var 声明",
+            "无法修复"
+          ],
+          "answer": 1,
+          "feedback": "Go 1.22 前循环变量共享，闭包全部读到最终值；旧版用 i := i 或参数传递副本。"
+        },
+        {
+          "id": "cl-tr2",
+          "type": "transfer",
+          "question": "闭包相比对象的主要优势是？",
+          "options": [
+            "轻量捕获状态、适合回调/惰性计算",
+            "一定更快",
+            "占用更少内存",
+            "天然线程安全"
+          ],
+          "answer": 0,
+          "feedback": "闭包用捕获环境携带状态，免去对象样板，回调与惰性求值场景自然。"
+        }
       ]
     },
     {
