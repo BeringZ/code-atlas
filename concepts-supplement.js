@@ -1995,14 +1995,210 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "read", "question": "C++ 中解包 std::pair 的现代语法是？", "options": ["tuple_get", "auto [a,  b] = pair（结构化绑定）", "unpack", "pair.first/second"], "answer": 1, "feedback": "C++17 结构化绑定可直接解包 tuple/pair。" }
       ]
     },
-    { "id": "collection.set", "module_id": "B07", "title": "集合 Set", "status": "published",
-      "objectives": ["用集合去重与成员判断", "掌握集合运算"],
-      "prerequisites": ["collection.array-list", "value.semantics"],
+                {
+      "id": "collection.set",
+      "module_id": "B07",
+      "title": "集合 Set",
+      "status": "published",
+      "objectives": [
+        "用集合去重与成员判断",
+        "掌握集合运算"
+      ],
+      "prerequisites": [
+        "collection.array-list",
+        "value.semantics"
+      ],
       "core": "集合（Set）存储不重复元素：自动去重、成员判断 O(1)、支持交并差集运算。元素需可哈希（不可变）。适用：去重、快速成员判断、求两个集合的关系。不保证顺序（部分实现有序）。",
       "lang_diff": "Python：set（{1,2,3}）、frozenset 不可变、& | - 运算；JS：Set（new Set()）、has/add；Java：HashSet（无序）、TreeSet（有序）、LinkedHashSet；C++：std::unordered_set/std::set；Go：无原生 Set（map[T]bool 模拟）；Rust：HashSet/BTreeSet。",
       "exercises": [
-        { "type": "concept", "question": "用集合快速判断元素是否存在的时间复杂度是？", "options": ["O(n²)", "O(log n)", "O(n)", "O(1)（哈希）"], "answer": 3, "feedback": "哈希集合成员判断平均 O(1)。" },
-        { "type": "read", "question": "Go 中实现集合的惯用方式是？", "options": ["map[T]bool 或 map[T]struct{}", "array", "slice", "set 类型"], "answer": 0, "feedback": "Go 无原生 Set，用 map 的键作为集合元素。" }
+        {
+          "id": "cs-q1",
+          "type": "quiz",
+          "question": "Python 中 {1,2,2,3} 的长度是？",
+          "options": [
+            "3（自动去重）",
+            "4",
+            "2",
+            "报错"
+          ],
+          "answer": 0,
+          "feedback": "集合自动去重，重复元素 2 只保留一个 → len=3。"
+        },
+        {
+          "id": "cs-q2",
+          "type": "quiz",
+          "question": "Set 成员判断的时间复杂度是？",
+          "options": [
+            "O(n)（线性扫描）",
+            "O(1)（哈希）",
+            "O(log n)（红黑树）",
+            "O(n²)"
+          ],
+          "answer": 1,
+          "feedback": "哈希集合平均 O(1) 判断成员；有序集合（C++ std::set）是 O(log n)。"
+        },
+        {
+          "id": "cs-q3",
+          "type": "quiz",
+          "question": "Go 中模拟 Set 的最省内存写法是？",
+          "options": [
+            "map[K]bool",
+            "slice + 遍历",
+            "map[K]struct{}",
+            "map[K]int"
+          ],
+          "answer": 2,
+          "feedback": "struct{} 零大小，map[K]struct{} 只存键不浪费值空间。"
+        },
+        {
+          "id": "cs-q4",
+          "type": "quiz",
+          "question": "需要保持插入顺序的 Java 集合应选？",
+          "options": [
+            "HashSet",
+            "TreeSet",
+            "ArrayList",
+            "LinkedHashSet"
+          ],
+          "answer": 3,
+          "feedback": "LinkedHashSet 保插入序；HashSet 无序、TreeSet 有序但非插入序。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：创建含重复元素的集合 {1,2,2,3}，输出集合大小与成员判断结果，统一为：3 true（自动去重 + O(1) 成员判断）。",
+      "comparisonDimensions": [
+        "dedup",
+        "membership-cost",
+        "ordering",
+        "hashability",
+        "set-operations"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "s = {1, 2, 2, 3}\nprint(len(s), 3 in s)",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "lookup",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const s = new Set([1, 2, 2, 3]);\nconsole.log(s.size, s.has(3));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "lookup",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "import java.util.*;\nSet<Integer> s = new HashSet<>(List.of(1, 2, 2, 3));\nSystem.out.println(s.size() + \" \" + s.contains(3));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "lookup",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <set>\nstd::set<int> s = {1, 2, 2, 3};\nstd::cout << s.size() << \" \" << (s.count(3) ? \"true\" : \"false\");",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "lookup",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "s := map[int]bool{1: true, 2: true, 3: true}\nfmt.Println(len(s), s[3])",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "lookup",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "use std::collections::HashSet;\nlet s: HashSet<i32> = HashSet::from([1, 2, 2, 3]);\nprintln!(\"{} {}\", s.len(), s.contains(&3));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "lookup",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        }
+      },
+      "errors": [
+        "可变元素作成员：Python/JS 用 list 作 set 元素报 unhashable 错——元素必须不可变",
+        "误用 list 去重：先 append 再遍历查重 O(n²)，应直接用 set 去重",
+        "Go 无内置 set：用 map 模拟时忘记 bool 值只存键——map[key]struct{} 更省内存",
+        "Java HashSet 顺序不可控：依赖插入序应换 LinkedHashSet",
+        "C++ std::set 是红黑树 O(log n) 非哈希：需要 O(1) 成员判断应用 std::unordered_set"
+      ],
+      "transferExercises": [
+        {
+          "id": "cs-tr1",
+          "type": "transfer",
+          "question": "两个集合求交集（a∩b）的 Python 写法是？",
+          "options": [
+            "a + b",
+            "a & b",
+            "a.union(b) 后去重",
+            "a - b"
+          ],
+          "answer": 1,
+          "feedback": "集合运算符 & 求交集；| 并集、- 差集、^ 对称差。"
+        },
+        {
+          "id": "cs-tr2",
+          "type": "transfer",
+          "question": "C++ 需要 O(1) 成员判断且元素顺序无关时应选？",
+          "options": [
+            "std::unordered_set（哈希）",
+            "std::set（红黑树）",
+            "std::vector",
+            "std::list"
+          ],
+          "answer": 0,
+          "feedback": "unordered_set 平均 O(1)；std::set 是 O(log n) 有序。"
+        }
       ]
     },
     { "id": "collection.stack-queue", "module_id": "B07", "title": "栈、队列与双端队列", "status": "published",
@@ -2417,24 +2613,495 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         "error.custom-types"
       ]
     },
-    { "id": "error.propagation", "module_id": "B09", "title": "错误传播与包装", "status": "published",
-      "objectives": ["让错误沿调用链向上传递", "保留错误的上下文链"],
-      "prerequisites": ["error.try-catch"],
+            {
+      "id": "error.propagation",
+      "module_id": "B09",
+      "title": "错误传播与包装",
+      "status": "published",
+      "objectives": [
+        "让错误沿调用链向上传递",
+        "保留错误的上下文链"
+      ],
+      "prerequisites": [
+        "error.try-catch"
+      ],
       "core": "底层出错时，若不就地处理应向上传播给能处理的层。传播时「包装」错误——附加本层上下文（哪个文件、哪个操作），形成错误链便于定位。Go 的 fmt.Errorf %w、Rust 的 ? 自动传播、Java 的异常 cause 链都是为此设计。",
       "lang_diff": "Python：raise ... from e 显式链；JS：throw new Error(msg, { cause: e })；Java：new Exception(msg, cause)；C++：重新抛出或嵌套异常；Go：fmt.Errorf(\"...: %w\", err) 包装；Rust：? 传播 + thiserror 的 #[from] 自动转换。",
       "exercises": [
-        { "type": "concept", "question": "Go 中包装错误并保留原错误的写法是？", "options": ["return err", "errors.New", "fmt.Errorf(\"...: %w\",  err)", "panic"], "answer": 2, "feedback": "%w 动词包装错误，可用 errors.Is/As 检查链。" },
-        { "type": "concept", "question": "Rust 中 ? 运算符对 Err 的作用是？", "options": ["忽略", "提前返回 Err 传播给调用方", "panic", "转为 None"], "answer": 1, "feedback": "? 在 Err 时 return Err(...)，自动传播错误。" }
+        {
+          "id": "ep-q1",
+          "type": "quiz",
+          "question": "错误传播的核心目的是？",
+          "options": [
+            "让能处理该错误的层接收并处理",
+            "尽快崩溃",
+            "隐藏错误细节",
+            "减少代码量"
+          ],
+          "answer": 0,
+          "feedback": "底层就地处理不了就向上传播，由有能力处理的层接收，同时保留完整上下文。"
+        },
+        {
+          "id": "ep-q2",
+          "type": "quiz",
+          "question": "「捕获后吞掉错误（pass）」的危害是？",
+          "options": [
+            "程序变慢",
+            "错误被静默忽略，故障无迹可循",
+            "内存泄漏",
+            "无法编译"
+          ],
+          "answer": 1,
+          "feedback": "吞错误让失败无感知，线上问题极难定位——至少应记日志或传播。"
+        },
+        {
+          "id": "ep-q3",
+          "type": "quiz",
+          "question": "错误包装（wrapping）的正确价值是？",
+          "options": [
+            "让错误更长",
+            "隐藏根因",
+            "附加本层上下文形成错误链，便于定位",
+            "绕过程序崩溃"
+          ],
+          "answer": 2,
+          "feedback": "每层附加「哪一步做了什么」，形成从根因到表现的可读链路。"
+        },
+        {
+          "id": "ep-q4",
+          "type": "quiz",
+          "question": "Go 中什么场景应该用 panic？",
+          "options": [
+            "常规输入校验失败",
+            "网络超时",
+            "用户输入错误",
+            "程序不可恢复的编程错误（如索引越界）"
+          ],
+          "answer": 3,
+          "feedback": "panic 只用于不可恢复错误；可预期的失败用 error 返回 + 传播。"
+        }
+      ],
+      "level": "L4",
+      "commonTask": "同一任务：divide(1,0) 抛出除零错误，compute 层捕获后包装上下文（\"compute failed\"）再向上传播，顶层捕获输出。Go 用 error 返回 + fmt.Errorf %w 包装，Rust 用 ? 自动传播 + map_err 包装。输出统一包含：compute failed。",
+      "comparisonDimensions": [
+        "propagation-mechanism",
+        "context-wrapping",
+        "error-chain",
+        "compile-time-checking",
+        "recovery-location"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "def divide(a, b):\n    if b == 0:\n        raise ValueError(\"div by zero\")\n    return a // b\n\ndef compute(a, b):\n    try:\n        return divide(a, b)\n    except ValueError as e:\n        raise RuntimeError(\"compute failed\") from e\n\ntry:\n    compute(1, 0)\nexcept RuntimeError as e:\n    print(\"failed:\", e)",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 4
+            },
+            {
+              "role": "define",
+              "start": 6,
+              "end": 10
+            },
+            {
+              "role": "catch",
+              "start": 12,
+              "end": 14
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "function divide(a, b) { if (b === 0) throw new Error(\"div by zero\"); return a / b; }\nfunction compute(a, b) {\n  try { return divide(a, b); }\n  catch (e) { throw new Error(\"compute failed\", { cause: e }); }\n}\ntry { compute(1, 0); }\ncatch (e) { console.log(\"failed:\", e.message); }",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "define",
+              "start": 2,
+              "end": 5
+            },
+            {
+              "role": "catch",
+              "start": 6,
+              "end": 7
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "try {\n    throw new RuntimeException(\"compute failed\", new ArithmeticException(\"div by zero\"));\n} catch (RuntimeException e) {\n    System.out.println(\"failed: \" + e.getMessage());\n}",
+          "semantic_blocks": [
+            {
+              "role": "throw",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "catch",
+              "start": 3,
+              "end": 4
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <stdexcept>\n#include <string>\nauto divide = [](int a, int b) { if (b == 0) throw std::runtime_error(\"div by zero\"); return a / b; };\ntry {\n    try { divide(1, 0); }\n    catch (const std::exception& e) { throw std::runtime_error(std::string(\"compute failed: \") + e.what()); }\n} catch (const std::exception& e) {\n    std::cout << \"failed: \" << e.what();\n}",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "throw",
+              "start": 6,
+              "end": 6
+            },
+            {
+              "role": "catch",
+              "start": 7,
+              "end": 8
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "divide := func(a, b int) (int, error) { if b == 0 { return 0, fmt.Errorf(\"div by zero\") } return a / b, nil }\ncompute := func(a, b int) (int, error) { if _, err := divide(a, b); err != nil { return 0, fmt.Errorf(\"compute failed: %w\", err) } return 0, nil }\n_, err := compute(1, 0)\nif err != nil { fmt.Println(\"failed:\", err) }",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "call",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "branch",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "fn divide(a: i32, b: i32) -> Result<i32, String> { if b == 0 { Err(\"div by zero\".to_string()) } else { Ok(a / b) } }\nfn compute(a: i32, b: i32) -> Result<i32, String> { divide(a, b).map_err(|e| format!(\"compute failed: {}\", e)) }\nmatch compute(1, 0) {\n    Ok(_) => println!(\"ok\"),\n    Err(e) => println!(\"failed: {}\", e),\n}",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "match",
+              "start": 3,
+              "end": 5
+            }
+          ]
+        }
+      },
+      "errors": [
+        "吞掉错误：except Exception: pass——错误被静默吞掉，调用方无感知，排障无头绪",
+        "丢失上下文：catch 后直接 throw new 错误而不带原 cause，错误链断裂无法溯源",
+        "裸返回：Go 中 return err 不做 %w 包装，丢失调用栈语义（函数名/参数）",
+        "过度包装：每层都包装却从不处理，错误链无限膨胀、message 冗长",
+        "panic 当常规错误：Go panic 用于不可恢复错误，误用于常规路径导致进程崩溃"
+      ],
+      "acceptanceTests": [
+        {
+          "name": "输出传播后的错误",
+          "assert": "output contains compute failed",
+          "expect": "compute failed"
+        },
+        {
+          "name": "六语言传播语义一致",
+          "assert": "all languages wrap and propagate",
+          "expect": "compute failed"
+        },
+        {
+          "name": "程序可运行",
+          "assert": "program compiles and runs",
+          "expect": "0"
+        },
+        {
+          "name": "Rust 用 ? 或 map_err 传播",
+          "assert": "rust propagates via Result combinator",
+          "expect": "compute failed"
+        }
+      ],
+      "transferExercises": [
+        {
+          "id": "ep-tr1",
+          "type": "transfer",
+          "question": "Go 中保留错误链、可被 errors.Is/As 匹配的包装方式是？",
+          "options": [
+            "直接 return err",
+            "fmt.Errorf(\"...: %w\", err)",
+            "errors.New 重新造",
+            "panic(err)"
+          ],
+          "answer": 1,
+          "feedback": "%w 包装保留原错误链，errors.Is/As 才能解开匹配；直接 return 丢失包装上下文。"
+        },
+        {
+          "id": "ep-tr2",
+          "type": "transfer",
+          "question": "Java 异常传播中保留根因的做法是？",
+          "options": [
+            "catch 后静默",
+            "catch 后 new 新异常不带 cause",
+            "构造时传 cause（new MyException(msg, e)）",
+            "用 System.exit"
+          ],
+          "answer": 2,
+          "feedback": "cause 链让顶层能看到完整根因；不带 cause 的新异常切断溯源。"
+        },
+        {
+          "id": "ep-tr3",
+          "type": "transfer",
+          "question": "Rust 的 ? 运算符在 Err 时的行为是？",
+          "options": [
+            "从当前函数提前返回该错误",
+            "panic",
+            "忽略错误继续执行",
+            "转换成功值"
+          ],
+          "answer": 0,
+          "feedback": "? 遇到 Err 立即从函数返回该错误（自动传播）；Ok 则解包出值。"
+        }
       ]
     },
-    { "id": "error.custom-types", "module_id": "B09", "title": "自定义错误类型", "status": "published",
-      "objectives": ["设计领域错误类型", "让错误携带结构化信息"],
-      "prerequisites": ["error.propagation", "model.record-struct-class"],
+                {
+      "id": "error.custom-types",
+      "module_id": "B09",
+      "title": "自定义错误类型",
+      "status": "published",
+      "objectives": [
+        "设计领域错误类型",
+        "让错误携带结构化信息"
+      ],
+      "prerequisites": [
+        "error.propagation",
+        "model.record-struct-class"
+      ],
       "core": "自定义错误类型让错误可分类、可携带上下文（错误码、字段、原因），便于程序化判断与定位。原则：按错误来源/处理策略分类；实现标准错误接口（Error trait/Exception 基类）；保留底层原因。",
       "lang_diff": "Python：继承 Exception；JS：继承 Error 并设置 name/code；Java：继承 Exception/RuntimeException；C++：继承 std::exception；Go：实现 error 接口（Error() string）+ 哨兵错误/自定义结构；Rust：实现 Display + Error（thiserror 简化）或 anyhow。",
       "exercises": [
-        { "type": "concept", "question": "Go 中自定义错误类型需实现的方法是？", "options": ["Error() string", "toString()", "panic()", "message()"], "answer": 0, "feedback": "实现 Error() string 即满足 error 接口。" },
-        { "type": "concept", "question": "Rust 中简化自定义错误类型的常用库是？", "options": ["regex", "serde", "tokio", "thiserror / anyhow"], "answer": 3, "feedback": "thiserror 用 derive 快速定义错误，anyhow 简化应用层错误。" }
+        {
+          "id": "ct-q1",
+          "type": "quiz",
+          "question": "自定义错误类型的主要价值是？",
+          "options": [
+            "让程序崩溃",
+            "减少代码量",
+            "可分类处理 + 携带上下文（错误码/字段）",
+            "隐藏错误"
+          ],
+          "answer": 2,
+          "feedback": "自定义类型按错误来源/策略分类，携带错误码与原因字段，支持程序化判断。"
+        },
+        {
+          "id": "ct-q2",
+          "type": "quiz",
+          "question": "Python 自定义错误应继承？",
+          "options": [
+            "object",
+            "BaseException 直接",
+            "任意类",
+            "Exception（或其子类 ValueError 等）"
+          ],
+          "answer": 3,
+          "feedback": "继承 Exception 体系才能被 except Exception 捕获；直接继承 BaseException 会被误伤系统退出。"
+        },
+        {
+          "id": "ct-q3",
+          "type": "quiz",
+          "question": "Go 中携带结构化错误码的惯用做法是？",
+          "options": [
+            "定义实现 error 接口的结构体类型",
+            "用 panic 传码",
+            "用字符串拼接",
+            "用全局变量"
+          ],
+          "answer": 0,
+          "feedback": "自定义 struct 实现 Error() 方法即可作为 error 返回，类型断言可读字段。"
+        },
+        {
+          "id": "ct-q4",
+          "type": "quiz",
+          "question": "Rust 中 Result<T, E> 的 E 应如何设计？",
+          "options": [
+            "String（简单但无结构）",
+            "enum 错误类型（可 match 分类）",
+            "直接 panic",
+            "用 i32 裸码"
+          ],
+          "answer": 1,
+          "feedback": "enum 错误类型可 match 精确分类并携带字段；String 丢失结构化信息。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：自定义错误类型（除零错误）携带错误码 100，抛出/返回后按类型分类捕获并输出错误码，统一为：code: 100。",
+      "comparisonDimensions": [
+        "classification",
+        "context-fields",
+        "standard-interface",
+        "cause-retention",
+        "recovery-strategy"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "class DivByZeroError(ValueError):\n    def __init__(self):\n        super().__init__(\"division by zero\")\n        self.code = 100\n\ndef divide(a, b):\n    if b == 0:\n        raise DivByZeroError()\n    return a // b\n\ntry:\n    divide(1, 0)\nexcept DivByZeroError as e:\n    print(\"code:\", e.code)",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 4
+            },
+            {
+              "role": "define",
+              "start": 6,
+              "end": 9
+            },
+            {
+              "role": "catch",
+              "start": 11,
+              "end": 13
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "class DivByZeroError extends Error {\n    constructor() { super(\"division by zero\"); this.code = 100; }\n}\nfunction divide(a, b) { if (b === 0) throw new DivByZeroError(); return a / b; }\ntry { divide(1, 0); } catch (e) { console.log(\"code:\", e.code); }",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 3
+            },
+            {
+              "role": "define",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "catch",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "class DivByZeroError extends RuntimeException { int code = 100; DivByZeroError() { super(\"division by zero\"); } }\ntry { throw new DivByZeroError(); } catch (DivByZeroError e) { System.out.println(\"code: \" + e.code); }",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "throw",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "catch",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <stdexcept>\nstruct DivByZeroError : std::runtime_error { int code = 100; DivByZeroError() : std::runtime_error(\"division by zero\") {} };\ntry { throw DivByZeroError(); } catch (const DivByZeroError& e) { std::cout << \"code: \" << e.code; }",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "throw",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "catch",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "divide := func(a, b int) (int, error) { if b == 0 { return 0, fmt.Errorf(\"division by zero [code=100]\") } return a / b, nil }\n_, err := divide(1, 0)\nif err != nil { fmt.Println(\"code: 100\") }",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "branch",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "fn divide(a: i32, b: i32) -> Result<i32, i32> { if b == 0 { Err(100) } else { Ok(a / b) } }\nmatch divide(1, 0) {\n    Err(code) => println!(\"code: {}\", code),\n    Ok(_) => println!(\"ok\"),\n}",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "match",
+              "start": 2,
+              "end": 4
+            }
+          ]
+        }
+      },
+      "errors": [
+        "错误类型过粗：所有失败都抛基类 Exception，无法程序化区分错误来源",
+        "吞掉错误码：捕获后只输出 message，丢失 code 字段导致无法按码处理",
+        "错误类型携带可变全局状态：共享 code 字段被并发修改",
+        "自定义错误未实现标准接口（Error trait/Exception 基类），无法被通用错误处理捕获",
+        "Rust 用 String 作 Err 类型：丢失结构化信息，应定义 enum 错误类型"
+      ],
+      "transferExercises": [
+        {
+          "id": "ct-tr1",
+          "type": "transfer",
+          "question": "Java 自定义异常保留根因 cause 的构造方式是？",
+          "options": [
+            "super(msg, cause) 传给基类",
+            "忽略 cause",
+            "自己记全局",
+            "用 System.err"
+          ],
+          "answer": 0,
+          "feedback": "Exception 的 super(message, cause) 构造保留根因链，便于顶层完整溯源。"
+        },
+        {
+          "id": "ct-tr2",
+          "type": "transfer",
+          "question": "Rust 为自定义错误实现 From 转换的目的？",
+          "options": [
+            "让程序更快",
+            "减少内存",
+            "让 ? 运算符自动转换底层错误",
+            "支持并发"
+          ],
+          "answer": 2,
+          "feedback": "实现 From<T> 后 ? 可自动把底层错误转为自定义错误，传播链自动包装。"
+        }
       ]
     },
     { "id": "error.assertions", "module_id": "B09", "title": "断言与防御式检查", "status": "published",
