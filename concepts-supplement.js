@@ -1636,14 +1636,209 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "read", "question": "Java 中把方法作为值传递的写法是？", "options": ["宏", "方法引用 Class::method 或 lambda", "注解", "函数指针"], "answer": 1, "feedback": "方法引用与 lambda 让 Java 函数可作为值传递。" }
       ]
     },
-    { "id": "function.lambda", "module_id": "B05", "title": "匿名函数 / Lambda", "status": "published",
-      "objectives": ["用匿名函数表达简短逻辑", "理解 lambda 的捕获与语法"],
-      "prerequisites": ["function.first-class"],
+            {
+      "id": "function.lambda",
+      "module_id": "B05",
+      "title": "匿名函数 / Lambda",
+      "status": "published",
+      "objectives": [
+        "用匿名函数表达简短逻辑",
+        "理解 lambda 的捕获与语法"
+      ],
+      "prerequisites": [
+        "function.first-class"
+      ],
       "core": "匿名函数（lambda）是「没有名字的短函数」，适合一次性使用的逻辑（排序比较器、事件回调、集合转换）。语法越简短越好；逻辑复杂时应命名以提升可读性与可测试性。",
       "lang_diff": "Python：lambda x: x*2（仅单表达式）；JS：(x) => x*2 或 function；Java：(x, y) -> x+y；C++：[捕获](参数) -> 类型 { }；Go：func(x int) int { } 匿名函数；Rust：|x| x*2 闭包。",
       "exercises": [
-        { "type": "concept", "question": "Python lambda 的限制是？", "options": ["不能用变量", "不能返回值", "不能传参", "只能包含单个表达式"], "answer": 3, "feedback": "lambda 仅限单表达式，多语句需用 def。" },
-        { "type": "read", "question": "Rust 闭包 |x| x * 2 的类型推断依据是？", "options": ["宏", "由调用上下文推断参数与返回类型", "必须标注", "总是 i32"], "answer": 1, "feedback": "Rust 闭包参数与返回类型由使用处推断，可省略标注。" }
+        {
+          "id": "lm-q1",
+          "type": "quiz",
+          "question": "Python lambda 的函数体限制是？",
+          "options": [
+            "只能写单个表达式（不能含语句）",
+            "可写任意语句",
+            "必须含 return",
+            "不支持参数"
+          ],
+          "answer": 0,
+          "feedback": "lambda 体限单表达式，多语句逻辑应改用 def 函数。"
+        },
+        {
+          "id": "lm-q2",
+          "type": "quiz",
+          "question": "Java 函数式接口（如 IntUnaryOperator）的作用是？",
+          "options": [
+            "让 lambda 变快",
+            "给 lambda 提供目标类型",
+            "替代 class",
+            "管理内存"
+          ],
+          "answer": 1,
+          "feedback": "lambda 需函数式接口（单抽象方法）提供类型上下文，applyAsInt 调用。"
+        },
+        {
+          "id": "lm-q3",
+          "type": "quiz",
+          "question": "Rust 中修改捕获变量的闭包需标记为？",
+          "options": [
+            "const",
+            "static",
+            "mut（FnMut 语义）",
+            "unsafe"
+          ],
+          "answer": 2,
+          "feedback": "闭包捕获可变变量需 let mut 声明，实现 FnMut 才允许修改。"
+        },
+        {
+          "id": "lm-q4",
+          "type": "quiz",
+          "question": "C++ lambda 修改捕获副本需加？",
+          "options": [
+            "const",
+            "volatile",
+            "static",
+            "mutable 关键字"
+          ],
+          "answer": 3,
+          "feedback": "lambda 的 operator() 默认 const，mutable 允许修改按值捕获的副本。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：创建匿名函数（lambda）计算 x*2 并传入 21，输出统一为：42。",
+      "comparisonDimensions": [
+        "syntax",
+        "capture",
+        "type-annotation",
+        "passing",
+        "performance"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "f = lambda x: x * 2\nprint(f(21))",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const f = (x) => x * 2;\nconsole.log(f(21));",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "java.util.function.IntUnaryOperator f = x -> x * 2;\nSystem.out.println(f.applyAsInt(21));",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "auto f = [](int x) { return x * 2; };\nstd::cout << f(21);",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "f := func(x int) int { return x * 2 }\nfmt.Println(f(21))",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "let f = |x: i32| x * 2;\nprintln!(\"{}\", f(21));",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        }
+      },
+      "errors": [
+        "捕获陷阱：lambda 捕获外部变量后共享状态（闭包语义），并发下需注意",
+        "类型缺失：Python lambda 单表达式限制，复杂逻辑硬塞 lambda 可读性差",
+        "Java lambda 局部变量 effectively final：不能捕获并修改计数变量",
+        "Rust 闭包默认不可变捕获：修改捕获变量需 FnMut/move",
+        "C++ lambda 默认 const 调用：修改捕获值需 mutable"
+      ],
+      "transferExercises": [
+        {
+          "id": "lm-tr1",
+          "type": "transfer",
+          "question": "高阶函数（把函数当参数）的典型场景是？",
+          "options": [
+            "全局变量管理",
+            "map/filter/sort 的回调、事件处理",
+            "指针运算",
+            "内存分配"
+          ],
+          "answer": 1,
+          "feedback": "高阶函数把行为参数化：集合变换、排序比较器、事件回调都是 lambda 大显身手处。"
+        },
+        {
+          "id": "lm-tr2",
+          "type": "transfer",
+          "question": "Go 匿名函数相比命名函数的优势？",
+          "options": [
+            "就地定义捕获局部状态，适合闭包与 goroutine",
+            "一定更快",
+            "必须用指针",
+            "不能有参数"
+          ],
+          "answer": 0,
+          "feedback": "Go 匿名函数就地定义并可捕获局部变量，goroutine 并发场景高频使用。"
+        }
       ]
     },
     { "id": "function.recursion", "module_id": "B05", "title": "递归函数", "status": "published",
@@ -2153,14 +2348,219 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "read", "question": "Rust 中直接 s[0] 对 String 的行为是？", "options": ["panic", "返回首字节", "返回首字符", "编译错误（需 chars() 或字节索引）"], "answer": 3, "feedback": "Rust 的 String 不支持按字符索引，避免 UTF-8 边界歧义。" }
       ]
     },
-    { "id": "string.search-replace", "module_id": "B06", "title": "查找、替换、拆分与连接", "status": "published",
-      "objectives": ["在文本中查找与替换", "拆分与连接字符串"],
-      "prerequisites": ["string.index-slice"],
+            {
+      "id": "string.search-replace",
+      "module_id": "B06",
+      "title": "查找、替换、拆分与连接",
+      "status": "published",
+      "objectives": [
+        "在文本中查找与替换",
+        "拆分与连接字符串"
+      ],
+      "prerequisites": [
+        "string.index-slice"
+      ],
       "core": "文本操作四件套：查找（find/indexOf/contains）、替换（replace）、拆分（split）、连接（join）。要点：替换生成新串；split 与 join 互逆；find 找不到时的返回值各语言不同（-1 / undefined / None）。",
       "lang_diff": "Python：find（找不到-1）、replace、split、sep.join(list)；JS：indexOf（-1）、replace/replaceAll、split、join；Java：indexOf、replace、split、String.join；C++：find（npos）、replace、无内置 split；Go：strings.Index/Replace/Split/Join；Rust：find（Option）、replace、split、collect/join。",
       "exercises": [
-        { "type": "concept", "question": "Python 中 'a,b,c'.split(',') 的结果是？", "options": ["['a', 'b', 'c']", "'a, b, c'", "'abc'", "('a', 'b', 'c')"], "answer": 0, "feedback": "split 按分隔符拆分为列表。" },
-        { "type": "read", "question": "JS 中 ['a','b'].join('-') 的结果是？", "options": ["'a, b'", "'ab'", "'a-b'", "['a-b']"], "answer": 2, "feedback": "join 用指定分隔符连接数组元素。" }
+        {
+          "id": "sr-q1",
+          "type": "quiz",
+          "question": "JS 中替换所有出现次数的写法是？",
+          "options": [
+            "直接 \"world\"",
+            "两次 replace",
+            "正则全局 /world/g",
+            "replaceAll 旧浏览器不支持"
+          ],
+          "answer": 2,
+          "feedback": "replace 默认只换第一个；正则加 g 标志或 replaceAll 替换全部。"
+        },
+        {
+          "id": "sr-q2",
+          "type": "quiz",
+          "question": "C++ 中 s.replace(pos, n, str) 的前提是？",
+          "options": [
+            "直接调用即可",
+            "pos 从 0 自动",
+            "无需检查",
+            "先用 find 确认 pos 合法（非 npos）"
+          ],
+          "answer": 3,
+          "feedback": "find 返回 npos 表示未找到，此时 replace 越界；必须先检查。"
+        },
+        {
+          "id": "sr-q3",
+          "type": "quiz",
+          "question": "Go strings.Replace(s, old, new, n) 中 n=-1 的含义是？",
+          "options": [
+            "替换全部出现",
+            "不替换",
+            "替换 n 个",
+            "替换第一个"
+          ],
+          "answer": 0,
+          "feedback": "n=-1 表示不限次数（全部替换）；n=1 只替换第一个。"
+        },
+        {
+          "id": "sr-q4",
+          "type": "quiz",
+          "question": "Python s.replace 的返回值语义是？",
+          "options": [
+            "修改 s 原串",
+            "返回新字符串，s 不变（不可变）",
+            "返回替换次数",
+            "返回 None"
+          ],
+          "answer": 1,
+          "feedback": "字符串不可变，replace 产生新串需重新赋值；原 s 不变。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：字符串 \"hello world\" 中查找 \"world\" 并替换为 \"there\"，输出统一为：hello there。",
+      "comparisonDimensions": [
+        "replace-api",
+        "immutability",
+        "all-occurrences",
+        "case-sensitivity",
+        "regex-support"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "s = \"hello world\"\nprint(s.replace(\"world\", \"there\"))",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "replace",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const s = \"hello world\";\nconsole.log(s.replace(\"world\", \"there\"));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "replace",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "String s = \"hello world\";\nSystem.out.println(s.replace(\"world\", \"there\"));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "replace",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <string>\nstd::string s = \"hello world\";\nauto pos = s.find(\"world\");\nif (pos != std::string::npos) s.replace(pos, 5, \"there\");\nstd::cout << s;",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "find",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "replace",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "print",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "import \"strings\"\ns := \"hello world\"\nfmt.Println(strings.Replace(s, \"world\", \"there\", 1))",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "replace",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "let s = \"hello world\";\nprintln!(\"{}\", s.replace(\"world\", \"there\"));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "replace",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        }
+      },
+      "errors": [
+        "替换被跳过：未检查 find 返回 npos（C++）就 replace，越界崩溃",
+        "只替换首个：JS replace(\"a\", \"b\") 默认只换第一个，需正则 /a/g 全局",
+        "大小写陷阱：替换 \"World\" 时大小写不匹配被忽略——注意字符串是精确匹配",
+        "Go Replace 计数参数：第三个参数 -1 才是全部替换，1 只换首个（易错）",
+        "不可变困惑：Python/JS/Java 的 replace 返回新串，原字符串不变——需重新赋值"
+      ],
+      "transferExercises": [
+        {
+          "id": "sr-tr1",
+          "type": "transfer",
+          "question": "需要按正则替换的场景（如去空白、脱敏手机号）应使用？",
+          "options": [
+            "语言的正则替换 API（re.sub / RegExp / regex）",
+            "多次 replace",
+            "find 循环",
+            "split 重组"
+          ],
+          "answer": 0,
+          "feedback": "模式匹配替换用正则：Python re.sub、JS /regex/g、Java replaceAll。"
+        },
+        {
+          "id": "sr-tr2",
+          "type": "transfer",
+          "question": "Rust 中 s.replace 与 s.replacen 的区别是？",
+          "options": [
+            "replace 更慢",
+            "replacen 只读",
+            "replace 全换，replacen 限制次数",
+            "无区别"
+          ],
+          "answer": 2,
+          "feedback": "replace 替换全部匹配；replacen(s, n) 限制替换前 n 次——与 Go 的计数参数同理。"
+        }
       ]
     },
     { "id": "string.case-whitespace", "module_id": "B06", "title": "大小写与空白处理", "status": "published",
@@ -3344,14 +3744,245 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "concept", "question": "Rust 中仅在 debug 构建执行的断言是？", "options": ["debug_assert!", "expect", "assert!", "panic!"], "answer": 0, "feedback": "debug_assert! 在 release 中被剥离，assert! 始终执行。" }
       ]
     },
-    { "id": "error.resource-release", "module_id": "B09", "title": "资源释放与作用域", "status": "published",
-      "objectives": ["保证资源在作用域结束时释放", "避免资源泄漏"],
-      "prerequisites": ["error.try-catch", "error.raii-defer"],
+            {
+      "id": "error.resource-release",
+      "module_id": "B09",
+      "title": "资源释放与作用域",
+      "status": "published",
+      "objectives": [
+        "保证资源在作用域结束时释放",
+        "避免资源泄漏"
+      ],
+      "prerequisites": [
+        "error.try-catch",
+        "error.raii-defer"
+      ],
       "core": "资源（文件、锁、连接、内存）必须确定释放。异常/提前返回最易导致泄漏。确定性释放三机制：RAII（析构自动释放）、defer（函数结束执行）、with/try-with-resources（块结束自动关闭）。手动 close 易被跳过，应避免。",
       "lang_diff": "Python：with 上下文管理器；JS：try/finally 手动；Java：try-with-resources（AutoCloseable）；C++：RAII（析构）；Go：defer；Rust：Drop trait（RAII）。",
       "exercises": [
-        { "type": "concept", "question": "Python 中保证文件自动关闭的写法是？", "options": ["try/finally", "with open(...) as f:", "del f", "f = open(); f.close()"], "answer": 1, "feedback": "with 语句退出时自动调用 __exit__ 关闭文件。" },
-        { "type": "concept", "question": "Go 中在函数结束时关闭资源的机制是？", "options": ["with", "defer", "析构函数", "finally"], "answer": 1, "feedback": "defer 注册函数结束时执行的清理调用。" }
+        {
+          "id": "rr-q1",
+          "type": "quiz",
+          "question": "文件句柄泄漏（忘记 close）的典型后果是？",
+          "options": [
+            "文件描述符耗尽（EMFILE），新文件打不开",
+            "内存泄漏",
+            "CPU 占用",
+            "无影响"
+          ],
+          "answer": 0,
+          "feedback": "操作系统限制进程文件描述符数，泄漏到上限后无法再打开文件。"
+        },
+        {
+          "id": "rr-q2",
+          "type": "quiz",
+          "question": "Java 自动释放资源的惯用语法是？",
+          "options": [
+            "手动 close 放 finally",
+            "try-with-resources（try (Resource r = ...)）",
+            "用 GC 等待",
+            "System.gc()"
+          ],
+          "answer": 1,
+          "feedback": "try-with-resources 自动调用 AutoCloseable.close，含异常路径；比手动 finally 简洁安全。"
+        },
+        {
+          "id": "rr-q3",
+          "type": "quiz",
+          "question": "Go defer 语句的时机是？",
+          "options": [
+            "语句立即执行",
+            "goroutine 结束时",
+            "函数返回前执行（LIFO）",
+            "任意时刻"
+          ],
+          "answer": 2,
+          "feedback": "defer 延迟到函数返回前执行，多个按 LIFO 逆序——适合成对的开/关资源。"
+        },
+        {
+          "id": "rr-q4",
+          "type": "quiz",
+          "question": "Rust 中资源自动释放依赖什么 trait？",
+          "options": [
+            "Clone",
+            "Display",
+            "Sized",
+            "Drop（作用域结束自动调用 drop）"
+          ],
+          "answer": 3,
+          "feedback": "Drop trait 的 drop 在变量离开作用域时自动调用，RAII 式确定性释放。"
+        }
+      ],
+      "level": "L4",
+      "commonTask": "同一任务：打开/创建资源并在作用域结束后自动释放，释放时输出统一为：released。六语言机制：Python with 上下文管理器、JS try/finally、Java try-with-resources（AutoCloseable）、C++ RAII 析构、Go defer、Rust Drop trait。",
+      "comparisonDimensions": [
+        "release-mechanism",
+        "exception-safety",
+        "scope-binding",
+        "manual-close-needed",
+        "leak-prevention"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "class Resource:\n    def __enter__(self):\n        return self\n    def __exit__(self, *exc):\n        print(\"released\")\n        return False\n\nwith Resource():\n    pass",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 5
+            },
+            {
+              "role": "with",
+              "start": 7,
+              "end": 8
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "try {\n    // 使用资源（JS 无自动释放，需手动 close）\n} finally {\n    console.log(\"released\");\n}",
+          "semantic_blocks": [
+            {
+              "role": "try",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "finally",
+              "start": 3,
+              "end": 4
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "class Resource implements AutoCloseable {\n    public void close() { System.out.println(\"released\"); }\n}\ntry (Resource r = new Resource()) {\n    // 使用资源\n}",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 3
+            },
+            {
+              "role": "with",
+              "start": 4,
+              "end": 5
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <iostream>\nstruct Resource {\n    ~Resource() { std::cout << \"released\"; }\n};\nResource r;",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 2,
+              "end": 4
+            },
+            {
+              "role": "declare",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "defer fmt.Println(\"released\")\n// 使用资源",
+          "semantic_blocks": [
+            {
+              "role": "defer",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "use",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "struct Resource;\nimpl Drop for Resource {\n    fn drop(&mut self) { println!(\"released\"); }\n}\nlet _r = Resource;",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 4
+            },
+            {
+              "role": "declare",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        }
+      },
+      "errors": [
+        "手动 close 被跳过：异常/提前 return 时 close 不执行 → 文件锁/连接泄漏",
+        "忘记关闭：打开后忘记 close，句柄耗尽导致 EMFILE（文件描述符用尽）",
+        "双重释放：手动 close 后析构又释放（C++ 需置空指针），造成 UB",
+        "defer 顺序误用：Go 多个 defer 按 LIFO 逆序执行，依赖顺序的清理会出错",
+        "把资源当普通值拷贝：C++ 拷贝构造复制句柄导致两个对象争抢释放（需移动语义）"
+      ],
+      "acceptanceTests": [
+        {
+          "name": "资源自动释放",
+          "assert": "output contains released",
+          "expect": "released"
+        },
+        {
+          "name": "六语言释放机制一致",
+          "assert": "all languages auto-release resource",
+          "expect": "released"
+        },
+        {
+          "name": "程序可运行",
+          "assert": "program compiles and runs",
+          "expect": "0"
+        },
+        {
+          "name": "异常安全释放",
+          "assert": "release happens even on early exit",
+          "expect": "released"
+        }
+      ],
+      "transferExercises": [
+        {
+          "id": "rr-tr1",
+          "type": "transfer",
+          "question": "Go 中多个 defer 的执行顺序是？",
+          "options": [
+            "先进先出",
+            "后进先出（LIFO）",
+            "按文件名排序",
+            "随机"
+          ],
+          "answer": 1,
+          "feedback": "defer 压栈执行，后注册的先执行——关闭依赖顺序的资源时注意逆序。"
+        },
+        {
+          "id": "rr-tr2",
+          "type": "transfer",
+          "question": "C++ 为什么 RAII 能保证异常安全？",
+          "options": [
+            "编译器强制 try",
+            "析构不抛异常",
+            "栈展开时析构自动执行，无论异常与否",
+            "需手动调用"
+          ],
+          "answer": 2,
+          "feedback": "异常导致栈展开，沿途对象析构自动调用——资源必然释放，无需显式清理。"
+        },
+        {
+          "id": "rr-tr3",
+          "type": "transfer",
+          "question": "Python with 语句的 __exit__ 在什么情况下被调用？",
+          "options": [
+            "块正常结束或异常都会调用（且可吞异常）",
+            "只有正常结束",
+            "只有异常",
+            "从不调用"
+          ],
+          "answer": 0,
+          "feedback": "__exit__ 在块结束（含异常）时必调用；返回 True 可吞掉异常。"
+        }
       ]
     },
     { "id": "error.retry-timeout", "module_id": "B09", "title": "重试、降级与超时", "status": "published",
