@@ -2338,14 +2338,210 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "read", "question": "JS 中把变量嵌入字符串的现代写法是？", "options": ["sprintf", "name.concat()", "\"+name+\"", "`${name}`"], "answer": 3, "feedback": "模板字符串用反引号与 ${} 插值。" }
       ]
     },
-    { "id": "string.index-slice", "module_id": "B06", "title": "长度、索引与切片", "status": "published",
-      "objectives": ["按字符访问字符串", "用切片提取子串"],
-      "prerequisites": ["expr.index-slice", "string.unicode"],
+            {
+      "id": "string.index-slice",
+      "module_id": "B06",
+      "title": "长度、索引与切片",
+      "status": "published",
+      "objectives": [
+        "按字符访问字符串",
+        "用切片提取子串"
+      ],
+      "prerequisites": [
+        "expr.index-slice",
+        "string.unicode"
+      ],
       "core": "长度统计、按下标访问、切片提取子串是文本处理基础。关键陷阱：索引单位是字符还是字节？切片区间是闭区间还是半开？负索引从尾部计数是部分语言特性。越界行为各语言不同（报错 vs undefined vs panic）。",
       "lang_diff": "Python：len、seq[i]（越界 IndexError）、seq[1:5] 半开、负索引；JS：length、charAt/at、slice(1,5) 半开、负索引 at(-1)；Java：length、charAt、substring(1,5)；C++：size、operator[]、substr(1,4) 长度制；Go：len（字节）、s[i]（字节）、s[1:5]；Rust：len（字节）、chars().nth()、&s[1..5]（字节索引）。",
       "exercises": [
-        { "type": "concept", "question": "Python 中 'hello'[1:4] 的结果是？", "options": ["'hel'", "'ello'", "'llo'", "'ell'"], "answer": 3, "feedback": "切片半开 [1,4)，取索引 1,2,3 → 'ell'。" },
-        { "type": "read", "question": "Rust 中直接 s[0] 对 String 的行为是？", "options": ["panic", "返回首字节", "返回首字符", "编译错误（需 chars() 或字节索引）"], "answer": 3, "feedback": "Rust 的 String 不支持按字符索引，避免 UTF-8 边界歧义。" }
+        {
+          "id": "is-q1",
+          "type": "quiz",
+          "question": "C++ s.substr(1, 3) 对 \"hello\" 的结果是？",
+          "options": [
+            "\"ell\"（第二参数是长度）",
+            "\"ell\"（第二参数是结束索引）",
+            "\"ell\"（都是 3）",
+            "\"el\""
+          ],
+          "answer": 0,
+          "feedback": "substr(pos, count) 第二参数是长度：从位置 1 取 3 个字符 = \"ell\"。"
+        },
+        {
+          "id": "is-q2",
+          "type": "quiz",
+          "question": "Rust 中对含中文的字符串 &s[0..1] 会？",
+          "options": [
+            "返回第一个汉字",
+            "panic（非 UTF-8 字节边界）",
+            "返回空串",
+            "截断"
+          ],
+          "answer": 1,
+          "feedback": "Rust 字符串切片按字节且必须落在字符边界，中文字符 3 字节，0..1 越界 panic。"
+        },
+        {
+          "id": "is-q3",
+          "type": "quiz",
+          "question": "Python s[1:4] 的切片语义是？",
+          "options": [
+            "取 1 到 4（含 4）",
+            "取长度 4",
+            "取索引 1 到 3（end 排他）",
+            "取到末尾"
+          ],
+          "answer": 2,
+          "feedback": "Python 切片 [start:end] end 排他，s[1:4] 取索引 1,2,3。"
+        },
+        {
+          "id": "is-q4",
+          "type": "quiz",
+          "question": "Go 字符串 s[1:4] 返回的是？",
+          "options": [
+            "字符切片",
+            "Unicode 码点",
+            "rune 数组",
+            "字节切片（ASCII 下等于字符子串）"
+          ],
+          "answer": 3,
+          "feedback": "Go 字符串切片是字节视角，ASCII 内容等价字符子串；多字节字符需转 []rune 处理。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：取字符串 \"hello\" 的长度并切片取 [1:4]，输出统一为：5 ell。注意 C++ substr 第二参数是长度而非结束索引。",
+      "comparisonDimensions": [
+        "length-api",
+        "slice-semantics",
+        "end-exclusive",
+        "byte-vs-char",
+        "out-of-range"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "s = \"hello\"\nprint(len(s), s[1:4])",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "slice",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const s = \"hello\";\nconsole.log(s.length, s.slice(1, 4));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "slice",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "String s = \"hello\";\nSystem.out.println(s.length() + \" \" + s.substring(1, 4));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "slice",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <string>\nstd::string s = \"hello\";\nstd::cout << s.size() << \" \" << s.substr(1, 3);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "slice",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "s := \"hello\"\nfmt.Println(len(s), s[1:4])",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "slice",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "let s = \"hello\";\nprintln!(\"{} {}\", s.len(), &s[1..4]);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "slice",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        }
+      },
+      "errors": [
+        "C++ substr 第二参数是长度：substr(1,3) 取 3 个字符，写成 end 索引会多取/少取",
+        "Rust 按字节切片：&s[1..4] 在中文串上按字节切会 panic（非 UTF-8 边界）——用 chars 迭代",
+        "越界切片：Python 静默截断、C++ 抛 out_of_range、Go 运行时 panic——行为不一致",
+        "Java substring 是 end 排他：substring(1,4) 取 1-3，end 索引易混淆",
+        "JS 无负索引统一：slice(-3) 支持负索引，substring(-3) 按 0 处理"
+      ],
+      "transferExercises": [
+        {
+          "id": "is-tr1",
+          "type": "transfer",
+          "question": "需要安全遍历 Unicode 字符（含中文/emoji）应使用？",
+          "options": [
+            "字节索引",
+            "语言的字符迭代 API（chars/runes/codepoints）",
+            "直接下标",
+            "反转字符串"
+          ],
+          "answer": 1,
+          "feedback": "多字节字符场景必须按字符迭代：Python 天然、Rust chars()、Go []rune、Java codePoints。"
+        },
+        {
+          "id": "is-tr2",
+          "type": "transfer",
+          "question": "取字符串末尾 n 个字符的跨语言注意点是？",
+          "options": [
+            "负数索引语义各异（JS slice 支持、Python 支持、Go 不支持）",
+            "都支持负数",
+            "都按长度",
+            "都报错"
+          ],
+          "answer": 0,
+          "feedback": "负索引不是通用约定：Python/JS 支持，Go/Rust/Java/C++ 需先算长度。"
+        }
       ]
     },
             {
@@ -2573,14 +2769,229 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "read", "question": "比较用户输入忽略大小写与空白应先？", "options": ["转数字", "规范化（strip + lower）后比较", "替换空格", "直接 =="], "answer": 1, "feedback": "规范化后再比较，避免格式差异导致误判。" }
       ]
     },
-    { "id": "string.builder", "module_id": "B06", "title": "字符串构建器与缓冲区", "status": "published",
-      "objectives": ["高效构建大量文本", "避免不可变字符串的拼接开销"],
-      "prerequisites": ["string.immutability"],
+            {
+      "id": "string.builder",
+      "module_id": "B06",
+      "title": "字符串构建器与缓冲区",
+      "status": "published",
+      "objectives": [
+        "高效构建大量文本",
+        "避免不可变字符串的拼接开销"
+      ],
+      "prerequisites": [
+        "string.immutability"
+      ],
       "core": "循环内拼接不可变字符串是 O(n²)——每次创建新对象并复制。构建器/缓冲区在内存中累积、最后一次性生成：StringBuilder（Java）、strings.Builder（Go）、join（Python/JS）。处理大文本或高频拼接时必备。",
       "lang_diff": "Python：列表收集 + ''.join() 或 io.StringIO；JS：数组 push + join('')；Java：StringBuilder（非线程安全）/StringBuffer；C++：std::string +=（可变，可优化）/ostringstream；Go：strings.Builder；Rust：String::with_capacity + push_str。",
       "exercises": [
-        { "type": "concept", "question": "构建大量字符串时，相比 s += 更高效的方式是？", "options": ["更多 +=", "用构建器/join 一次性生成", "转列表", "转字节"], "answer": 1, "feedback": "构建器/join 避免反复复制，O(n) 完成。" },
-        { "type": "read", "question": "Go 中高效构建字符串的类型是？", "options": ["string", "rune", "strings.Builder", "bytes.Buffer（通用）"], "answer": 2, "feedback": "strings.Builder 专为字符串构建优化。" }
+        {
+          "id": "sb-q1",
+          "type": "quiz",
+          "question": "循环内 s += x 拼接的复杂度问题是？",
+          "options": [
+            "O(n)",
+            "O(1)",
+            "O(n²)（每次创建新字符串拷贝）",
+            "O(log n)"
+          ],
+          "answer": 2,
+          "feedback": "不可变字符串每次拼接都复制全部内容，n 次拼接 O(n²)——构建器原地扩容 O(n)。"
+        },
+        {
+          "id": "sb-q2",
+          "type": "quiz",
+          "question": "Java 多线程安全的字符串构建类是？",
+          "options": [
+            "StringBuilder（非同步）",
+            "String",
+            "CharBuffer",
+            "StringBuffer（同步）"
+          ],
+          "answer": 3,
+          "feedback": "StringBuffer 方法同步线程安全；StringBuilder 单线程更快。"
+        },
+        {
+          "id": "sb-q3",
+          "type": "quiz",
+          "question": "Python 高效拼接大量字符串的惯用方式是？",
+          "options": [
+            "\"\".join(parts)（一次性拼接）",
+            "循环 +=",
+            "format 循环",
+            "乘号"
+          ],
+          "answer": 0,
+          "feedback": "join 一次性分配拼接，避免循环内多次复制；循环 += 是反模式。"
+        },
+        {
+          "id": "sb-q4",
+          "type": "quiz",
+          "question": "Go 中高效拼接字符串的推荐工具是？",
+          "options": [
+            "循环 +=",
+            "strings.Builder",
+            "fmt.Sprint 循环",
+            "[]byte 手写"
+          ],
+          "answer": 1,
+          "feedback": "strings.Builder 维护可变缓冲，WriteString 高效；避免循环 += 反复分配。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：用字符串构建器/缓冲区拼接 a、b、c 三个字符，输出统一为：abc。避免循环内反复拼接产生 O(n²) 临时对象。",
+      "comparisonDimensions": [
+        "mutable-buffer",
+        "loop-pattern",
+        "allocation",
+        "thread-safety",
+        "immutability-workaround"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "parts = [\"a\", \"b\", \"c\"]\nprint(\"\".join(parts))",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "join",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const parts = [\"a\", \"b\", \"c\"];\nconsole.log(parts.join(\"\"));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "join",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "StringBuilder sb = new StringBuilder();\nsb.append(\"a\").append(\"b\").append(\"c\");\nSystem.out.println(sb.toString());",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "append",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <sstream>\nstd::stringstream ss;\nss << \"a\" << \"b\" << \"c\";\nstd::cout << ss.str();",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "append",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "print",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "import \"strings\"\nvar sb strings.Builder\nsb.WriteString(\"a\")\nsb.WriteString(\"b\")\nsb.WriteString(\"c\")\nfmt.Println(sb.String())",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "append",
+              "start": 3,
+              "end": 5
+            },
+            {
+              "role": "print",
+              "start": 6,
+              "end": 6
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "let mut s = String::new();\ns.push('a');\ns.push('b');\ns.push('c');\nprintln!(\"{}\", s);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "append",
+              "start": 2,
+              "end": 4
+            },
+            {
+              "role": "print",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        }
+      },
+      "errors": [
+        "循环内拼接 O(n²)：Python s += x / Java s = s + x 循环产生大量临时对象",
+        "不可变假象：Python/JS 字符串拼接看似原地，实际每次创建新串",
+        "Go += 在循环内同样低效：应改用 strings.Builder（WriteString 扩容复用）",
+        "Java 并发 StringBuilder 非线程安全：多线程拼接用 StringBuffer",
+        "C++ 频繁 += 触发多次扩容：应 reserve 预分配容量"
+      ],
+      "transferExercises": [
+        {
+          "id": "sb-tr1",
+          "type": "transfer",
+          "question": "C++ 构建字符串前预分配容量的方法是？",
+          "options": [
+            "s.reserve(n)（避免多次扩容拷贝）",
+            "直接赋值",
+            "用宏",
+            "手动 realloc"
+          ],
+          "answer": 0,
+          "feedback": "reserve 预分配避免增长时反复 reallocate+拷贝，与 Go Builder.Grow 同理。"
+        },
+        {
+          "id": "sb-tr2",
+          "type": "transfer",
+          "question": "Rust 中 String 与 &str 的关系是？",
+          "options": [
+            "完全相同",
+            "String 只读",
+            "String 可增长拥有所有权，&str 是借用视图",
+            "&str 可修改"
+          ],
+          "answer": 2,
+          "feedback": "String 是堆上可变缓冲（push 扩容），&str 借用其内容；构建用 String，传递用 &str。"
+        }
       ]
     },
     { "id": "string.regex", "module_id": "B06", "title": "正则表达式基础", "status": "published",
