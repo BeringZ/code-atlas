@@ -34,7 +34,7 @@ const PLACEHOLDER = /\.\.\.|\u2026|省略|TODO/;
 
 console.log('—— 显式 level 数据事实化 ——');
 const explicit = D2.concepts.filter((c) => c.level === 'L3' || c.level === 'L4');
-check('显式 L3/L4 共 26 个（17 L3 + 9 L4）', explicit.length === 26, `实际 ${explicit.length}`);
+check('显式 L3/L4 共 28 个（19 L3 + 9 L4）', explicit.length === 28, `实际 ${explicit.length}`);
 check('L3 含 try-catch（此前显式）', D2.concepts.some((c) => c.id === 'error.try-catch' && c.level === 'L3'));
 check('L3 含 spawn-await（I7 示范升级）', D2.concepts.some((c) => c.id === 'concurrency.spawn-await' && c.level === 'L3'));
 check('L4 含 mutability/conversion/nullability/unicode', ['value.mutability', 'value.conversion', 'value.nullability', 'string.unicode'].every((id) => D2.concepts.some((c) => c.id === id && c.level === 'L4')));
