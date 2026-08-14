@@ -3262,14 +3262,265 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "read", "question": "Go 中删除切片第 i 个元素的惯用法是？", "options": ["append(s[:i],  s[i+1:]...)", "s.remove(i)", "pop(s,  i)", "delete(s,  i)"], "answer": 0, "feedback": "Go 无内置删除，用切片拼接跳过目标元素。" }
       ]
     },
-    { "id": "collection.copy", "module_id": "B07", "title": "复制、引用与深浅拷贝", "status": "published",
-      "objectives": ["区分赋值、浅拷贝与深拷贝", "避免共享引用导致的意外修改"],
-      "prerequisites": ["value.semantics", "collection.array-list"],
+                {
+      "id": "collection.copy",
+      "module_id": "B07",
+      "title": "复制、引用与深浅拷贝",
+      "status": "published",
+      "objectives": [
+        "区分赋值、浅拷贝与深拷贝",
+        "避免共享引用导致的意外修改"
+      ],
+      "prerequisites": [
+        "value.semantics",
+        "collection.array-list"
+      ],
       "core": "赋值对象/集合通常是「复制引用」——两个名字指向同一对象，改一个影响另一个。浅拷贝：复制容器本身，内部嵌套对象仍共享；深拷贝：递归复制全部嵌套。需要独立副本时务必显式拷贝，嵌套结构需深拷贝。",
       "lang_diff": "Python：= 引用、list.copy()/[:] 浅拷贝、copy.deepcopy 深拷贝；JS：= 引用、[...arr]/Object.assign 浅拷贝、structuredClone 深拷贝；Java：= 引用、clone 浅拷贝、序列化深拷贝；C++：= 值拷贝（默认深拷贝值语义）；Go：= 值拷贝（slice 共享底层数组）、copy()；Rust：= 移动、clone() 显式深拷贝。",
       "exercises": [
-        { "type": "concept", "question": "Python 中 b = a（a 是列表）后修改 b，a 会？", "options": ["报错", "一起变（共享引用）", "变为副本", "不变"], "answer": 1, "feedback": "赋值是引用拷贝，共享同一对象；独立副本用 a.copy() 或 a[:]。" },
-        { "type": "read", "question": "JS 中深拷贝嵌套对象的现代方法是？", "options": ["JSON.parse(JSON.stringify(obj))", "[...obj]", "structuredClone(obj)", "Object.assign({},  obj)"], "answer": 2, "feedback": "structuredClone 递归深拷贝；浅拷贝方法对嵌套对象仍共享。" }
+        {
+          "id": "cp-q1",
+          "type": "quiz",
+          "question": "Python a.copy() 对嵌套列表 [[1]] 是？",
+          "options": [
+            "深拷贝",
+            "引用拷贝",
+            "浅拷贝：外层独立，内层列表共享",
+            "报错"
+          ],
+          "answer": 2,
+          "feedback": "copy() 浅拷贝只复制外层引用，内层列表仍共享；修改内层 a 同步变。"
+        },
+        {
+          "id": "cp-q2",
+          "type": "quiz",
+          "question": "JS 深拷贝（含嵌套对象）的推荐 API 是？",
+          "options": [
+            "展开运算符",
+            "Object.assign",
+            "直接赋值",
+            "structuredClone"
+          ],
+          "answer": 3,
+          "feedback": "structuredClone 递归深拷贝；展开/assign 只浅拷贝第一层。"
+        },
+        {
+          "id": "cp-q3",
+          "type": "quiz",
+          "question": "Go 中 b := a（切片）后 a 的元素修改会？",
+          "options": [
+            "影响 b（共享底层数组）",
+            "不影响",
+            "报错",
+            "b 变空"
+          ],
+          "answer": 0,
+          "feedback": "切片赋值共享底层数组，直接赋值是浅引用；copy() 才复制元素。"
+        },
+        {
+          "id": "cp-q4",
+          "type": "quiz",
+          "question": "C++ 含指针成员的类默认拷贝构造是？",
+          "options": [
+            "深拷贝",
+            "浅拷贝（两个对象共享指针指向的堆内存）",
+            "禁止拷贝",
+            "自动深拷贝"
+          ],
+          "answer": 1,
+          "feedback": "默认拷贝构造逐成员拷贝，指针成员共享堆对象——析构时双重释放。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：复制数组 [1,2] 到副本，修改副本首元素为 99，输出原数组首元素——浅拷贝外层独立，统一为：1。",
+      "comparisonDimensions": [
+        "shallow-vs-deep",
+        "copy-apis",
+        "nested-sharing",
+        "immutability",
+        "performance"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "a = [1, 2]\nb = a.copy()\nb[0] = 99\nprint(a[0])",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "copy",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "mutate",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "print",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const a = [1, 2];\nconst b = a.slice();\nb[0] = 99;\nconsole.log(a[0]);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "copy",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "mutate",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "print",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "int[] a = {1, 2};\nint[] b = a.clone();\nb[0] = 99;\nSystem.out.println(a[0]);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "copy",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "mutate",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "print",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <vector>\nstd::vector<int> a = {1, 2};\nauto b = a;\nb[0] = 99;\nstd::cout << a[0];",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "copy",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "mutate",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "print",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "a := []int{1, 2}\nb := make([]int, len(a))\ncopy(b, a)\nb[0] = 99\nfmt.Println(a[0])",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "copy",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "mutate",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "print",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "let a = vec![1, 2];\nlet b = a.clone();\n// b[0] = 99 需 mut\nprintln!(\"{}\", a[0]);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "copy",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        }
+      },
+      "errors": [
+        "浅拷贝内层共享：b = a.copy() 后修改 b 内层元素，a 同步变化（嵌套结构陷阱）",
+        "JS 展开/结构浅拷贝：[...a] 内层对象仍共享，深拷贝需 structuredClone",
+        "Go 切片赋值是浅引用：b := a 共享底层数组，append 触发扩容后才分离——行为隐蔽",
+        "C++ 拷贝构造对含指针的类默认浅拷贝：两个对象共享堆内存，双重释放",
+        "Rust 值语义默认 move 而非拷贝：直接 let b = a 会转移所有权，需显式 clone"
+      ],
+      "transferExercises": [
+        {
+          "id": "cp-tr1",
+          "type": "transfer",
+          "question": "Rust 中 let b = a（Vec）的行为是？",
+          "options": [
+            "所有权移动，a 失效；需 a.clone() 复制",
+            "自动深拷贝",
+            "共享引用",
+            "拷贝后 a 不变"
+          ],
+          "answer": 0,
+          "feedback": "Rust 值语义默认 move 转移所有权；复制需显式 clone（成本可见）。"
+        },
+        {
+          "id": "cp-tr2",
+          "type": "transfer",
+          "question": "函数返回局部大数组的正确方式（避免拷贝开销）是？",
+          "options": [
+            "显式深拷贝",
+            "用全局变量",
+            "依赖返回值优化/移动语义（NRVO/move/return 引用）",
+            "指针裸返回"
+          ],
+          "answer": 2,
+          "feedback": "现代语言靠 RVO/移动语义让返回大对象零拷贝；C++ move、Rust move、Go 逃逸分析。"
+        }
       ]
     },
     { "id": "collection.sort-search", "module_id": "B07", "title": "排序、查找与去重", "status": "published",
@@ -3282,14 +3533,220 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "read", "question": "Python 中保序去重的惯用法是？", "options": ["set(lst)", "lst.unique()", "list(dict.fromkeys(lst))", "sorted(set(lst))"], "answer": 2, "feedback": "dict.fromkeys 保序去重；set 不保序。" }
       ]
     },
-    { "id": "collection.filter-map-reduce", "module_id": "B07", "title": "过滤、映射与归约", "status": "published",
-      "objectives": ["用声明式转换集合", "组合 filter/map/reduce 表达数据管线"],
-      "prerequisites": ["collection.iteration", "function.higher-order"],
+            {
+      "id": "collection.filter-map-reduce",
+      "module_id": "B07",
+      "title": "过滤、映射与归约",
+      "status": "published",
+      "objectives": [
+        "用声明式转换集合",
+        "组合 filter/map/reduce 表达数据管线"
+      ],
+      "prerequisites": [
+        "collection.iteration",
+        "function.higher-order"
+      ],
       "core": "声明式集合处理三件套：filter 保留满足条件的元素、map 逐个转换、reduce 归约为单一值。链式组合形成数据管线（filter→map→reduce），比显式循环更聚焦意图。惰性实现（流/迭代器）可处理大集合。",
       "lang_diff": "Python：filter/map（惰性）或推导式、functools.reduce；JS：arr.filter/map/reduce；Java：Stream filter/map/reduce/collect；C++：ranges::views::filter/transform（C++20）；Go：无内置，for 循环；Rust：iter().filter().map().fold()/collect()。",
       "exercises": [
-        { "type": "concept", "question": "把集合中所有元素求和应该用？", "options": ["reduce/fold", "sort", "map", "filter"], "answer": 0, "feedback": "reduce/fold 把集合归约为单一值。" },
-        { "type": "read", "question": "JS 中 arr.filter(x => x > 0).map(x => x * 2) 的结果是？", "options": ["原数组", "先过滤正数再翻倍的新数组", "排序", "报错"], "answer": 1, "feedback": "链式：filter 先筛选，map 再转换，返回新数组。" }
+        {
+          "id": "fm-q1",
+          "type": "quiz",
+          "question": "JS [1,2,3].filter(f).map(g).reduce(h) 执行次数是？",
+          "options": [
+            "filter 全遍历、map 全遍历、reduce 全遍历（三次遍历）",
+            "一次遍历",
+            "惰性单次",
+            "零次"
+          ],
+          "answer": 0,
+          "feedback": "JS 流式操作急切执行，每步产生中间数组，共 3 次遍历；Rust/Python 可惰性合并。"
+        },
+        {
+          "id": "fm-q2",
+          "type": "quiz",
+          "question": "Rust filter 闭包中访问元素的方式是？",
+          "options": [
+            "|x| x（直接用）",
+            "|x| *x（解引用，元素是 &T）",
+            "|&x| x",
+            "|mut x|"
+          ],
+          "answer": 1,
+          "feedback": "iter() 产生 &T，闭包参数是引用，需 *x 或模式 |&x| 解引用。"
+        },
+        {
+          "id": "fm-q3",
+          "type": "quiz",
+          "question": "Go 中实现过滤/映射的惯用方式是？",
+          "options": [
+            "map/filter 内建",
+            "stream 包",
+            "手写 for 循环（无内建流式 API）",
+            "lambda 链"
+          ],
+          "answer": 2,
+          "feedback": "Go 无内建 filter/map，手写循环是标准做法；泛型 slices 包可辅助。"
+        },
+        {
+          "id": "fm-q4",
+          "type": "quiz",
+          "question": "C++ accumulate 的初值参数（如 0）决定了？",
+          "options": [
+            "迭代方向",
+            "容器类型",
+            "比较方式",
+            "累加器类型（0 是 int，浮点累加需 0.0）"
+          ],
+          "answer": 3,
+          "feedback": "初值类型决定返回类型：int 0 累加 double 会截断，浮点用 0.0。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：对 [1,2,3,4] 过滤偶数、映射平方、归约求和，输出统一为：20。",
+      "comparisonDimensions": [
+        "chain-style",
+        "lazy-vs-eager",
+        "intermediate-allocation",
+        "parallel-capability",
+        "readability"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "nums = [1, 2, 3, 4]\nprint(sum(x * x for x in nums if x % 2 == 0))",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "chain",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const nums = [1, 2, 3, 4];\nconsole.log(nums.filter((x) => x % 2 === 0).map((x) => x * x).reduce((a, b) => a + b, 0));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "chain",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "import java.util.stream.*;\nint sum = IntStream.of(1, 2, 3, 4).filter((x) -> x % 2 == 0).map((x) -> x * x).sum();\nSystem.out.println(sum);",
+          "semantic_blocks": [
+            {
+              "role": "chain",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <numeric>\n#include <vector>\nstd::vector<int> nums = {1, 2, 3, 4};\nint sum = std::accumulate(nums.begin(), nums.end(), 0, [](int acc, int x) { return x % 2 == 0 ? acc + x * x : acc; });\nstd::cout << sum;",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "reduce",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "print",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "nums := []int{1, 2, 3, 4}\nsum := 0\nfor _, x := range nums {\n    if x%2 == 0 {\n        sum += x * x\n    }\n}\nfmt.Println(sum)",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "iterate",
+              "start": 3,
+              "end": 7
+            },
+            {
+              "role": "print",
+              "start": 8,
+              "end": 8
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "let sum: i32 = [1, 2, 3, 4].iter().filter(|x| *x % 2 == 0).map(|x| x * x).sum();\nprintln!(\"{}\", sum);",
+          "semantic_blocks": [
+            {
+              "role": "chain",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "print",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        }
+      },
+      "errors": [
+        "链式调用可读性：JS/Java 长链 debug 困难，中间结果不可见",
+        "Go 无内建 filter/map：手写循环是惯用法，误以为有内置 API 而到处找",
+        "Rust filter 闭包接收引用：|x| x%2 会类型错误，需 *x 解引用",
+        "C++ accumulate 初始值类型决定返回类型：int 初值做浮点累加会截断",
+        "惰性 vs 急切：Python 生成器惰性、JS filter/map 急切（中间数组分配）"
+      ],
+      "transferExercises": [
+        {
+          "id": "fm-tr1",
+          "type": "transfer",
+          "question": "Python 生成器表达式 vs 列表推导的内存差异是？",
+          "options": [
+            "无差异",
+            "生成器惰性逐元素、列表推导一次性建全量",
+            "生成器更慢",
+            "列表更省内存"
+          ],
+          "answer": 1,
+          "feedback": "生成器惰性不建中间列表，大数据集省内存；列表推导一次建全量。"
+        },
+        {
+          "id": "fm-tr2",
+          "type": "transfer",
+          "question": "Rust iterator 链的惰性体现在？",
+          "options": [
+            "collect() 前不实际执行（零中间分配）",
+            "立即执行",
+            "每步建 Vec",
+            "不支持链式"
+          ],
+          "answer": 0,
+          "feedback": "Rust 迭代器惰性，collect 前不遍历不分配——filter/map 合并为单次扫描。"
+        }
       ]
     },
     { "id": "collection.equality-hash", "module_id": "B07", "title": "集合相等性与哈希", "status": "published",
