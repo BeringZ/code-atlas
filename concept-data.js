@@ -2023,15 +2023,230 @@ window.CODE_ATLAS_2 = {
         "Java HashMap 遍历无序：依赖顺序的代码在 HashMap 上不可移植——需 LinkedHashMap"
       ]
     },
-    {
-      "id": "model.record-struct-class", "module_id": "B08", "title": "记录 / 结构体 / 类", "status": "published",
-      "objectives": ["用聚合结构表达领域数据", "理解数据载体在各语言的形态差异"],
-      "prerequisites": ["collection.map", "value.semantics"],
+                {
+      "id": "model.record-struct-class",
+      "module_id": "B08",
+      "title": "记录 / 结构体 / 类",
+      "status": "published",
+      "objectives": [
+        "用聚合结构表达领域数据",
+        "理解数据载体在各语言的形态差异"
+      ],
+      "prerequisites": [
+        "collection.map",
+        "value.semantics"
+      ],
       "core": "把相关字段聚合为一个类型是建模基础。三种形态：纯数据记录（struct/record/dataclass）、带方法的类（class/struct）、带行为抽象的接口（trait/protocol）。选择原则：先用最轻的数据载体，需要行为再升级。",
       "lang_diff": "Python：dataclass 提供轻量数据类，class 完整 OOP；JS：对象字面量/class（无显式 record）；Java：record（不可变）vs class；C++：struct（默认公有）vs class（默认私有）；Go：struct 仅数据 + 方法（方法在外部定义）；Rust：struct 数据 + impl 方法块。",
       "exercises": [
-        { "type": "concept", "question": "Java 中不可变数据载体的推荐写法是？", "options": ["enum", "class + setter", "interface", "record"], "answer": 3, "feedback": "record 自动生成构造/equals/hashCode/toString，天然不可变。" },
-        { "type": "read", "question": "Go 的方法如何定义？", "options": ["接口内", "在类内部", "在 struct 外部通过接收者", "全局函数"], "answer": 2, "feedback": "Go 用 func (s T) Method() 在 struct 外定义方法。" }
+        {
+          "id": "rs-q1",
+          "type": "quiz",
+          "question": "Go 中未初始化的 struct 字段值是？",
+          "options": [
+            "零值（0/\"\"/nil）",
+            "undefined",
+            "null",
+            "编译错误"
+          ],
+          "answer": 0,
+          "feedback": "Go 结构体零值初始化：数值 0、字符串空、指针 nil——安全可读。"
+        },
+        {
+          "id": "rs-q2",
+          "type": "quiz",
+          "question": "Rust 修改 struct 字段（如 p.age=37）需要？",
+          "options": [
+            "直接改即可",
+            "let mut p（字段默认不可变）",
+            "unsafe 块",
+            "RefCell"
+          ],
+          "answer": 1,
+          "feedback": "Rust 绑定默认不可变，字段随之不可变；声明 let mut 才能修改。"
+        },
+        {
+          "id": "rs-q3",
+          "type": "quiz",
+          "question": "C++ struct 与 class 的核心区别是？",
+          "options": [
+            "性能不同",
+            "struct 不能有方法",
+            "默认访问级别（struct public / class private）",
+            "class 不能聚合"
+          ],
+          "answer": 2,
+          "feedback": "C++ 中 struct/class 仅默认访问控制不同（public/private），其余完全一致。"
+        },
+        {
+          "id": "rs-q4",
+          "type": "quiz",
+          "question": "Python 定义轻量数据类的现代方式是？",
+          "options": [
+            "手写 __init__",
+            "字典代替",
+            "namedtuple 已废弃",
+            "@dataclass 装饰器"
+          ],
+          "answer": 3,
+          "feedback": "@dataclass 自动生成 __init__/__repr__/__eq__，简洁定义数据类。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：定义 Person（name/age）记录类型，创建实例 Ada(36) 并读取字段，输出统一为：Ada 36。",
+      "comparisonDimensions": [
+        "data-aggregation",
+        "type-annotation",
+        "construction",
+        "field-access",
+        "value-vs-reference"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "class Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n\np = Person(\"Ada\", 36)\nprint(p.name, p.age)",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 4
+            },
+            {
+              "role": "construct",
+              "start": 6,
+              "end": 6
+            },
+            {
+              "role": "print",
+              "start": 7,
+              "end": 7
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const p = { name: \"Ada\", age: 36 };\nconsole.log(p.name, p.age);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "print",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "class Person {\n    String name;\n    int age;\n    Person(String n, int a) { name = n; age = a; }\n}\nPerson p = new Person(\"Ada\", 36);\nSystem.out.println(p.name + \" \" + p.age);",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 5
+            },
+            {
+              "role": "construct",
+              "start": 6,
+              "end": 6
+            },
+            {
+              "role": "print",
+              "start": 7,
+              "end": 7
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <string>\nstruct Person { std::string name; int age; };\nPerson p = {\"Ada\", 36};\nstd::cout << p.name << \" \" << p.age;",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "construct",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "print",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "p := struct {\n    Name string\n    Age  int\n}{Name: \"Ada\", Age: 36}\nfmt.Println(p.Name, p.Age)",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 4
+            },
+            {
+              "role": "print",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "struct Person { name: String, age: i32 }\nlet p = Person { name: String::from(\"Ada\"), age: 36 };\nprintln!(\"{} {}\", p.name, p.age);",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "construct",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "print",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        }
+      },
+      "errors": [
+        "字段默认值差异：Go 零值、Java null/0、Rust 无默认——未初始化字段读取行为不同",
+        "可变性：Rust struct 字段默认不可变（需 mut），JS 对象可任意增删字段",
+        "构造方式：Java/C++ 需显式构造，Go 字面量、Python 类、JS 对象字面量——语法各异",
+        "值 vs 引用：Python/JS/Java 对象是引用，C++/Rust struct 是值语义（拷贝）",
+        "类型标注：动态语言（Python/JS）字段无类型约束，静态语言编译期检查"
+      ],
+      "transferExercises": [
+        {
+          "id": "rs-tr1",
+          "type": "transfer",
+          "question": "不可变数据对象的跨语言实现要点？",
+          "options": [
+            "全用全局变量",
+            "字段只读（final/readonly/不可变绑定）+ 构造后不可改",
+            "深拷贝每次访问",
+            "禁用类"
+          ],
+          "answer": 1,
+          "feedback": "不可变对象：Java final 字段、Rust 无 mut、C++ const——构造后不可变保证共享安全。"
+        },
+        {
+          "id": "rs-tr2",
+          "type": "transfer",
+          "question": "值语义（C++/Rust struct）拷贝的注意点是？",
+          "options": [
+            "拷贝是整份复制，大对象有开销（移动/借用优化）",
+            "零开销",
+            "自动引用",
+            "拷贝必报错"
+          ],
+          "answer": 0,
+          "feedback": "值语义拷贝复制整块数据，大结构体用引用/移动避免复制开销。"
+        }
       ]
     },
     {
@@ -2067,15 +2282,200 @@ window.CODE_ATLAS_2 = {
         { "type": "read", "question": "JS 中 JSON.stringify 的作用？", "options": ["把值序列化为 JSON 字符串", "压缩对象", "解析 JSON 字符串", "校验格式"], "answer": 0, "feedback": "stringify 序列化，parse 反序列化。" }
       ]
     },
-    {
-      "id": "generic.functions", "module_id": "B12", "title": "泛型函数", "status": "published",
-      "objectives": ["用类型参数消除重复代码", "理解泛型的约束与实例化"],
-      "prerequisites": ["function.declare-call", "value.semantics"],
+            {
+      "id": "generic.functions",
+      "module_id": "B12",
+      "title": "泛型函数",
+      "status": "published",
+      "objectives": [
+        "用类型参数消除重复代码",
+        "理解泛型的约束与实例化"
+      ],
+      "prerequisites": [
+        "function.declare-call",
+        "value.semantics"
+      ],
       "core": "泛型让同一段逻辑适用于多种类型：max、反转、查找等。类型参数（T）由调用点推断或显式指定；约束（bound）限制 T 必须具备的能力（可比较、可克隆）。",
       "lang_diff": "Python：typing.TypeVar + Generic（运行时无强制）；JS：JSDoc/TypeScript 泛型（语言本身无）；Java：<T> 泛型方法 + 类型擦除；C++：template 模板（编译期实例化，无运行时开销）；Go：1.18+ [T any] 类型参数；Rust：fn max<T: Ord> 泛型 + 单态化。",
       "exercises": [
-        { "type": "concept", "question": "Rust 泛型函数的约束写在哪里？", "options": ["类型参数 bound（T: Ord）", "运行时检查", "配置文件", "接口注释"], "answer": 0, "feedback": "泛型参数后跟冒号约束，如 T: Ord 要求可排序。" },
-        { "type": "concept", "question": "哪个语言的泛型在运行时被擦除？", "options": ["C++", "Rust", "Go", "Java"], "answer": 3, "feedback": "Java 泛型编译期检查、运行时擦除；C++/Rust/Go 有真实类型。" }
+        {
+          "id": "gf-q1",
+          "type": "quiz",
+          "question": "Rust 泛型函数比较大小需要什么约束？",
+          "options": [
+            "T: Clone",
+            "T: Sized",
+            "T: PartialOrd",
+            "无需约束"
+          ],
+          "answer": 2,
+          "feedback": "PartialOrd 提供比较运算符；无约束的 T 无法使用 >。"
+        },
+        {
+          "id": "gf-q2",
+          "type": "quiz",
+          "question": "Java 泛型的类型擦除（Erasure）意味着？",
+          "options": [
+            "运行时保留类型",
+            "编译期删除代码",
+            "无擦除",
+            "运行时泛型参数类型不可知（转 Object）"
+          ],
+          "answer": 3,
+          "feedback": "Java 泛型编译后擦除为 Object/边界，运行时无法获取具体泛型类型。"
+        },
+        {
+          "id": "gf-q3",
+          "type": "quiz",
+          "question": "C++ 模板的编译方式（monomorphization）是？",
+          "options": [
+            "每实例化类型生成独立代码（体积膨胀）",
+            "共享一份代码",
+            "运行时解释",
+            "只生成一次"
+          ],
+          "answer": 0,
+          "feedback": "模板按实例化类型分别编译生成（如 int/string 各一份），代码体积随类型数增长。"
+        },
+        {
+          "id": "gf-q4",
+          "type": "quiz",
+          "question": "Go 泛型（1.18+）的约束关键字是？",
+          "options": [
+            "template",
+            "interface{ ~T } 或 comparable 等",
+            "typename",
+            "<T>"
+          ],
+          "answer": 1,
+          "feedback": "Go 用类型集约束（interface 内嵌 ~T/comparable），限制泛型参数的可用操作。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：编写取两个值中较大者的泛型/多态函数并调用（3,5），输出统一为：5。",
+      "comparisonDimensions": [
+        "type-parameter",
+        "compile-time-check",
+        "monomorphization",
+        "constraints",
+        "reuse"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "def bigger(a, b):\n    return a if a > b else b\n\nprint(bigger(3, 5))",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "call",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "function bigger(a, b) { return a > b ? a : b; }\nconsole.log(bigger(3, 5));",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "System.out.println(Integer.max(3, 5));",
+          "semantic_blocks": [
+            {
+              "role": "call",
+              "start": 1,
+              "end": 1
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "auto bigger = [](auto a, auto b) { return a > b ? a : b; };\nstd::cout << bigger(3, 5);",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "fmt.Println(max(3, 5))",
+          "semantic_blocks": [
+            {
+              "role": "call",
+              "start": 1,
+              "end": 1
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "fn bigger<T: PartialOrd>(a: T, b: T) -> T { if a > b { a } else { b } }\nprintln!(\"{}\", bigger(3, 5));",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        }
+      },
+      "errors": [
+        "缺少约束：Rust 泛型比较需 T: PartialOrd，漏掉约束编译失败",
+        "类型擦除：Java 泛型运行时擦除（Erasure），无法在运行时判断泛型参数类型",
+        "C++ 模板编译膨胀：每实例化一种类型生成一份代码（monomorphization 体积）",
+        "动态语言无编译期检查：Python/JS 传错类型运行时才暴露（鸭子类型风险）",
+        "Go 泛型约束：T comparable 才能比较，写 T any 无法用 > 运算符"
+      ],
+      "transferExercises": [
+        {
+          "id": "gf-tr1",
+          "type": "transfer",
+          "question": "泛型与多态的取舍：何时值得用泛型？",
+          "options": [
+            "多种类型同一逻辑且需编译期类型安全",
+            "只有一种类型",
+            "性能无所谓时",
+            "永远不用"
+          ],
+          "answer": 0,
+          "feedback": "多种类型共享逻辑 + 需要类型安全时用泛型；单一类型或纯动态场景可不用。"
+        },
+        {
+          "id": "gf-tr2",
+          "type": "transfer",
+          "question": "Python/JS 动态类型天然\"泛型\"的代价是？",
+          "options": [
+            "性能更好",
+            "类型更安全",
+            "错误延迟到运行时（缺编译期检查）",
+            "无需测试"
+          ],
+          "answer": 2,
+          "feedback": "动态类型免写泛型标注，但类型错误运行时才暴露，大项目需类型标注/测试兜底。"
+        }
       ]
     },
     {
