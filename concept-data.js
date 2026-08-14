@@ -899,7 +899,7 @@ window.CODE_ATLAS_2 = {
       "level": "L3"
     },
     // ============ 深做样板 5：异常与错误值 ============
-            {
+                {
       "id": "error.exception-vs-result",
       "status": "published",
       "module_id": "B09",
@@ -993,7 +993,7 @@ window.CODE_ATLAS_2 = {
           ]
         },
         "go": {
-          "minimal_code": "divide := func(a, b int) (int, error) { if b == 0 { return 0, fmt.Errorf(\"div0\") } return a / b, nil }\n_, err := divide(1, 0)\nif err != nil { fmt.Println(\"error\") }",
+          "minimal_code": "divide := func(a, b int) (int, error) {\n    if b == 0 { return 0, fmt.Errorf(\"div0\") }\n    return a / b, nil\n}\n_, err := divide(1, 0)\nif err != nil { fmt.Println(\"error\") }",
           "semantic_blocks": [
             {
               "role": "define",
@@ -1330,7 +1330,7 @@ window.CODE_ATLAS_2 = {
         { "type": "concept", "question": "pyenv local 的作用是？", "options": ["在项目目录锁定版本", "更新 pip", "删除版本", "安装 Python"], "answer": 0, "feedback": "pyenv local 生成 .python-version 锁定该项目使用的版本。" }
       ]
     },
-            {
+                {
       "id": "value.semantics",
       "module_id": "B02",
       "title": "值语义、引用语义与对象身份",
@@ -1509,7 +1509,7 @@ window.CODE_ATLAS_2 = {
           ]
         },
         "go": {
-          "minimal_code": "lst := []int{1}\na := 1\nx := a; x = 99\nlst = append(lst, 2)\nfmt.Println(a, len(lst))",
+          "minimal_code": "lst := []int{1}\na := 1\nx := a\nx = 99\n_ = x\nlst = append(lst, 2)\nfmt.Println(a, len(lst))",
           "semantic_blocks": [
             {
               "role": "declare",

@@ -4111,7 +4111,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         "error.custom-types"
       ]
     },
-            {
+                {
       "id": "error.propagation",
       "module_id": "B09",
       "title": "错误传播与包装",
@@ -4265,7 +4265,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
           ]
         },
         "go": {
-          "minimal_code": "divide := func(a, b int) (int, error) { if b == 0 { return 0, fmt.Errorf(\"div by zero\") } return a / b, nil }\ncompute := func(a, b int) (int, error) { if _, err := divide(a, b); err != nil { return 0, fmt.Errorf(\"compute failed: %w\", err) } return 0, nil }\n_, err := compute(1, 0)\nif err != nil { fmt.Println(\"failed:\", err) }",
+          "minimal_code": "divide := func(a, b int) (int, error) {\n    if b == 0 { return 0, fmt.Errorf(\"div by zero\") }\n    return a / b, nil\n}\ncompute := func(a, b int) (int, error) {\n    if _, err := divide(a, b); err != nil { return 0, fmt.Errorf(\"compute failed: %w\", err) }\n    return 0, nil\n}\n_, err := compute(1, 0)\nif err != nil { fmt.Println(\"failed:\", err) }",
           "semantic_blocks": [
             {
               "role": "define",
@@ -4371,7 +4371,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         }
       ]
     },
-                {
+                    {
       "id": "error.custom-types",
       "module_id": "B09",
       "title": "自定义错误类型",
@@ -4531,7 +4531,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
           ]
         },
         "go": {
-          "minimal_code": "divide := func(a, b int) (int, error) { if b == 0 { return 0, fmt.Errorf(\"division by zero [code=100]\") } return a / b, nil }\n_, err := divide(1, 0)\nif err != nil { fmt.Println(\"code: 100\") }",
+          "minimal_code": "divide := func(a, b int) (int, error) {\n    if b == 0 { return 0, fmt.Errorf(\"division by zero [code=100]\") }\n    return a / b, nil\n}\n_, err := divide(1, 0)\nif err != nil { fmt.Println(\"code: 100\") }",
           "semantic_blocks": [
             {
               "role": "define",
@@ -6160,7 +6160,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "concept", "question": "验证跨平台兼容性的可靠方式是？", "options": ["问同事", "只在自己机器测", "CI 在 Windows/macOS/Linux 多平台跑测试", "读文档"], "answer": 2, "feedback": "多平台 CI 真实暴露平台差异问题，单平台测试不够。" }
       ]
     },
-        {
+            {
       "id": "expr.float-precision",
       "module_id": "B03",
       "title": "浮点精度与 IEEE 754",
@@ -6227,7 +6227,7 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
           ]
         },
         "go": {
-          "minimal_code": "fmt.Println(0.1 + 0.2)",
+          "minimal_code": "a, b := 0.1, 0.2\nfmt.Println(a + b)",
           "semantic_blocks": [
             {
               "role": "calc",

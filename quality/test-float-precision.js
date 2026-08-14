@@ -60,7 +60,9 @@ check('每题选项 ≥ 3', [...(c.exercises || []), ...(c.transferExercises || 
 
 console.log('—— 同题一致性（0.1+0.2 → 0.30000000000000004）——');
 const codes = Object.fromEntries(Object.entries(c.variants || {}).map(([l, v]) => [l, v.minimal_code || '']));
-check('五语言直接计算 0.1+0.2', ['python', 'javascript', 'java', 'go', 'rust'].every((l) => /0\.1 \+ 0\.2/.test(codes[l])));
+// Go 注意：0.1+0.2 若写成常量表达式会被编译期折叠（任意精度 → 0.3），必须用变量做运行时计算
+check('Python/JS/Java/Rust 直接计算 0.1+0.2', ['python', 'javascript', 'java', 'rust'].every((l) => /0\.1 \+ 0\.2/.test(codes[l])));
+check('Go 用运行时变量计算（避开常量折叠）', /a, b := 0\.1, 0\.2/.test(codes.go) && /a \+ b/.test(codes.go));
 check('C++ 用 setprecision(17) 防截断', /setprecision\(17\)/.test(codes.cpp));
 check('C++ 含 <iomanip>', /#include <iomanip>/.test(codes.cpp));
 check('Rust 用 f64 默认字面量', /0\.1 \+ 0\.2/.test(codes.rust));

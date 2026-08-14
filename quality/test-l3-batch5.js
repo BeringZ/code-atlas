@@ -59,10 +59,11 @@ check('C++ 先 find 检查 npos 再 replace', /std::string::npos/.test(sr.varian
 check('Go 用 strings.Replace + import', /import "strings"/.test(sr.variants.go.minimal_code) && /strings\.Replace/.test(sr.variants.go.minimal_code));
 check('Python replace 返回新串', /s\.replace\("world", "there"\)/.test(sr.variants.python.minimal_code));
 
-console.log('—— verify Go import 提取（I12-B 改进）——');
+console.log('—— verify Go import 处理（智能导入）——');
 const verifySrc = fs.readFileSync(path.join(root, 'quality/verify-concepts.js'), 'utf8');
-check('extractPrelude 支持 Go import', /if \(lang === 'go'\) return s\.startsWith\('import '\)/.test(verifySrc));
-check('wrap go 合并 prelude 到 import 块', /prelude/.test(verifySrc.split("if (lang === 'go')")[1] || ''));
+check('goImportPaths 解析 import "x" 与 import (…) 两种形式', verifySrc.includes('function goImportPaths') && verifySrc.includes('import\\s+"') && verifySrc.includes("s === 'import ('"));
+check('智能导入：只导入实际使用的包（无 unused import）', verifySrc.includes('function goUsedPackages') && verifySrc.includes("['utf8.', 'unicode/utf8']"));
+check('完整程序（package 声明）原样使用不包裹', verifySrc.includes('/^\\s*package\\s+\\w+/'));
 
 console.log('—— 成熟度统计 ——');
 const l3 = D2.concepts.filter((c) => c.level === 'L3').length;

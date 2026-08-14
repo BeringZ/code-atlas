@@ -45,10 +45,75 @@ function extractPrelude(lang, code) {
     if (lang === 'java') return s.startsWith('import ');
     if (lang === 'cpp') return s.startsWith('#include');
     if (lang === 'rust') return s.startsWith('use ') && s.includes('::');
-    if (lang === 'go') return s.startsWith('import '); // I12-B：Go 标准库 import 提取
-    return false;
+    return false; // Go 的 import 由 wrapGo 统一解析（含 import "x" 与 import (…) 两种形式）
   };
   return { prelude: lines.filter(isPre).join('\n'), body: lines.filter((l) => !isPre(l)).join('\n') };
+}
+
+// Go：解析显式 import 声明 → 包路径数组（支持 import "x" 与 import (\n "x"\n "y"\n) 两种形式）
+function goImportPaths(code) {
+  const paths = new Set();
+  const lines = code.split('\n');
+  for (let i = 0; i < lines.length; i++) {
+    const s = lines[i].trim();
+    let m = s.match(/^import\s+"([^"]+)"/); // import "fmt"
+    if (m) { paths.add(m[1]); continue; }
+    m = s.match(/^import\s+(\w+)\s+"([^"]+)"/); // import f "fmt"
+    if (m) { paths.add(m[2]); continue; }
+    if (s === 'import (' || s === 'import(') { // 多行块
+      for (let j = i + 1; j < lines.length; j++) {
+        const t = lines[j].trim();
+        if (t === ')') break;
+        m = t.match(/^"([^"]+)"$/); // "fmt"
+        if (m) { paths.add(m[1]); continue; }
+        m = t.match(/^(\w+)\s+"([^"]+)"$/); // f "fmt"
+        if (m) paths.add(m[2]);
+      }
+    }
+  }
+  return [...paths];
+}
+
+// Go：从代码标识符用法推断所需标准库包（只导入实际使用的包，杜绝 unused import）
+// declared：显式声明的 import 包路径（作为候选，还需确认其默认标识符确实被使用）
+function goUsedPackages(code, declared = []) {
+  const used = new Set();
+  const PREFIXES = [
+    ['fmt.', 'fmt'],
+    ['strings.', 'strings'],
+    ['utf8.', 'unicode/utf8'],
+    ['sync.', 'sync'],
+    ['os.', 'os'],
+    ['sort.', 'sort'],
+    ['strconv.', 'strconv'],
+    ['math.', 'math'],
+    ['time.', 'time'],
+    ['errors.', 'errors'],
+    ['bytes.', 'bytes'],
+    ['log.', 'log'],
+  ];
+  for (const [token, pkg] of PREFIXES) {
+    if (code.includes(token)) used.add(pkg);
+  }
+  // 显式声明的包：仅当其默认标识符（或别名）确实出现在代码中才保留
+  for (const p of declared) {
+    const name = p.split('/').pop(); // 默认包名 = 路径最后一段
+    if (code.includes(name + '.')) used.add(p);
+  }
+  return used;
+}
+
+// Go：剥离 import 声明行，返回函数体语句
+function goBody(code) {
+  const out = [];
+  let inImportBlock = false;
+  for (const l of code.split('\n')) {
+    const s = l.trim();
+    if (inImportBlock) { if (s === ')') inImportBlock = false; continue; }
+    if (s.startsWith('import ')) { if (s.endsWith('(')) inImportBlock = true; continue; }
+    out.push(l);
+  }
+  return out.join('\n');
 }
 
 // 每语言：minimal_code → 可运行包装
@@ -59,7 +124,15 @@ function wrap(lang, code) {
   if (lang === 'javascript') return code;
   if (lang === 'java') return `${prelude}\npublic class Main {\n    public static void main(String[] args) {\n${indent(body)}\n    }\n}`;
   if (lang === 'cpp') return `${prelude}\n#include <iostream>\n#include <string>\nint main() {\n${indent(body)}\n    std::cout << std::endl;\n    return 0;\n}`;
-  if (lang === 'go') return `package main\n\nimport (\n    "fmt"\n    "unicode/utf8"${prelude ? '\n    ' + prelude.split('\n').map((l) => l.trim()).join('\n    ') : ''}\n)\n\nfunc main() {\n${indent(body)}\n}`;
+  if (lang === 'go') {
+    // 已是完整程序（含 package 声明）→ 原样使用，不再包裹
+    if (/^\s*package\s+\w+/.test(code)) return code;
+    // 智能导入：显式声明的 import 仅作候选，最终只导入代码实际使用的包（杜绝 unused import）
+    const declared = goImportPaths(code);
+    const pkgs = new Set(goUsedPackages(code, declared));
+    const importBlock = pkgs.size ? `\nimport (\n${[...pkgs].sort().map((p) => `    "${p}"`).join('\n')}\n)\n` : '';
+    return `package main${importBlock}\nfunc main() {\n${indent(goBody(code))}\n}`;
+  }
   if (lang === 'rust') return `${prelude}\nfn main() {\n${indent(body)}\n}`;
   return null;
 }
