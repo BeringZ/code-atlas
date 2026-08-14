@@ -60,7 +60,7 @@ check('答案分布均衡（3/2/1/0）', JSON.stringify(cmAns) === '[3,2,1,0]', 
 console.log('—— 成熟度统计 ——');
 const l3 = D2.concepts.filter((c) => c.level === 'L3').length;
 const l4 = D2.concepts.filter((c) => c.level === 'L4').length;
-check(`L3 = 21（7+2+2+2 新增）`, l3 === 21, `实际 ${l3}`);
+check(`L3 = 23（7+2+2+2 新增）`, l3 === 23, `实际 ${l3}`);
 check(`L4 = 9（6+1+1 新增）`, l4 === 9, `实际 ${l4}`);
 
 console.log(`\n结果：${pass} 通过 / ${fail} 失败`);

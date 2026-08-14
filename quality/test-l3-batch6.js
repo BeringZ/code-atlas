@@ -63,7 +63,7 @@ check('含 O(n²) 循环拼接反例', sb.errors.some((e) => /O\(n²\)|临时对
 console.log('—— 成熟度统计 ——');
 const l3 = D2.concepts.filter((c) => c.level === 'L3').length;
 const l4 = D2.concepts.filter((c) => c.level === 'L4').length;
-check(`L3 = 21（15+2 新增）`, l3 === 21, `实际 ${l3}`);
+check(`L3 = 23（15+2 新增）`, l3 === 23, `实际 ${l3}`);
 check(`L4 = 9`, l4 === 9, `实际 ${l4}`);
 
 console.log(`\n结果：${pass} 通过 / ${fail} 失败`);

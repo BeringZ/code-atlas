@@ -1841,14 +1841,215 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         }
       ]
     },
-    { "id": "function.recursion", "module_id": "B05", "title": "递归函数", "status": "published",
-      "objectives": ["用递归分解自相似问题", "设计基例与递归步骤"],
-      "prerequisites": ["control.recursion", "function.declare-call"],
+            {
+      "id": "function.recursion",
+      "module_id": "B05",
+      "title": "递归函数",
+      "status": "published",
+      "objectives": [
+        "用递归分解自相似问题",
+        "设计基例与递归步骤"
+      ],
+      "prerequisites": [
+        "control.recursion",
+        "function.declare-call"
+      ],
       "core": "递归函数 = 基例（直接可解的最小规模）+ 递归步骤（把问题缩小后调用自身）。设计要点：每次递归必须向基例逼近；状态通过参数传递而非全局。阶乘、斐波那契、树遍历是经典练习。",
       "lang_diff": "各语言递归写法一致：基例判断 + 自身调用。栈深度限制不同（Python 默认 1000、Go 栈可增长）。树/图递归遍历比迭代更自然；线性递归可轻易改迭代。",
       "exercises": [
-        { "type": "concept", "question": "递归函数必须包含的要素是？", "options": ["循环", "基例（终止条件）与递归步骤", "异常处理", "全局变量"], "answer": 1, "feedback": "无基例会无限递归导致栈溢出。" },
-        { "type": "read", "question": "def fib(n): return n if n<2 else fib(n-1)+fib(n-2) 的问题是？", "options": ["栈溢出", "返回类型错误", "语法错误", "指数级重复计算（无记忆化）"], "answer": 3, "feedback": "朴素递归斐波那契是 O(2^n)，应加记忆化或改迭代。" }
+        {
+          "id": "rc-q1",
+          "type": "quiz",
+          "question": "递归函数必须满足的两个条件？",
+          "options": [
+            "基例（最小规模直接求解）+ 递归步向基例逼近",
+            "基例 + 全局变量",
+            "递归步 + 缓存",
+            "基例即可"
+          ],
+          "answer": 0,
+          "feedback": "基例终止递归，递归步缩小问题规模逼近基例——缺一不可。"
+        },
+        {
+          "id": "rc-q2",
+          "type": "quiz",
+          "question": "Python 深递归（如 fact(10000)）的风险是？",
+          "options": [
+            "结果错误",
+            "RecursionError 栈溢出（默认深度约 1000）",
+            "无限循环",
+            "内存泄漏"
+          ],
+          "answer": 1,
+          "feedback": "Python 递归深度默认 ~1000，超限抛 RecursionError；大输入需迭代或尾递归改写。"
+        },
+        {
+          "id": "rc-q3",
+          "type": "quiz",
+          "question": "Go/JS 中用匿名函数实现递归的正确写法是？",
+          "options": [
+            "直接 func() { func() } 自引用",
+            "用 return 自引用",
+            "先声明变量 var f = ...，再 f = func() { f() }",
+            "无法实现"
+          ],
+          "answer": 2,
+          "feedback": "匿名函数内部无法直接自引用，需先声明变量再赋值，函数体内通过变量名调用。"
+        },
+        {
+          "id": "rc-q4",
+          "type": "quiz",
+          "question": "递归相比迭代的典型代价是？",
+          "options": [
+            "代码必然更长",
+            "性能必然更好",
+            "不能处理集合",
+            "每次调用压栈（栈帧开销 + 深度受限）"
+          ],
+          "answer": 3,
+          "feedback": "递归每次调用分配栈帧，深度大时栈溢出且开销高；迭代常可替代。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：用递归实现阶乘 fact(5)，输出统一为：120。递归 = 基例（n≤1 返回 1）+ 递归步（n × fact(n-1)）。",
+      "comparisonDimensions": [
+        "base-case",
+        "recursive-step",
+        "termination",
+        "stack-depth",
+        "iteration-alternative"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "def fact(n):\n    return 1 if n <= 1 else n * fact(n - 1)\n\nprint(fact(5))",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "call",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "function fact(n) { return n <= 1 ? 1 : n * fact(n - 1); }\nconsole.log(fact(5));",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "class F {\n    int fact(int n) { return n <= 1 ? 1 : n * fact(n - 1); }\n}\nSystem.out.println(new F().fact(5));",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 3
+            },
+            {
+              "role": "call",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <functional>\nstd::function<int(int)> fact = [&](int n) { return n <= 1 ? 1 : n * fact(n - 1); };\nstd::cout << fact(5);",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "call",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "var fact func(int) int\nfact = func(n int) int {\n    if n <= 1 { return 1 }\n    return n * fact(n - 1)\n}\nfmt.Println(fact(5))",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "define",
+              "start": 2,
+              "end": 5
+            },
+            {
+              "role": "call",
+              "start": 6,
+              "end": 6
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "fn fact(n: i32) -> i32 {\n    if n <= 1 { 1 } else { n * fact(n - 1) }\n}\nprintln!(\"{}\", fact(5));",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 3
+            },
+            {
+              "role": "call",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        }
+      },
+      "errors": [
+        "缺基例：无限递归直到栈溢出（StackOverflowError / RecursionError / segment fault）",
+        "递归步不收敛：参数不向基例逼近（如 fact(n) 调 fact(n)），死循环",
+        "深递归栈溢出：Python 默认递归深度约 1000，Java 默认栈深有限——大输入应改迭代",
+        "Rust/C++ 未显式尾递归优化：深度递归仍可能爆栈（编译器不保证 TCO）",
+        "闭包递归陷阱：Go/JS 用匿名函数递归需先声明变量再赋值（var fact = ... 内不能自引用）"
+      ],
+      "transferExercises": [
+        {
+          "id": "rc-tr1",
+          "type": "transfer",
+          "question": "树/链表遍历为什么天然适合递归？",
+          "options": [
+            "递归一定更快",
+            "结构自相似（子树/子链表仍同类结构），递归随结构下降",
+            "迭代无法实现",
+            "数据量固定"
+          ],
+          "answer": 1,
+          "feedback": "递归结构用递归遍历最自然：每层处理当前结点 + 递归子树，无需手动栈。"
+        },
+        {
+          "id": "rc-tr2",
+          "type": "transfer",
+          "question": "避免深递归爆栈的通用方案是？",
+          "options": [
+            "改显式栈迭代或尾递归（编译器支持时）",
+            "加大栈",
+            "用更多全局变量",
+            "降低精度"
+          ],
+          "answer": 0,
+          "feedback": "显式栈迭代彻底消除调用栈压力；尾递归在支持 TCO 的语言（非 Python/JS 默认）才有效。"
+        }
       ]
     },
     { "id": "function.pure-side-effect", "module_id": "B05", "title": "纯函数、副作用与可测试性", "status": "published",
@@ -3523,14 +3724,245 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         }
       ]
     },
-    { "id": "collection.sort-search", "module_id": "B07", "title": "排序、查找与去重", "status": "published",
-      "objectives": ["对集合排序与查找", "用合适方法去重"],
-      "prerequisites": ["collection.crud", "collection.set"],
+            {
+      "id": "collection.sort-search",
+      "module_id": "B07",
+      "title": "排序、查找与去重",
+      "status": "published",
+      "objectives": [
+        "对集合排序与查找",
+        "用合适方法去重"
+      ],
+      "prerequisites": [
+        "collection.crud",
+        "collection.set"
+      ],
       "core": "排序：稳定 vs 不稳定、自定义比较器（key/comparator）。查找：线性 O(n) vs 有序二分 O(log n)。去重：保序用「见过的加入集合判断」、不保序直接转集合。排序是许多算法的前置（二分查找、合并区间）。",
       "lang_diff": "Python：sorted(list, key=f) 返回新列表、list.sort() 原地、bisect 二分；JS：arr.sort(compareFn) 原地（默认字典序！）、find/findIndex、Set 去重；Java：Collections.sort/Arrays.sort + Comparator、binarySearch；C++：std::sort/binary_search；Go：sort.Slice/sort.Ints；Rust：vec.sort()/sort_by/binary_search。",
       "exercises": [
-        { "type": "concept", "question": "JS 中 [10, 9, 1].sort() 的默认结果是？", "options": ["[1, 9, 10]", "报错", "[1, 10, 9]（按字典序）", "[10, 9, 1]"], "answer": 2, "feedback": "sort() 默认按字符串字典序，数字排序需 arr.sort((a,b)=>a-b)。" },
-        { "type": "read", "question": "Python 中保序去重的惯用法是？", "options": ["set(lst)", "lst.unique()", "list(dict.fromkeys(lst))", "sorted(set(lst))"], "answer": 2, "feedback": "dict.fromkeys 保序去重；set 不保序。" }
+        {
+          "id": "ss-q1",
+          "type": "quiz",
+          "question": "JS [10, 2, 1].sort() 的结果是？",
+          "options": [
+            "[1, 2, 10]（数值序）",
+            "[2, 1, 10]",
+            "[1, 10, 2]（默认字典序，10 < 2）",
+            "报错"
+          ],
+          "answer": 2,
+          "feedback": "sort() 默认按字符串字典序比较，10 排在 2 前；数值排序必须传 (a,b)=>a-b。"
+        },
+        {
+          "id": "ss-q2",
+          "type": "quiz",
+          "question": "二分查找（binary_search）的前提是？",
+          "options": [
+            "数组已去重",
+            "数组非空",
+            "任意数组",
+            "数组已有序"
+          ],
+          "answer": 3,
+          "feedback": "二分依赖有序性，未排序输入结果是未定义行为。"
+        },
+        {
+          "id": "ss-q3",
+          "type": "quiz",
+          "question": "Python 中频繁判断元素是否存在的正确结构是？",
+          "options": [
+            "set（O(1)）",
+            "list + in（O(n)）",
+            "tuple",
+            "str"
+          ],
+          "answer": 0,
+          "feedback": "list 的 in 是线性扫描 O(n)；频繁查询应转 set/dict 哈希 O(1)。"
+        },
+        {
+          "id": "ss-q4",
+          "type": "quiz",
+          "question": "C++ 需要稳定排序（相等元素保持原序）应使用？",
+          "options": [
+            "std::sort",
+            "std::stable_sort",
+            "std::qsort",
+            "std::nth_element"
+          ],
+          "answer": 1,
+          "feedback": "std::sort 不保证稳定；stable_sort 保证相等元素相对顺序不变。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：对 [3,1,2] 排序后输出三个元素与「2 是否存在」（1=存在），统一为：1 2 3 1。",
+      "comparisonDimensions": [
+        "sort-api",
+        "stable-vs-unstable",
+        "search-complexity",
+        "custom-comparator",
+        "in-place-vs-copy"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "nums = [3, 1, 2]\nnums.sort()\nprint(nums[0], nums[1], nums[2], 1 if 2 in nums else 0)",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "sort",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "search",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const nums = [3, 1, 2];\nnums.sort((a, b) => a - b);\nconsole.log(nums[0], nums[1], nums[2], nums.includes(2) ? 1 : 0);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "sort",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "search",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "import java.util.*;\nint[] nums = {3, 1, 2};\nArrays.sort(nums);\nSystem.out.println(nums[0] + \" \" + nums[1] + \" \" + nums[2] + \" \" + (Arrays.binarySearch(nums, 2) >= 0 ? 1 : 0));",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "sort",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "search",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <algorithm>\n#include <vector>\nstd::vector<int> nums = {3, 1, 2};\nstd::sort(nums.begin(), nums.end());\nstd::cout << nums[0] << \" \" << nums[1] << \" \" << nums[2] << \" \" << (std::binary_search(nums.begin(), nums.end(), 2) ? 1 : 0);",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "sort",
+              "start": 4,
+              "end": 4
+            },
+            {
+              "role": "search",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "nums := []int{3, 1, 2}\nsort.Ints(nums)\nfound := 0\nif sort.SearchInts(nums, 2) < len(nums) && nums[sort.SearchInts(nums, 2)] == 2 { found = 1 }\nfmt.Println(nums[0], nums[1], nums[2], found)",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "sort",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "search",
+              "start": 3,
+              "end": 4
+            },
+            {
+              "role": "print",
+              "start": 5,
+              "end": 5
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "let mut nums = vec![3, 1, 2];\nnums.sort();\nprintln!(\"{} {} {} {}\", nums[0], nums[1], nums[2], if nums.contains(&2) { 1 } else { 0 });",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "sort",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "search",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        }
+      },
+      "errors": [
+        "JS sort 默认按字典序：nums.sort() 把 10 排到 2 前面——必须传数字比较器 (a,b)=>a-b",
+        "C++ 稳定性：std::sort 不保证稳定（introsort），需稳定用 std::stable_sort",
+        "二分查找前置：binary_search/binarySearch/SearchInts 要求已排序，未排序结果是未定义",
+        "Rust sort 是稳定排序但非 in-place 语义误解：mut 才能排序，不可变引用需先 clone",
+        "Python in 是线性 O(n)：频繁查找应用 set/dict；排序后 binary_search 才 O(log n)"
+      ],
+      "transferExercises": [
+        {
+          "id": "ss-tr1",
+          "type": "transfer",
+          "question": "排序稳定性的意义在于？",
+          "options": [
+            "多关键字排序时先排次键再排主键，主键相同时保持次键顺序",
+            "排序更快",
+            "省内存",
+            "避免去重"
+          ],
+          "answer": 0,
+          "feedback": "稳定排序让「先按次键排、再按主键排」的多级排序成立，主键相等时次键顺序保留。"
+        },
+        {
+          "id": "ss-tr2",
+          "type": "transfer",
+          "question": "自定义比较器（降序/按对象属性）的通用写法是？",
+          "options": [
+            "改全局变量",
+            "复制数组",
+            "传比较函数/键函数（sort(key=)/comparator/lambda）",
+            "固定升序"
+          ],
+          "answer": 2,
+          "feedback": "各语言排序 API 支持自定义比较：Python key=、JS 比较器、Java Comparator、C++ lambda、Go sort.Slice。"
+        }
       ]
     },
             {
