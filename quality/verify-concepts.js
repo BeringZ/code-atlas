@@ -30,7 +30,8 @@ const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'ca-verify-'));
 let pass = 0, fail = 0, skip = 0;
 
 function run(cmd, args, cwd) {
-  return execFileSync(cmd, args, { cwd, encoding: 'utf8', timeout: 20000, stdio: ['ignore', 'pipe', 'pipe'] });
+  // 60s 上限：CI 冷环境下 rustc/g++/javac 首次编译可能超过 20s
+  return execFileSync(cmd, args, { cwd, encoding: 'utf8', timeout: 60000, stdio: ['ignore', 'pipe', 'pipe'] });
 }
 function available(cmd) {
   try { execFileSync('sh', ['-c', `command -v ${cmd}`], { stdio: 'ignore' }); return true; }
@@ -143,7 +144,7 @@ const RUNNER = {
   java: (f) => { run('javac', [f], tmp); return run('java', ['-cp', tmp, 'Main'], tmp); },
   cpp: (f) => { run('g++', ['-std=c++17', f, '-o', path.join(tmp, 'a.out')], tmp); return run(path.join(tmp, 'a.out'), [], tmp); },
   go: (f) => { if (!available('go')) throw new Error('GO_MISSING'); return run('go', ['run', f], tmp); },
-  rust: (f) => { run('rustc', ['-O', f, '-o', path.join(tmp, 'rs.out')], tmp); return run(path.join(tmp, 'rs.out'), [], tmp); },
+  rust: (f) => { run('rustc', [f, '-o', path.join(tmp, 'rs.out')], tmp); return run(path.join(tmp, 'rs.out'), [], tmp); }, // 不启用 -O：教学片段无需优化，避免 CI 冷环境编译超时
 };
 
 console.log(`验证 L3+ 概念：${concepts.map((c) => c.id).join(', ')}`);
