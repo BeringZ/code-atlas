@@ -67,7 +67,7 @@ check('wrap go 合并 prelude 到 import 块', /prelude/.test(verifySrc.split("i
 console.log('—— 成熟度统计 ——');
 const l3 = D2.concepts.filter((c) => c.level === 'L3').length;
 const l4 = D2.concepts.filter((c) => c.level === 'L4').length;
-check(`L3 = 17（13+2 新增）`, l3 === 17, `实际 ${l3}`);
+check(`L3 = 19（13+2 新增）`, l3 === 19, `实际 ${l3}`);
 check(`L4 = 9（8+1 新增）`, l4 === 9, `实际 ${l4}`);
 
 console.log(`\n结果：${pass} 通过 / ${fail} 失败`);
