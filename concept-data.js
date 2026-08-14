@@ -2478,15 +2478,234 @@ window.CODE_ATLAS_2 = {
         }
       ]
     },
-    {
-      "id": "concurrency.channel", "module_id": "B13", "title": "Channel / 消息队列", "status": "published",
-      "objectives": ["用消息传递而非共享内存通信", "理解阻塞与缓冲语义"],
-      "prerequisites": ["concurrency.spawn-await"],
+            {
+      "id": "concurrency.channel",
+      "module_id": "B13",
+      "title": "Channel / 消息队列",
+      "status": "published",
+      "objectives": [
+        "用消息传递而非共享内存通信",
+        "理解阻塞与缓冲语义"
+      ],
+      "prerequisites": [
+        "concurrency.spawn-await"
+      ],
       "core": "「不要通过共享内存通信，要通过通信共享内存」：任务之间用 channel 传递消息，避免直接共享可变状态。channel 提供同步（无缓冲）或缓冲两种模式；关闭语义与方向（发送/接收）是各语言实现差异点。",
       "lang_diff": "Python：queue.Queue（线程）与 asyncio.Queue（协程）；JS：无内置 channel，用 Promise 或 Worker postMessage；Java：BlockingQueue（ArrayBlockingQueue 等）；C++：无标准 channel（用 mutex+condvar 或第三方）；Go：chan 内建类型（<- 发送/接收，close 关闭）；Rust：std::sync::mpsc（多生产者单消费者）。",
       "exercises": [
-        { "type": "concept", "question": "Go 内建的并发通信原语是？", "options": ["BlockingQueue", "chan", "postMessage", "Queue"], "answer": 1, "feedback": "chan 是 Go 的一等公民，支持缓冲、方向与 select。" },
-        { "type": "read", "question": "无缓冲 channel 的收发特点是？", "options": ["必须关闭", "自动缓冲", "同步交接（发送阻塞至接收就绪）", "异步"], "answer": 2, "feedback": "无缓冲 channel 要求收发同时就绪，是同步交接。" }
+        {
+          "id": "ch-q1",
+          "type": "quiz",
+          "question": "Go 中无缓冲 channel 的发送行为是？",
+          "options": [
+            "发送方阻塞直到有接收方（同步）",
+            "立即返回",
+            "缓冲到内存",
+            "自动扩容"
+          ],
+          "answer": 0,
+          "feedback": "无缓冲 channel 无存储，发送必须与接收同步配对——天然同步机制。"
+        },
+        {
+          "id": "ch-q2",
+          "type": "quiz",
+          "question": "channel 相比共享内存的核心优势是？",
+          "options": [
+            "更快",
+            "消息传递天然同步，无数据竞争",
+            "更省内存",
+            "无需同步"
+          ],
+          "answer": 1,
+          "feedback": "数据经由 channel 流动即完成同步，避免共享可变状态的竞态——「通过通信共享内存」。"
+        },
+        {
+          "id": "ch-q3",
+          "type": "quiz",
+          "question": "Go 中 close(ch) 后再向 ch 发送会？",
+          "options": [
+            "静默丢弃",
+            "阻塞",
+            "panic（向已关闭 channel 发送）",
+            "无限等待"
+          ],
+          "answer": 2,
+          "feedback": "关闭表示不再发送；向已关闭 channel 发送会触发 panic。"
+        },
+        {
+          "id": "ch-q4",
+          "type": "quiz",
+          "question": "Java BlockingQueue 的 take() 在队列空时的行为是？",
+          "options": [
+            "返回 null",
+            "抛异常",
+            "立即返回",
+            "阻塞等待元素到达"
+          ],
+          "answer": 3,
+          "feedback": "take() 阻塞直到有元素；put() 在满时阻塞——阻塞队列提供线程间同步。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：发送者向 channel 发送值 42，接收者接收并输出，统一为：42。演示「通过通信共享内存」——消息传递替代直接共享可变状态。",
+      "comparisonDimensions": [
+        "synchronization",
+        "buffering",
+        "direction",
+        "closing-semantics",
+        "blocking-behavior"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "import queue\nq = queue.Queue()\nq.put(42)\nprint(q.get())",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "send",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "recv",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "Promise.resolve(42).then((v) => console.log(v));",
+          "semantic_blocks": [
+            {
+              "role": "send",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "recv",
+              "start": 1,
+              "end": 1
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "import java.util.concurrent.*;\nBlockingQueue<Integer> q = new LinkedBlockingQueue<>();\ntry { q.put(42); System.out.println(q.take()); } catch (InterruptedException e) {}",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "send",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "recv",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "#include <future>\n#include <iostream>\nstd::promise<int> p;\nauto f = p.get_future();\np.set_value(42);\nstd::cout << f.get();",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 3,
+              "end": 4
+            },
+            {
+              "role": "send",
+              "start": 5,
+              "end": 5
+            },
+            {
+              "role": "recv",
+              "start": 6,
+              "end": 6
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "ch := make(chan int)\ngo func() { ch <- 42 }()\nfmt.Println(<-ch)",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "send",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "recv",
+              "start": 3,
+              "end": 3
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "use std::sync::mpsc;\nlet (tx, rx) = mpsc::channel();\ntx.send(42).unwrap();\nprintln!(\"{}\", rx.recv().unwrap());",
+          "semantic_blocks": [
+            {
+              "role": "declare",
+              "start": 2,
+              "end": 2
+            },
+            {
+              "role": "send",
+              "start": 3,
+              "end": 3
+            },
+            {
+              "role": "recv",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        }
+      },
+      "errors": [
+        "忘记接收：只 send 不 recv，无缓冲 channel（Go）或队列积压导致生产者永久阻塞",
+        "关闭后发送：Go close(ch) 后继续 send 会 panic——关闭是「不再发送」的信号",
+        "死锁循环等待：无缓冲 channel 上无消费者时，发送方阻塞等待接收方——必须先有接收",
+        "C++ promise 重复 set_value：同一 promise 只能 set 一次，重复调用抛 future_error",
+        "误用共享变量替代 channel：竞态（counter++ 非原子）——channel 语义是同步+传递"
+      ],
+      "transferExercises": [
+        {
+          "id": "ch-tr1",
+          "type": "transfer",
+          "question": "「扇出」模式（一个生产者多个消费者）的正确实现是？",
+          "options": [
+            "每个消费者单独 channel",
+            "多个消费者同时从同一 channel 取（Go 支持）",
+            "轮询轮询",
+            "共享锁变量"
+          ],
+          "answer": 1,
+          "feedback": "Go 多个 goroutine 可同时从同一 channel 接收，任务自然分发——fan-out 模式。"
+        },
+        {
+          "id": "ch-tr2",
+          "type": "transfer",
+          "question": "选择 Rust mpsc 还是 Go channel 的差异是？",
+          "options": [
+            "Rust mpsc 单发送者多接收者（M-S），Go 多对多",
+            "两者完全相同",
+            "Rust 有缓冲",
+            "Go 单向"
+          ],
+          "answer": 0,
+          "feedback": "Rust mpsc 是 multi-producer single-consumer（clone tx 多发送）；Go channel 任意方向多对多。"
+        }
       ]
     },
     {

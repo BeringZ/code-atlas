@@ -2062,14 +2062,210 @@ window.CODE_ATLAS_2_SUPPLEMENT = {
         { "type": "concept", "question": "纯函数的最大测试优势是？", "options": ["更快", "相同输入恒同输出，断言简单无需 mock", "省内存", "可并行"], "answer": 1, "feedback": "纯函数确定性输出，测试只需给定输入断言输出。" }
       ]
     },
-    { "id": "function.higher-order", "module_id": "B05", "title": "高阶函数与回调", "status": "published",
-      "objectives": ["用高阶函数组合行为", "理解回调在异步与事件中的角色"],
-      "prerequisites": ["function.first-class", "function.lambda"],
+            {
+      "id": "function.higher-order",
+      "module_id": "B05",
+      "title": "高阶函数与回调",
+      "status": "published",
+      "objectives": [
+        "用高阶函数组合行为",
+        "理解回调在异步与事件中的角色"
+      ],
+      "prerequisites": [
+        "function.first-class",
+        "function.lambda"
+      ],
       "core": "高阶函数：接收函数作为参数或返回函数的函数。map/filter/reduce 是典型高阶函数——把「遍历」抽象化，把「做什么」作为函数参数传入。回调是被传递并在特定时机调用的函数，广泛用于事件处理与异步编程。",
       "lang_diff": "Python：map/filter/sorted(key=f)、装饰器；JS：数组 map/filter/reduce、addEventListener 回调；Java：Stream map/filter、Comparator；C++：std::transform/sort 传 lambda；Go：把函数当参数（sort.Slice(slice, less)）；Rust：迭代器适配器 map/filter、Fn trait。",
       "exercises": [
-        { "type": "concept", "question": "sorted(items, key=len) 中 key=len 体现了？", "options": ["装饰器", "高阶函数（函数作为参数）", "递归", "继承"], "answer": 1, "feedback": "sorted 接收 key 函数决定排序依据，是高阶函数应用。" },
-        { "type": "read", "question": "JS 中 arr.map(x => x*2) 的 map 属于？", "options": ["循环", "类", "高阶函数", "异常"], "answer": 2, "feedback": "map 接收转换函数并应用到每个元素，是高阶函数。" }
+        {
+          "id": "ho-q1",
+          "type": "quiz",
+          "question": "高阶函数的定义是？",
+          "options": [
+            "返回数字的函数",
+            "带循环的函数",
+            "接收函数作参数或返回函数的函数",
+            "递归函数"
+          ],
+          "answer": 2,
+          "feedback": "高阶函数把函数当作值处理：作为参数传入或作为返回值——map/filter 是典型代表。"
+        },
+        {
+          "id": "ho-q2",
+          "type": "quiz",
+          "question": "JS 回调地狱的现代替代方案是？",
+          "options": [
+            "更多嵌套回调",
+            "全局变量",
+            "setTimeout",
+            "Promise + async/await"
+          ],
+          "answer": 3,
+          "feedback": "Promise 链 + async/await 把嵌套回调展平为顺序代码，可读性大幅提升。"
+        },
+        {
+          "id": "ho-q3",
+          "type": "quiz",
+          "question": "Rust 闭包作参数时 Fn/FnMut/FnOnce 的选择依据是？",
+          "options": [
+            "闭包如何捕获外部变量（不可变/可变/所有权）",
+            "闭包参数个数",
+            "函数名长度",
+            "返回值类型"
+          ],
+          "answer": 0,
+          "feedback": "Fn 只读捕获、FnMut 可变捕获、FnOnce 消费所有权——按捕获方式声明约束。"
+        },
+        {
+          "id": "ho-q4",
+          "type": "quiz",
+          "question": "Java 中把「加倍」逻辑传给高阶函数需要？",
+          "options": [
+            "直接传方法引用",
+            "函数式接口（Function<Integer,Integer> 或 lambda）",
+            "反射",
+            "接口实现类"
+          ],
+          "answer": 1,
+          "feedback": "Java 用函数式接口承载函数值：lambda 或方法引用赋值给 Function/Consumer 等。"
+        }
+      ],
+      "level": "L3",
+      "commonTask": "同一任务：定义高阶函数 apply(f, x)（调用参数函数 f(x)），传入 double（×2）与 5，输出统一为：10。",
+      "comparisonDimensions": [
+        "function-argument",
+        "function-return",
+        "callback",
+        "abstraction",
+        "type-signature"
+      ],
+      "variants": {
+        "python": {
+          "minimal_code": "def apply(f, x):\n    return f(x)\n\nprint(apply(lambda v: v * 2, 5))",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 2
+            },
+            {
+              "role": "call",
+              "start": 4,
+              "end": 4
+            }
+          ]
+        },
+        "javascript": {
+          "minimal_code": "const apply = (f, x) => f(x);\nconsole.log(apply((v) => v * 2, 5));",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "java": {
+          "minimal_code": "java.util.function.Function<Integer, Integer> d = v -> v * 2;\nSystem.out.println(d.apply(5));",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "cpp": {
+          "minimal_code": "auto apply = [](auto f, auto x) { return f(x); };\nstd::cout << apply([](int v) { return v * 2; }, 5);",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "go": {
+          "minimal_code": "apply := func(f func(int) int, x int) int { return f(x) }\nfmt.Println(apply(func(v int) int { return v * 2 }, 5))",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        },
+        "rust": {
+          "minimal_code": "fn apply<F: Fn(i32) -> i32>(f: F, x: i32) -> i32 { f(x) }\nprintln!(\"{}\", apply(|v| v * 2, 5));",
+          "semantic_blocks": [
+            {
+              "role": "define",
+              "start": 1,
+              "end": 1
+            },
+            {
+              "role": "call",
+              "start": 2,
+              "end": 2
+            }
+          ]
+        }
+      },
+      "errors": [
+        "回调地狱（JS）：多层嵌套回调可读性崩溃——Promise/async 替代",
+        "类型签名缺失（Python/JS）：参数不是函数时运行时才报错（TypeError），静态语言编译期拦截",
+        "C++ 泛型 lambda 传普通函数指针不兼容：接受 auto 参数按值捕获，函数指针需显式模板",
+        "Rust 闭包作为参数需 Fn/FnMut/FnOnce 约束：按捕获方式选择 trait，写错编译失败",
+        "Java 无一等函数：必须用函数式接口（Function/Consumer 等）包装——不能直接传方法名"
+      ],
+      "transferExercises": [
+        {
+          "id": "ho-tr1",
+          "type": "transfer",
+          "question": "map/filter/reduce 相比手写循环的优势是？",
+          "options": [
+            "声明式表达「做什么」，遍历细节隐藏",
+            "运行更快",
+            "内存更省",
+            "必定更短"
+          ],
+          "answer": 0,
+          "feedback": "高阶函数抽象遍历，代码声明意图；配合惰性（Rust/Python）可合并多次遍历。"
+        },
+        {
+          "id": "ho-tr2",
+          "type": "transfer",
+          "question": "回调（callback）的典型场景是？",
+          "options": [
+            "数值计算",
+            "内存管理",
+            "事件处理/异步完成通知/排序比较器",
+            "类型转换"
+          ],
+          "answer": 2,
+          "feedback": "回调在事件触发或异步完成时被调用：DOM 事件、定时器、请求回调都是。"
+        }
       ]
     },
 

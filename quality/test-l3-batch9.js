@@ -60,7 +60,7 @@ check('含二分查找前置条件反例', ss.errors.some((e) => /已排序|未�
 console.log('—— 成熟度统计 ——');
 const l3 = D2.concepts.filter((c) => c.level === 'L3').length;
 const l4 = D2.concepts.filter((c) => c.level === 'L4').length;
-check(`L3 = 23（21+2 新增）`, l3 === 23, `实际 ${l3}`);
+check(`L3 = 25（21+2 新增）`, l3 === 25, `实际 ${l3}`);
 check(`L4 = 9`, l4 === 9, `实际 ${l4}`);
 
 console.log('—— 答案分布均衡（防猜题规律）——');
