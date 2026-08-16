@@ -609,6 +609,654 @@ window.CODE_ATLAS_V2 = {
         description: "理解函数定义和调用后，下一步要搞清楚：当你把变量传给函数时，传递的是值本身还是引用？这决定了函数内部修改参数是否影响外部——这是值语义和引用语义的核心区别。",
         targetId: "function.parameter-passing"
       }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 4：参数传递（调用模型）
+    // ================================================================
+    {
+      id: "function.parameter-passing",
+      estimatedTime: 11,
+      difficulty: "beginner",
+
+      hook: {
+        question: "函数内部修改参数，会影响到外面的变量吗？",
+        code: "def add_one(x):\n    x = x + 1\n\nn = 5\nadd_one(n)\nprint(n)",
+        options: [
+          "输出 6（函数修改了 n）",
+          "输出 5（n 没有被改变）",
+          "报错（不能把变量传给函数）",
+          "输出 None（函数没有返回值）"
+        ],
+        answer: 1,
+        explanation: "Python 的 add_one(n) 把 n 的值 5 传给了参数 x。函数内 x = x + 1 只是让参数 x 重新绑定到 6，外面的 n 仍然指向 5。这是「按值传递」的直觉模型：函数拿到的是值的副本（或者指向同一对象的引用，但重新绑定参数不会影响外部变量）。理解参数传递，是理解函数副作用和值/引用语义的桥梁。"
+      },
+
+      mentalModel: {
+        title: "参数是传递进来的值，不是外面变量的遥控器",
+        description: "调用函数时，实参的值被复制到函数的参数里。函数内部对参数重新赋值，不会反向修改调用者的变量——就像你给打印机一份文件的复印件，打印机怎么涂改都不会影响你手里的原件。但要注意：如果传的是对象引用，修改对象内部是会共享的。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:16px;font-family:ui-monospace,Menlo,monospace;font-size:14px">
+  <div style="text-align:center">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px">调用前</div>
+    <div style="display:flex;gap:32px">
+      <div style="text-align:center">
+        <div style="font-size:16px;font-weight:700;color:var(--accent);border:2px solid var(--accent);border-radius:8px;padding:4px 12px">n</div>
+        <div style="font-size:18px;margin:4px 0">↓</div>
+        <div style="font-size:22px;font-weight:800">5</div>
+      </div>
+      <div style="text-align:center;opacity:.5">
+        <div style="font-size:16px;font-weight:700;border:1px dashed var(--line);border-radius:8px;padding:4px 12px">x（参数）</div>
+        <div style="font-size:18px;margin:4px 0">↓</div>
+        <div style="font-size:22px;font-weight:800">5（副本）</div>
+      </div>
+    </div>
+  </div>
+  <div style="width:2px;height:20px;background:var(--line)"></div>
+  <div style="text-align:center">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:6px">函数内 x = x + 1 之后</div>
+    <div style="display:flex;gap:32px">
+      <div style="text-align:center">
+        <div style="font-size:16px;font-weight:700;color:var(--accent);border:2px solid var(--accent);border-radius:8px;padding:4px 12px">n</div>
+        <div style="font-size:18px;margin:4px 0">↓</div>
+        <div style="font-size:22px;font-weight:800;color:var(--success)">5（不变）</div>
+      </div>
+      <div style="text-align:center">
+        <div style="font-size:16px;font-weight:700;border:1px dashed var(--line);border-radius:8px;padding:4px 12px">x（参数）</div>
+        <div style="font-size:18px;margin:4px 0">↓</div>
+        <div style="font-size:22px;font-weight:800;color:var(--danger)">6</div>
+      </div>
+    </div>
+  </div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "定义函数 add_one：参数 x，函数体为 x = x + 1。函数已定义但未执行。",
+          state: { functions: { add_one: "defined(x) → x = x + 1" }, n: undefined }
+        },
+        {
+          line: 4,
+          explanation: "创建变量 n，绑定到 5",
+          state: { functions: { add_one: "defined(x) → x = x + 1" }, n: 5 }
+        },
+        {
+          line: 5,
+          explanation: "调用 add_one(n)：创建新栈帧，把 n 的值 5 复制给参数 x。注意：不是把 n 本身传进去。",
+          state: { functions: { add_one: "defined(x) → x = x + 1" }, n: 5, callStack: [{ func: "add_one", x: 5 }] }
+        },
+        {
+          line: 2,
+          explanation: "执行 x = x + 1：x 从 5 变成 6。这只是参数 x 的重新绑定，n 不受影响。",
+          state: { functions: { add_one: "defined(x) → x = x + 1" }, n: 5, callStack: [{ func: "add_one", x: 6 }] }
+        },
+        {
+          line: 6,
+          explanation: "函数返回（没有 return，返回 None），栈帧销毁。print(n) 输出 n 的值 5",
+          state: { functions: { add_one: "defined(x) → x = x + 1" }, n: 5, output: "5" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "定义 add_one 函数，声明参数 x。函数体是 x = x + 1。" },
+        { line: 4, text: "n = 5：创建变量 n 绑定到 5。" },
+        { line: 5, text: "add_one(n)：调用函数。关键点——实参 n 的『值』5 被复制到形参 x。函数拿到的是 5 这个值，不是 n 本身。" },
+        { line: 2, text: "x = x + 1：x 变成 6。这只影响函数内的参数 x，外面的 n 仍是 5。" },
+        { line: 6, text: "print(n) 输出 5。函数没有 return，默认返回 None，但这里没有使用返回值。" }
+      ],
+
+      realWorldExample: {
+        title: "修改列表元素 vs 重新赋值参数",
+        problem: "在记账系统中，你需要写一个函数给订单打折。如果函数修改传入的列表内容，外部会看到变化（引用共享）；如果函数只是给参数重新赋值，外部不会变。理解这个区别能避免一半以上的参数相关 bug。",
+        code: "def apply_discount(order, rate):\n    for i in range(len(order)):\n        order[i] = round(order[i] * rate, 2)\n    # 修改对象内部 → 外部可见\n\ndef broken_discount(order, rate):\n    order = [round(p * rate, 2) for p in order]\n    # 重新绑定参数 → 外部不可见\n\nprices = [100, 200, 300]\napply_discount(prices, 0.9)\nprint(prices)      # [90, 180, 270] —— 修改生效\n\nprices2 = [100, 200, 300]\nbroken_discount(prices2, 0.9)\nprint(prices2)     # [100, 200, 300] —— 没变！",
+        language: "python",
+        connections: ["value.semantics", "collection.copy"]
+      },
+
+      confusions: [
+        {
+          left: "按值传递",
+          right: "按引用传递",
+          explanation: "按值传递：函数拿到值的副本，修改参数不影响外部。按引用传递：函数拿到外部变量的引用，函数内重新绑定会影响外部。多数语言（Python/Java/JS）实际是「按共享传递」——对象引用按值复制，所以修改对象内部共享，重新绑定不共享。",
+          leftExample: "def f(x):\n    x = x + 1\n\nn = 5\nf(n)\nprint(n)  # 5（值传递：不变）",
+          rightExample: "// C++ 按引用\nvoid f(int& x) {\n    x = x + 1;\n}\nint n = 5;\nf(n);\nstd::cout << n;  // 6（引用传递：改变）"
+        },
+        {
+          left: "修改参数（对象内部）",
+          right: "重新绑定参数",
+          explanation: "如果参数指向一个对象（列表/字典/对象），修改对象内部（如 list.append）是共享的——外部变量会看到。但给参数重新赋值（如 x = 新列表）只改变参数自己，外部变量不变。这是初学者最常踩的坑。",
+          leftExample: "def f(lst):\n    lst.append(1)\n\na = []\nf(a)\nprint(a)  # [1]（内部修改共享）",
+          rightExample: "def f(lst):\n    lst = [9, 9]\n\na = []\nf(a)\nprint(a)  # []（重新绑定不共享）"
+        },
+        {
+          left: "形参",
+          right: "实参",
+          explanation: "形参是函数定义时的占位变量（def f(x) 中的 x），实参是调用时传入的具体值（f(5) 中的 5）。实参的值在调用时被复制到形参中。",
+          leftExample: "def f(x, y):  # x, y 是形参\n    return x + y",
+          rightExample: "f(3, 4)  # 3, 4 是实参\n# 3→x, 4→y"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\ndef reset_score(score):\n    score = 0\n\nplayer_score = 100\nreset_score(player_score)\nprint(player_score)",
+          message: "输出 100，而不是 0",
+          cause: "score = 0 只是重新绑定了函数内的形参 score，并没有修改外面的 player_score。期望「把分数清零」的函数实际上什么都没做。",
+          fix: "返回新值并重新赋值给外部变量，或传递可变容器并修改其内部。",
+          variantCode: "# 方式 1：返回新值\ndef reset_score(score):\n    return 0\n\nplayer_score = 100\nplayer_score = reset_score(player_score)\nprint(player_score)  # 0\n\n# 方式 2：用可变容器\ndef reset_score(state):\n    state['score'] = 0\n\nstate = {'score': 100}\nreset_score(state)\nprint(state['score'])  # 0"
+        },
+        {
+          code: "// JavaScript\nfunction setToZero(list) {\n    list = [0];\n}\n\nconst arr = [1, 2, 3];\nsetToZero(arr);\nconsole.log(arr);",
+          message: "输出 [1, 2, 3]，而不是 [0]",
+          cause: "list = [0] 让形参 list 指向了一个新数组，但外面的 arr 仍指向原数组。很多初学者以为这样能「清空」数组。",
+          fix: "要修改原数组，应使用 list.length = 0 或 list.splice(0, list.length) 等修改对象内部的方法。",
+          variantCode: "function setToZero(list) {\n    list.length = 0;      // 修改对象内部\n    list.push(0);\n}\n\nconst arr = [1, 2, 3];\nsetToZero(arr);\nconsole.log(arr);  // [0]"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "function.parameter-passing.ex01",
+          level: "A",
+          type: "concept",
+          question: "调用 f(3, 4) 时，3 和 4 分别叫做什么？",
+          options: [
+            "返回值",
+            "局部变量",
+            "形参（参数）",
+            "实参（自变量）"
+          ],
+          answer: 3,
+          feedback: "调用时传入的值叫实参（argument）；函数定义时的占位符叫形参（parameter）。"
+        },
+        {
+          id: "function.parameter-passing.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\ndef change(x):\n    x = 10\n\nn = 5\nchange(n)\nprint(n)",
+          options: ["10", "5", "None", "报错"],
+          answer: 1,
+          feedback: "change(n) 传入 n 的值 5，函数内 x = 10 只改形参，外面的 n 仍是 5。"
+        },
+        {
+          id: "function.parameter-passing.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\ndef add_item(lst):\n    lst.append(9)\n\na = [1, 2]\nadd_item(a)\nprint(a)",
+          options: ["[1, 2]", "[9]", "[1, 2, 9]", "报错"],
+          answer: 2,
+          feedback: "lst.append(9) 修改的是列表对象内部，外部变量 a 和形参 lst 指向同一个列表，所以 a 变成 [1, 2, 9]。这就是「按共享传递」。"
+        },
+        {
+          id: "function.parameter-passing.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，使函数能真正把外部变量清零：",
+          options: [
+            "def reset():\n    return 0\n\nscore = 100\nscore = reset()",
+            "def reset(score):\n    score = 0\n\nscore = 100\nreset(score)",
+            "def reset(score):\n    score = 0\n    return score\n\nscore = 100\nreset(score)",
+            "def reset(score):\n    return 0\n\nscore = 100\nreset(score)"
+          ],
+          answer: 0,
+          feedback: "选项 0 正确：reset() 返回 0，外部用 score = reset() 重新绑定。选项 1 只改形参；选项 2 返回了 0 但外部没有接收；选项 3 返回了 0 但外部也没接收。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写一个函数 double_list(nums)，返回一个新列表，其中每个元素翻倍（不要修改原列表）",
+        hints: [
+          "返回新值而不是修改参数",
+          "用列表推导式或循环构建新列表",
+          "return 新列表"
+        ],
+        solution: "def double_list(nums):\n    return [n * 2 for n in nums]\n\noriginal = [1, 2, 3]\nresult = double_list(original)\nprint(original)  # [1, 2, 3] 不变\nprint(result)    # [2, 4, 6]",
+        solutionOutput: "[1, 2, 3]\n[2, 4, 6]"
+      },
+
+      connections: {
+        current: "函数",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">函数定义</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">实参 → 参数传递 → 形参</div>
+  <div>│</div>
+  <div style="color:var(--muted)">值语义 / 引用语义 / 闭包</div>
+</div>`,
+        prerequisites: ["function.lambda", "value.binding"],
+        related: ["value.semantics", "value.scope-lifetime", "function.closure"],
+        next: ["value.semantics", "function.closure"]
+      },
+
+      nextStep: {
+        title: "值语义与引用语义",
+        description: "参数传递的核心问题「修改是否共享」根源于值语义和引用语义。下一步深入学习：什么类型是值（复制时独立），什么类型是引用（复制时共享），以及可变对象的陷阱。",
+        targetId: "value.semantics"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 5：集合遍历（数据模型）
+    // ================================================================
+    {
+      id: "collection.iteration",
+      estimatedTime: 10,
+      difficulty: "beginner",
+
+      hook: {
+        question: "如何「挨个处理」集合里的每个元素？",
+        code: "scores = [82, 47, 91]\nfor s in scores:\n    print(s)",
+        options: [
+          "按索引 s[0], s[1], s[2] 手工打印",
+          "遍历：s 依次绑定到 82、47、91，各打印一次",
+          "只打印第一个元素 82",
+          "报错（不能直接 for 一个列表）"
+        ],
+        answer: 1,
+        explanation: "for 循环的本质是「遍历（iterate）」：每次迭代，循环变量 s 绑定到集合中的下一个元素，执行一次循环体。不需要你知道集合有多大，也不需要手动管理索引——遍历结构自动处理。这是所有语言处理集合的统一心智模型。"
+      },
+
+      mentalModel: {
+        title: "遍历是逐个访问元素",
+        description: "想象你有一排盒子，遍历就是从头到尾每个盒子打开看一眼。循环变量是「当前盒子的标签」——每轮循环它指向一个新元素。关键是理解：遍历只读集合、按顺序访问，循环体和集合本身是两个不同的东西。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:12px;font-family:ui-monospace,Menlo,monospace;font-size:14px">
+  <div style="font-size:12px;color:var(--muted)">集合 scores</div>
+  <div style="display:flex;gap:10px">
+    <div style="width:52px;height:52px;border:2px solid var(--accent);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(99,102,241,.08)">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)">82</div>
+      <div style="font-size:10px;color:var(--muted)">第1轮: s</div>
+    </div>
+    <div style="width:52px;height:52px;border:2px solid var(--line);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <div style="font-size:20px;font-weight:800">47</div>
+      <div style="font-size:10px;color:var(--muted)">第2轮: s</div>
+    </div>
+    <div style="width:52px;height:52px;border:2px solid var(--line);border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <div style="font-size:20px;font-weight:800">91</div>
+      <div style="font-size:10px;color:var(--muted)">第3轮: s</div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--muted)">每轮：s 指向下一个元素 → 执行循环体 → 直到末尾</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "创建列表 scores，包含 82、47、91 三个元素",
+          state: { scores: [82, 47, 91] }
+        },
+        {
+          line: 2,
+          explanation: "遍历开始：第 1 轮，循环变量 s 绑定到第一个元素 82",
+          state: { scores: [82, 47, 91], s: 82, round: 1 }
+        },
+        {
+          line: 3,
+          explanation: "print(s) 输出 82",
+          state: { scores: [82, 47, 91], s: 82, output: "82" }
+        },
+        {
+          line: 2,
+          explanation: "第 2 轮：s 重新绑定到 47",
+          state: { scores: [82, 47, 91], s: 47, round: 2 }
+        },
+        {
+          line: 3,
+          explanation: "print(s) 输出 47",
+          state: { scores: [82, 47, 91], s: 47, output: "82\n47" }
+        },
+        {
+          line: 2,
+          explanation: "第 3 轮：s 绑定到 91，输出 91。集合遍历完毕，循环结束",
+          state: { scores: [82, 47, 91], s: 91, round: 3, output: "82\n47\n91" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "创建列表 scores，包含三个元素。" },
+        { line: 2, text: "for s in scores：Python 创建一个迭代器，从集合第一个元素开始。第 1 轮，s 绑定到 82。" },
+        { line: 3, text: "执行循环体 print(s)，输出 82。循环体结束后自动回到 for 行，取下一个元素。" },
+        { line: 2, text: "第 2 轮：s 绑定到 47（覆盖上一轮的 82）。再次执行循环体。" },
+        { line: 3, text: "输出 47。循环体结束后取下一个元素 91。" },
+        { line: 2, text: "第 3 轮：s 绑定到 91，输出 91。之后迭代器发现没有更多元素，循环自然结束，继续执行循环之后的代码。" }
+      ],
+
+      realWorldExample: {
+        title: "统计不及格科目",
+        problem: "学生成绩单里有多个科目的分数，需要找出所有不及格（<60）的科目。这正是遍历的典型场景：挨个检查每个元素，符合条件的收集起来。遍历 + 条件判断 + 列表收集是数据处理最常用的组合。",
+        code: "scores = [82, 47, 91, 55, 68]\n\nfailed = []\nfor subject, score in scores.items() if isinstance(scores, dict) else enumerate(scores):\n    if score < 60:\n        failed.append((subject, score))\n\nprint(failed)  # [(1, 47), (3, 55)]",
+        language: "python",
+        connections: ["control.conditionals", "collection.filter-map-reduce"]
+      },
+
+      confusions: [
+        {
+          left: "遍历（for in）",
+          right: "按索引（for i）",
+          explanation: "for x in list 直接取元素，不需要关心位置；for i in range(n) 遍历的是索引，需要再用 list[i] 取元素。直接遍历更安全（不会越界），按索引遍历则在你需要知道位置时使用。",
+          leftExample: "for s in scores:\n    print(s)  # 直接拿元素",
+          rightExample: "for i in range(len(scores)):\n    print(i, scores[i])  # 需要位置时"
+        },
+        {
+          left: "修改集合（遍历中）",
+          right: "只读集合（遍历中）",
+          explanation: "遍历过程中修改集合（增删元素）会导致元素跳过、重复或报错（RuntimeError: list changed size during iteration）。正确做法是遍历副本，或在遍历后统一修改。",
+          leftExample: "# 危险：遍历中删除\nfor s in scores:\n    if s < 60:\n        scores.remove(s)  # 可能跳过元素",
+          rightExample: "# 安全：遍历副本\nfor s in scores[:]:\n    if s < 60:\n        scores.remove(s)"
+        },
+        {
+          left: "集合（可遍历）",
+          right: "迭代器（一次性）",
+          explanation: "集合是「可以遍历的对象」，可以重复遍历。迭代器是「遍历状态的快照」，用一次就耗尽。Python 的 iter(list) 返回迭代器；list 本身可以反复 for。",
+          leftExample: "scores = [1, 2, 3]\nfor x in scores: ...\nfor x in scores: ...  # 可以再来一次",
+          rightExample: "it = iter(scores)\nnext(it)  # 1\nnext(it)  # 2\n# 用完就没了"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\nscores = [82, 47, 91, 55]\nfor s in scores:\n    if s < 60:\n        scores.remove(s)\nprint(scores)",
+          message: "输出 [82, 91, 55]，而不是 [82, 91]",
+          cause: "遍历过程中删除元素会改变列表长度和后续元素的索引，导致 55 被跳过——因为删除 47 后，55 移动到了 47 的位置，而循环已经指向下一个位置。遍历中修改集合是经典 bug。",
+          fix: "遍历副本或先收集要删除的元素，遍历结束后再统一删除。",
+          variantCode: "# 方式 1：遍历副本\nfor s in scores[:]:\n    if s < 60:\n        scores.remove(s)\n\n# 方式 2：重建列表\nscores = [s for s in scores if s >= 60]"
+        },
+        {
+          code: "// JavaScript\nconst obj = { name: 'A', score: 82 };\nfor (const item of obj) {\n    console.log(item);\n}",
+          message: "报错：obj is not iterable",
+          cause: "for...of 只能遍历可迭代对象（数组、字符串、Map、Set 等）。普通对象没有迭代器，需要用 for...in（遍历键名）或 Object.entries()。",
+          fix: "对对象使用 Object.entries(obj) 得到 [键, 值] 对数组再遍历。",
+          variantCode: "const obj = { name: 'A', score: 82 };\nfor (const [key, value] of Object.entries(obj)) {\n    console.log(key, value);  // name A / score 82\n}"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "collection.iteration.ex01",
+          level: "A",
+          type: "concept",
+          question: "以下哪个属于「遍历」集合的正确方式？",
+          options: [
+            "scores.each()",
+            "scores.iterate",
+            "while scores:",
+            "for s in scores:"
+          ],
+          answer: 3,
+          feedback: "for s in scores 是 Python 遍历集合的标准方式。while scores 判断列表真假（非空为真），不是遍历每个元素。"
+        },
+        {
+          id: "collection.iteration.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\nnums = [1, 2, 3]\ntotal = 0\nfor n in nums:\n    total = total + n\nprint(total)",
+          options: ["123", "6", "[1, 2, 3]", "0"],
+          answer: 1,
+          feedback: "循环依次把 1、2、3 累加到 total：0+1=1，1+2=3，3+3=6。输出 6。这是累加器模式。"
+        },
+        {
+          id: "collection.iteration.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\nwords = [\"a\", \"bb\", \"ccc\"]\nfor w in words:\n    if len(w) > 1:\n        print(w)",
+          options: ["a\\nbb\\nccc", "a", "bb\\nccc", "ccc"],
+          answer: 2,
+          feedback: "len('a')=1 不大于 1，跳过；len('bb')=2 和 len('ccc')=3 满足条件，输出 bb 和 ccc。"
+        },
+        {
+          id: "collection.iteration.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，把列表中所有偶数收集到 evens：",
+          options: [
+            "evens = []\nfor n in nums:\n    if n % 2 == 0:\n        evens.append(n)",
+            "evens = []\nfor n in nums:\n    evens.append(n % 2 == 0)",
+            "evens = nums[::2]",
+            "evens = []\nfor n in nums:\n    if n % 2 != 0:\n        evens.append(n)"
+          ],
+          answer: 0,
+          feedback: "选项 0 正确：遍历每个数，偶数（n % 2 == 0）收集到新列表。选项 1 收集的是布尔值。选项 2 是每隔一个取元素，不是取偶数。选项 3 收集的是奇数。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "用遍历计算列表 nums 中所有负数的个数（例如 [-1, 2, -3] 中有 2 个）",
+        hints: [
+          "用 count 变量计数",
+          "条件是 n < 0",
+          "每遇到一个负数 count += 1"
+        ],
+        solution: "nums = [-1, 2, -3, 4, -5]\ncount = 0\nfor n in nums:\n    if n < 0:\n        count = count + 1\nprint(count)",
+        solutionOutput: "3"
+      },
+
+      connections: {
+        current: "集合",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">数组 / 列表</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">遍历 ── 过滤 / 映射 / 归约</div>
+  <div>│</div>
+  <div style="color:var(--muted)">生成器 / 迭代器</div>
+</div>`,
+        prerequisites: ["collection.array-list", "value.binding"],
+        related: ["control.loops", "collection.filter-map-reduce", "collection.map"],
+        next: ["collection.filter-map-reduce", "collection.crud"]
+      },
+
+      nextStep: {
+        title: "过滤、映射与归约",
+        description: "遍历是最基础的集合操作。下一步学习三个更高层的抽象：过滤（filter，留下符合条件的）、映射（map，变换每个元素）、归约（reduce，把集合合并成一个值）。它们让你的集合处理代码更清晰。",
+        targetId: "collection.filter-map-reduce"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 6：错误处理（异常模型）
+    // ================================================================
+    {
+      id: "error.exception-vs-result",
+      estimatedTime: 12,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "程序出错时，应该怎么「优雅地」处理？",
+        code: "# Python\nx = int(\"abc\")  # 无法转成整数\nprint(x)",
+        options: [
+          "程序崩溃并打印堆栈跟踪",
+          "x 自动变成 0",
+          "什么都不发生，x 为 undefined",
+          "打印 'abc'"
+        ],
+        answer: 0,
+        explanation: "int(\"abc\") 会抛出 ValueError 异常。如果没有 try/except 捕获，异常会向上传播直到程序崩溃，打印堆栈跟踪。这就是「异常」模型：错误发生时中断正常流程，抛出一个异常对象，由调用链上的异常处理器决定如何处理。与之相对的是「错误值」模型（如 Go）：函数返回一个表示错误的值，由调用者检查。"
+      },
+
+      mentalModel: {
+        title: "异常是抛出的信号球",
+        description: "想象程序是一条传送带。正常情况零件一路顺利加工；出错时，传送带抛出一个红色信号球（异常对象），它会顺着调用链向上「抛」（throw），直到有人接住（catch）。如果没人接住，整个系统停机（程序崩溃）。错误值模型则是：每个工位检查零件是否损坏（检查返回值），损坏就自己处理。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:14px;font-family:ui-monospace,Menlo,monospace;font-size:14px">
+  <div style="display:flex;align-items:center;gap:24px">
+    <div style="text-align:center">
+      <div style="padding:6px 14px;border:2px solid var(--accent);border-radius:8px;font-weight:700;color:var(--accent)">函数 f</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">发现错误</div>
+    </div>
+    <div style="font-size:24px;color:var(--danger)">throw ⤴</div>
+    <div style="text-align:center">
+      <div style="padding:6px 14px;border:2px solid var(--line);border-radius:8px;color:var(--muted)">调用者 g</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">没接住</div>
+    </div>
+    <div style="font-size:24px;color:var(--danger)">throw ⤴</div>
+    <div style="text-align:center">
+      <div style="padding:6px 14px;border:2px solid var(--success);border-radius:8px;font-weight:700;color:var(--success)">catch 处理器</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px">接住了！</div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--muted)">异常沿调用链向上抛，直到被 catch 接住；无人接住则程序崩溃</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "执行 int(\"abc\")：Python 尝试把字符串 'abc' 转成整数，失败",
+          state: { x: undefined }
+        },
+        {
+          line: 2,
+          explanation: "抛出 ValueError 异常，携带消息 \"invalid literal for int() with base 10: 'abc'\"。当前作用域没有 try/except，异常向上传播",
+          state: { x: undefined, exception: "ValueError: invalid literal for int()..." }
+        },
+        {
+          line: 3,
+          explanation: "print(x) 永远不会执行——异常跳过了它。异常到达顶层，程序终止并打印堆栈跟踪",
+          state: { x: undefined, outcome: "program crashed" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "int(\"abc\")：字符串 'abc' 不能被解析为整数。此时 Python 不会返回一个特殊值，而是抛出一个异常对象。" },
+        { line: 2, text: "异常类型是 ValueError。因为代码不在 try 块中，异常开始沿调用链向上传播，寻找最近的异常处理器。" },
+        { line: 3, text: "print(x) 永远不执行——异常跳过了它。异常传播到程序最顶层仍无人处理，程序终止并打印堆栈跟踪（traceback）。" }
+      ],
+
+      realWorldExample: {
+        title: "解析用户输入",
+        problem: "用户输入年龄时可能输入非数字（如 \"abc\" 或空字符串）。真实系统必须优雅处理——不能因为一个用户的输入错误就让整个程序崩溃，而是提示用户重新输入。异常处理让「正常流程」和「错误流程」分离，代码更清晰。",
+        code: "def get_age():\n    while True:\n        raw = input(\"请输入年龄: \")\n        try:\n            return int(raw)\n        except ValueError:\n            print(\"输入无效，请输入数字！\")\n\nage = get_age()\nprint(f\"年龄: {age}\")",
+        language: "python",
+        connections: ["function.parameter-passing", "control.loops"]
+      },
+
+      confusions: [
+        {
+          left: "异常模型",
+          right: "错误值模型",
+          explanation: "异常模型（Python/Java/JS）：错误发生时中断流程，抛出异常对象，由 catch 处理。错误值模型（Go）：函数返回 (result, error)，调用者检查 err != nil。异常让错误处理不打断主流程，错误值让错误处理显式可见。",
+          leftExample: "try:\n    x = int(s)\nexcept ValueError:\n    print(\"转换失败\")",
+          rightExample: "// Go\nx, err := strconv.Atoi(s)\nif err != nil {\n    fmt.Println(\"转换失败\")\n}"
+        },
+        {
+          left: "抛出异常（throw）",
+          right: "捕获异常（catch）",
+          explanation: "throw/raise 是主动制造异常信号；try/catch 是接住异常并处理。抛出和捕获可以在不同的函数中——抛出点只需要表达「这里出错了」，由调用链上合适的处理器决定如何处理。",
+          leftExample: "def check(age):\n    if age < 0:\n        raise ValueError(\"年龄不能为负\")",
+          rightExample: "try:\n    check(-5)\nexcept ValueError as e:\n    print(\"参数错误:\", e)"
+        },
+        {
+          left: "错误处理",
+          right: "程序崩溃",
+          explanation: "错误处理是程序主动响应异常（提示用户、重试、降级）。程序崩溃是异常无人处理时被迫终止。同一个异常，处理了就是「优雅降级」，不处理就是「崩溃」——区别只在于是否有人 catch。",
+          leftExample: "try:\n    x = int(raw)\nexcept ValueError:\n    x = 0  # 降级为默认值",
+          rightExample: "x = int(raw)  # 输入非法 → 崩溃\n# Traceback (most recent call last): ..."
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\ndef divide(a, b):\n    return a / b\n\nresult = divide(10, 0)\nprint(result)",
+          message: "崩溃：ZeroDivisionError: division by zero",
+          cause: "除以 0 抛出 ZeroDivisionError，代码没有捕获。异常直接传播到顶层导致程序崩溃。",
+          fix: "在可能出错的调用点捕获异常，或先检查除数是否为 0。",
+          variantCode: "# 方式 1：捕获异常\ntry:\n    result = divide(10, 0)\n    print(result)\nexcept ZeroDivisionError:\n    print(\"除数不能为 0\")\n\n# 方式 2：先检查\ndef divide(a, b):\n    if b == 0:\n        return None  # 或 raise ValueError(\"除数为 0\")\n    return a / b"
+        },
+        {
+          code: "# Python\ntry:\n    x = int(\"abc\")\nexcept ValueError:\n    print(\"转换失败\")\n\nprint(x)",
+          message: "崩溃：NameError: name 'x' is not defined",
+          cause: "int(\"abc\") 抛出异常后，x 从未被赋值。except 块打印提示后，程序继续执行，但 x 不存在。捕获异常后，代码仍要处理「变量未定义」的后果。",
+          fix: "在 except 块中给 x 一个默认值，或把后续依赖 x 的代码也放进 try 块。",
+          variantCode: "try:\n    x = int(\"abc\")\nexcept ValueError:\n    x = 0  # 默认值\n\nprint(x)  # 0，程序不崩溃"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "error.exception-vs-result.ex01",
+          level: "A",
+          type: "concept",
+          question: "Python 中 int(\"abc\") 会发生什么？",
+          options: [
+            "返回 0",
+            "返回 None",
+            "静默失败",
+            "抛出 ValueError 异常"
+          ],
+          answer: 3,
+          feedback: "int() 无法解析 'abc' 时抛出 ValueError 异常。Python 使用异常模型而非错误值模型。"
+        },
+        {
+          id: "error.exception-vs-result.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\ntry:\n    x = int(\"abc\")\n    print(\"成功\")\nexcept ValueError:\n    print(\"失败\")\nprint(\"结束\")",
+          options: ["失败\\n结束", "成功\\n结束", "失败", "崩溃"],
+          answer: 0,
+          feedback: "int(\"abc\") 抛异常，跳过 print(\"成功\")，进入 except 块输出「失败」，然后程序继续输出「结束」。"
+        },
+        {
+          id: "error.exception-vs-result.ex03",
+          level: "B",
+          type: "read",
+          question: "Go 语言通常如何处理函数错误？",
+          options: [
+            "抛出异常，由调用者 catch",
+            "程序自动重试",
+            "函数返回 (result, error)，调用者检查 err",
+            "忽略错误"
+          ],
+          answer: 2,
+          feedback: "Go 采用错误值模型：函数返回结果和 error 两个值，调用者显式检查 err != nil。没有 try/catch 机制。"
+        },
+        {
+          id: "error.exception-vs-result.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，让除法在除数为 0 时输出「除数不能为 0」而不是崩溃：",
+          options: [
+            "if b == 0:\n    print(\"除数不能为 0\")\nresult = a / b\nprint(result)",
+            "try:\n    result = a / b\n    print(result)\nexcept ZeroDivisionError:\n    print(\"除数不能为 0\")",
+            "result = a / b or \"除数不能为 0\"\nprint(result)",
+            "try:\n    result = a / b\nexcept:\n    pass\nprint(result)"
+          ],
+          answer: 1,
+          feedback: "选项 0 正确：try 中执行除法，ZeroDivisionError 被捕获并提示。选项 1 打印提示后仍然执行了除法（崩溃）。选项 3 捕获异常但 pass 后 result 未定义。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写一个安全转换函数 safe_int(s)：转换成功返回整数，失败返回 None",
+        hints: [
+          "用 try/except 包裹 int(s)",
+          "except ValueError 时返回 None",
+          "成功时返回转换结果"
+        ],
+        solution: "def safe_int(s):\n    try:\n        return int(s)\n    except ValueError:\n        return None\n\nprint(safe_int(\"42\"))   # 42\nprint(safe_int(\"abc\"))  # None",
+        solutionOutput: "42\nNone"
+      },
+
+      connections: {
+        current: "错误处理",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">函数调用</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">异常模型 ── 错误值模型</div>
+  <div>│</div>
+  <div style="color:var(--muted)">错误传播 / 自定义错误</div>
+</div>`,
+        prerequisites: ["function.lambda", "function.parameter-passing"],
+        related: ["error.try-catch", "error.custom-types", "value.nullability"],
+        next: ["error.propagation", "error.custom-types"]
+      },
+
+      nextStep: {
+        title: "错误传播与包装",
+        description: "理解异常和错误值的区别后，下一步学习：错误在调用链中如何逐层传播、何时应该包装（添加上下文信息）、何时应该立即处理。这决定了大型系统的错误信息质量。",
+        targetId: "error.propagation"
+      }
     }
   ]
 };
