@@ -52,7 +52,7 @@ window.CodeAtlas2 = (() => {
     return next;
   }
 
-  // ===== 知识点进度（浏览 / 理解 / 练习通过） =====
+  // ===== 知识点进度（v1: browsed/understood/passed + v2: viewed/quiz/challenge/selfAssessment/score） =====
   const PROG_KEY = "code-atlas-progress";
   function loadProgress() {
     try { return JSON.parse(localStorage.getItem(PROG_KEY) || "{}"); }
@@ -63,13 +63,52 @@ window.CodeAtlas2 = (() => {
     const p = loadProgress();
     p[id] = p[id] || {};
     p[id][field] = true;
+    // v1 兼容：viewed → browsed
+    if (field === "viewed") p[id].browsed = true;
     saveProgress(p);
   }
   function getProgress(id) { return (loadProgress())[id] || {}; }
+
+  // v2: 自评
+  function setSelfAssessment(id, level) {
+    const p = loadProgress();
+    p[id] = p[id] || {};
+    p[id].selfAssessment = level;
+    saveProgress(p);
+    updateMasteryScore(id);
+  }
+
+  // v2: 计算 mastery score (0-100)
+  // viewed=10, hookCompleted=10, quiz correct ratio=30, challengeCompleted=20, selfAssessment=30
+  function updateMasteryScore(id) {
+    const p = loadProgress();
+    const prog = p[id] || {};
+    let score = 0;
+    if (prog.viewed || prog.browsed) score += 10;
+    if (prog.hookCompleted) score += 10;
+    // quiz: count passed exercises (simplified — each passed = portion of 30)
+    if (prog.passed) score += 15;
+    if (prog.quiz) {
+      const ratio = prog.quiz.total > 0 ? prog.quiz.correct / prog.quiz.total : 0;
+      score += Math.round(ratio * 15);
+    } else {
+      score += 0;
+    }
+    if (prog.challengeCompleted) score += 20;
+    // selfAssessment: 0=0, 1=10, 2=20, 3=30
+    const saMap = [0, 10, 20, 30];
+    score += saMap[prog.selfAssessment || 0];
+    score = Math.min(100, score);
+    p[id] = prog;
+    p[id].score = score;
+    saveProgress(p);
+    return score;
+  }
+
   function progressSummary() {
     const p = loadProgress();
     return {
-      browsed: Object.values(p).filter((v) => v.browsed).length,
+      browsed: Object.values(p).filter((v) => v.browsed || v.viewed).length,
       understood: Object.values(p).filter((v) => v.understood).length,
       passed: Object.values(p).filter((v) => v.passed).length,
     };
@@ -210,6 +249,7 @@ window.CodeAtlas2 = (() => {
   return {
     loadTheme, saveTheme, initTheme, toggleTheme,
     loadProgress, saveProgress, markProgress, getProgress, progressSummary,
+    setSelfAssessment, updateMasteryScore,
     buildIndex, search, bindSearch,
     markConceptLevels, maturityStats,
     esc, qs, langById, showToast, highlight, applySemanticHighlights,

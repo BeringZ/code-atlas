@@ -31,7 +31,7 @@ const mainIdsBeforeMerge = new Set((sandboxMain.window.CODE_ATLAS_2.concepts || 
 
 const sandbox = { window: {} };
 vm.createContext(sandbox);
-['concept-data.js', 'concepts-supplement.js', 'advanced-data.js'].forEach((f) => {
+['concept-data.js', 'concepts-supplement.js', 'concept-v2-data.js', 'advanced-data.js'].forEach((f) => {
   vm.runInContext(fs.readFileSync(path.join(root, f), 'utf8'), sandbox, { filename: f });
 });
 const D2 = sandbox.window.CODE_ATLAS_2;
@@ -210,9 +210,135 @@ if (contractErr === 0) {
   notes.push(`L3/L4 结构合同全部满足（${concepts.filter((c) => c.level === 'L3' || c.level === 'L4').length} 个精讲概念）`);
 }
 
+// 10) v2 微型课程合同（含 hook 字段的概念须满足完整 v2 结构）
+//     v2 必须有：hook, mentalModel, executionSteps, walkthrough, realWorldExample,
+//                confusions(≥1), challenge, connections, nextStep,
+//                exercises 带 level(至少 A/B/C 三级), exercises 带 id(唯一)
+const v2Fields = ["hook", "mentalModel", "executionSteps", "walkthrough", "realWorldExample", "confusions", "challenge", "connections", "nextStep"];
+const v2Concepts = concepts.filter((c) => c.hook);
+let v2Err = 0;
+const v2ExerciseIds = new Set();
+
+if (v2Concepts.length > 0) {
+  notes.push(`v2 微型课程概念：${v2Concepts.length} 个（${v2Concepts.map((c) => c.id).join(", ")}）`);
+
+  v2Concepts.forEach((c) => {
+    // 必须字段存在
+    v2Fields.forEach((f) => {
+      if (c[f] === undefined || c[f] === null) {
+        v2Err++;
+        errors.push(`概念 ${c.id}（v2）缺字段：${f}`);
+      }
+    });
+
+    // hook 结构
+    if (c.hook) {
+      const h = c.hook;
+      if (!h.question || !h.options || !Array.isArray(h.options) || h.options.length < 2) {
+        v2Err++; errors.push(`概念 ${c.id}（v2）hook 结构不完整（需 question + options ≥2）`);
+      }
+      if (!Number.isInteger(h.answer) || h.answer < 0 || h.answer >= (h.options || []).length) {
+        v2Err++; errors.push(`概念 ${c.id}（v2）hook answer 越界`);
+      }
+      if (!h.explanation) {
+        v2Err++; errors.push(`概念 ${c.id}（v2）hook 缺 explanation`);
+      }
+    }
+
+    // mentalModel 结构
+    if (c.mentalModel && (!c.mentalModel.title || !c.mentalModel.diagram)) {
+      v2Err++; errors.push(`概念 ${c.id}（v2）mentalModel 需 title + diagram`);
+    }
+
+    // executionSteps 结构
+    if (c.executionSteps) {
+      if (!Array.isArray(c.executionSteps) || c.executionSteps.length < 1) {
+        v2Err++; errors.push(`概念 ${c.id}（v2）executionSteps 至少 1 步`);
+      } else {
+        c.executionSteps.forEach((s, i) => {
+          if (!Number.isInteger(s.line) || s.line < 1) { v2Err++; errors.push(`概念 ${c.id}（v2）executionSteps[${i}] line 无效`); }
+          if (!s.explanation) { v2Err++; errors.push(`概念 ${c.id}（v2）executionSteps[${i}] 缺 explanation`); }
+        });
+      }
+    }
+
+    // walkthrough 结构
+    if (c.walkthrough) {
+      if (!Array.isArray(c.walkthrough) || c.walkthrough.length < 1) {
+        v2Err++; errors.push(`概念 ${c.id}（v2）walkthrough 至少 1 条`);
+      }
+    }
+
+    // confusions ≥ 1
+    if (c.confusions && (!Array.isArray(c.confusions) || c.confusions.length < 1)) {
+      v2Err++; errors.push(`概念 ${c.id}（v2）confusions 至少 1 项`);
+    }
+
+    // exercises 带 level 和 id
+    if (c.exercises) {
+      const levels = new Set();
+      c.exercises.forEach((ex, i) => {
+        if (!ex.level) {
+          v2Err++; errors.push(`概念 ${c.id}（v2）exercises[${i}] 缺 level（A/B/C/D）`);
+        } else {
+          levels.add(ex.level);
+        }
+        if (!ex.id) {
+          warnings.push(`概念 ${c.id}（v2）exercises[${i}] 缺 id（建议格式 concept.exNN）`);
+        } else {
+          if (v2ExerciseIds.has(ex.id)) { v2Err++; errors.push(`练习 id 重复：${ex.id}`); }
+          v2ExerciseIds.add(ex.id);
+        }
+      });
+      // 至少 A/B/C 三级
+      ["A", "B", "C"].forEach((lv) => {
+        if (!levels.has(lv)) {
+          v2Err++; errors.push(`概念 ${c.id}（v2）exercises 缺 Level ${lv}（至少需 A/B/C 三级）`);
+        }
+      });
+    }
+
+    // challenge 结构
+    if (c.challenge && (!c.challenge.prompt || !c.challenge.solution)) {
+      v2Err++; errors.push(`概念 ${c.id}（v2）challenge 需 prompt + solution`);
+    }
+
+    // connections 结构
+    if (c.connections && (!c.connections.current || !c.connections.diagram)) {
+      v2Err++; errors.push(`概念 ${c.id}（v2）connections 需 current + diagram`);
+    }
+
+    // nextStep 结构
+    if (c.nextStep && (!c.nextStep.title || !c.nextStep.targetId)) {
+      v2Err++; errors.push(`概念 ${c.id}（v2）nextStep 需 title + targetId`);
+    }
+    // nextStep targetId 有效性
+    if (c.nextStep && c.nextStep.targetId && !ids.has(c.nextStep.targetId)) {
+      v2Err++; errors.push(`概念 ${c.id}（v2）nextStep.targetId "${c.nextStep.targetId}" 无效`);
+    }
+
+    // connections 引用有效性
+    if (c.connections) {
+      (c.connections.prerequisites || []).forEach((p) => { if (!ids.has(p)) { v2Err++; errors.push(`概念 ${c.id}（v2）connections.prerequisites "${p}" 无效`); } });
+      (c.connections.related || []).forEach((p) => { if (!ids.has(p)) { v2Err++; errors.push(`概念 ${c.id}（v2）connections.related "${p}" 无效`); } });
+      (c.connections.next || []).forEach((p) => { if (!ids.has(p)) { v2Err++; errors.push(`概念 ${c.id}（v2）connections.next "${p}" 无效`); } });
+    }
+
+    // realWorldExample connections 有效性
+    if (c.realWorldExample && c.realWorldExample.connections) {
+      c.realWorldExample.connections.forEach((p) => { if (!ids.has(p)) { v2Err++; errors.push(`概念 ${c.id}（v2）realWorldExample.connections "${p}" 无效`); } });
+    }
+  });
+
+  if (v2Err === 0) {
+    notes.push(`v2 微型课程合同全部满足（${v2Concepts.length} 个概念，${v2ExerciseIds.size} 个练习 ID）`);
+  }
+}
+
 // —— 汇总 ——
 console.log(`Code Atlas 数据质检（${concepts.length} 个概念 / ${modules.length} 个模块）`);
 console.log(`成熟度分布：L1=${levelCount.L1}  L2=${levelCount.L2}  L3=${levelCount.L3}  L4=${levelCount.L4}`);
+console.log(`v2 微型课程：${v2Concepts.length} 个`);
 console.log(`错误 ${errors.length} · 警告 ${warnings.length}`);
 notes.forEach((n) => console.log(`  [INFO] ${n}`));
 errors.forEach((e) => console.log(`  [ERROR] ${e}`));

@@ -1,21 +1,138 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://beringz.github.io/code-atlas/schema/concept.schema.json",
-  "title": "Code Atlas 概念数据合同 v1",
-  "description": "每个知识点（concept）的统一数据合同。按《内容质量升级落地计划书》八层内容结构建模：问题场景 → 语言无关模型 → 最小可运行案例 → 六语言同题实现 → 语义差异矩阵 → 常见错误与反例 → 跨语言迁移练习 → 综合验收。兼容现有 concept-data.js 字段。",
+  "title": "Code Atlas 概念数据合同 v2",
+  "description": "知识点（concept）统一数据合同 v2。在 v1 基础上新增微型课程字段：hook / mentalModel / executionSteps / walkthrough / realWorldExample / confusions / challenge / connections / nextStep。所有 v2 字段可选，向后兼容（if (concept.hook) renderHook()）。L3 v2 概念（含 hook 字段）须满足完整微型课程合同。",
   "type": "object",
   "properties": {
-    "id": { "type": "string", "pattern": "^[a-z][a-z0-9.-]*$", "description": "知识点唯一 ID，如 value.binding" },
-    "status": { "type": "string", "enum": ["published", "draft"], "description": "显示态：published 可见，draft 建设中占位" },
-    "level": { "type": "string", "enum": ["L1", "L2", "L3", "L4"], "description": "内容成熟度：L1 概览 / L2 标准 / L3 精讲 / L4 实验（计划书四级）" },
-    "module_id": { "type": "string", "description": "所属模块 ID，必须存在于 CODE_ATLAS_2.modules" },
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9.-]*$", "description": "知识点唯一 ID" },
+    "status": { "type": "string", "enum": ["published", "draft"] },
+    "level": { "type": "string", "enum": ["L1", "L2", "L3", "L4"] },
+    "module_id": { "type": "string" },
     "title": { "type": "string", "minLength": 1 },
-    "objectives": { "type": "array", "items": { "type": "string" }, "description": "学习目标（问题场景层）" },
-    "prerequisites": { "type": "array", "items": { "type": "string" }, "description": "前置知识点 ID 列表，必须有效且无循环依赖" },
-    "core": { "type": "string", "minLength": 1, "description": "语言无关模型（核心解释）" },
+
+    "objectives": { "type": "array", "items": { "type": "string" } },
+    "prerequisites": { "type": "array", "items": { "type": "string" } },
+    "core": { "type": "string", "minLength": 1 },
+
+    "estimatedTime": { "type": "integer", "description": "预计学习时间（分钟）", "minimum": 1 },
+    "difficulty": { "type": "string", "enum": ["beginner", "intermediate", "advanced"], "description": "难度等级" },
+
+    "hook": {
+      "type": "object",
+      "description": "问题引入：制造认知冲突，让用户先猜再学",
+      "required": ["question", "options", "answer"],
+      "properties": {
+        "question": { "type": "string" },
+        "code": { "type": "string", "description": "引发问题的代码片段" },
+        "options": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+        "answer": { "type": "integer", "minimum": 0 },
+        "explanation": { "type": "string", "description": "为什么答案是正确的" }
+      }
+    },
+
+    "mentalModel": {
+      "type": "object",
+      "description": "心智模型：用 HTML/CSS 图示建立抽象概念的视觉锚点",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "diagram": { "type": "string", "description": "HTML 片段，直接渲染为可视化图示" }
+      }
+    },
+
+    "executionSteps": {
+      "type": "array",
+      "description": "程序执行过程：逐步展示代码行与变量状态变化",
+      "items": {
+        "type": "object",
+        "required": ["line", "explanation"],
+        "properties": {
+          "line": { "type": "integer", "minimum": 1 },
+          "explanation": { "type": "string" },
+          "state": { "type": "object", "description": "当前行执行后的变量状态 { varName: value }" }
+        }
+      }
+    },
+
+    "walkthrough": {
+      "type": "array",
+      "description": "逐行解释：最小示例的每行代码含义",
+      "items": {
+        "type": "object",
+        "required": ["line", "text"],
+        "properties": {
+          "line": { "type": "integer", "minimum": 1 },
+          "text": { "type": "string" }
+        }
+      }
+    },
+
+    "realWorldExample": {
+      "type": "object",
+      "description": "真实场景：最小示例之后的实际应用案例",
+      "properties": {
+        "title": { "type": "string" },
+        "problem": { "type": "string", "description": "要解决的实际问题" },
+        "code": { "type": "string" },
+        "language": { "type": "string", "description": "代码使用的语言" },
+        "connections": { "type": "array", "items": { "type": "string" }, "description": "连接到的其他知识点 ID" }
+      }
+    },
+
+    "confusions": {
+      "type": "array",
+      "description": "易混概念：并排对比容易混淆的概念对",
+      "items": {
+        "type": "object",
+        "required": ["left", "right", "explanation"],
+        "properties": {
+          "left": { "type": "string" },
+          "right": { "type": "string" },
+          "explanation": { "type": "string" },
+          "leftExample": { "type": "string" },
+          "rightExample": { "type": "string" }
+        }
+      }
+    },
+
+    "challenge": {
+      "type": "object",
+      "description": "30 秒挑战：要求用户主动输出一次",
+      "properties": {
+        "title": { "type": "string" },
+        "prompt": { "type": "string" },
+        "hints": { "type": "array", "items": { "type": "string" } },
+        "solution": { "type": "string", "description": "参考答案代码" },
+        "solutionOutput": { "type": "string", "description": "预期输出" }
+      }
+    },
+
+    "connections": {
+      "type": "object",
+      "description": "知识连接：当前知识点在知识图谱中的位置",
+      "properties": {
+        "current": { "type": "string", "description": "当前所在的知识域" },
+        "diagram": { "type": "string", "description": "HTML 片段，知识图谱可视化" },
+        "prerequisites": { "type": "array", "items": { "type": "string" } },
+        "related": { "type": "array", "items": { "type": "string" } },
+        "next": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "nextStep": {
+      "type": "object",
+      "description": "下一步：学完本节后的推荐路径",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "targetId": { "type": "string", "description": "目标知识点 ID" }
+      }
+    },
+
     "variants": {
       "type": "object",
-      "description": "六语言同题实现（同一任务/输入/输出协议）",
+      "description": "六语言同题实现",
       "properties": {
         "python": { "$ref": "#/definitions/variant" },
         "javascript": { "$ref": "#/definitions/variant" },
@@ -23,35 +140,55 @@
         "cpp": { "$ref": "#/definitions/variant" },
         "go": { "$ref": "#/definitions/variant" },
         "rust": { "$ref": "#/definitions/variant" }
-      },
-      "minProperties": 0
+      }
     },
+
     "comparisonDimensions": {
       "type": "array",
-      "description": "语义差异矩阵维度（文档工作流 I），现有 lang_diff 文本可迁移为结构化矩阵",
       "items": { "type": "string", "enum": ["type-checking", "mutability", "memory-model", "failure-mode", "idiomatic-style", "runtime-cost", "unicode-representation", "error-propagation", "ownership"] }
     },
-    "lang_diff": { "type": "string", "description": "兼容字段：跨语言差异说明文本（L1/L2 可用，L3+ 应逐步迁移到 comparisonDimensions 结构化矩阵）" },
-    "errors": { "type": "array", "items": { "type": "object" }, "description": "常见错误与反例（每项至少含 code/explanation）" },
+    "lang_diff": { "type": "string" },
+    "commonTask": { "type": "object" },
+    "transferExercises": { "type": "array" },
+    "acceptanceTests": { "type": "array" },
+
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "cause": { "type": "string" },
+          "fix": { "type": "string" },
+          "variantCode": { "type": "string", "description": "v2: 变体问题——为什么类似代码合法" }
+        }
+      }
+    },
+
     "exercises": {
       "type": "array",
-      "description": "练习（概念识别/代码输出/错误定位/跨语言迁移/设计选择）",
+      "description": "练习：支持四级难度 A-识别 / B-预测 / C-修改 / D-生成",
       "items": {
         "type": "object",
         "required": ["type", "question", "options", "answer"],
         "properties": {
-          "type": { "type": "string", "enum": ["concept", "read", "output", "debug", "migrate", "design"] },
+          "id": { "type": "string", "description": "练习唯一 ID，如 value.binding.ex01" },
+          "level": { "type": "string", "enum": ["A", "B", "C", "D"], "description": "A-识别 B-预测 C-修改 D-生成" },
+          "type": { "type": "string", "enum": ["concept", "read", "output", "debug", "migrate", "design", "pair", "fill"] },
           "question": { "type": "string" },
           "options": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
           "answer": { "type": "integer", "minimum": 0 },
-          "feedback": { "type": "string" }
+          "feedback": { "type": "string" },
+          "starterCode": { "type": "string", "description": "C/D 级练习的起始代码" }
         }
       }
     },
-    "deep_dive": { "type": "string", "description": "精讲（L3）：反例/错误案例/状态解释" },
+
+    "deep_dive": { "type": "string" },
     "summary": { "type": "string" },
-    "next": { "type": "array", "items": { "type": "string" }, "description": "后续知识点（反向引用，校验有效性）" },
-    "related_advanced": { "type": "array", "items": { "type": "string" }, "description": "关联的语言进阶专题 ID" }
+    "next": { "type": "array", "items": { "type": "string" } },
+    "related_advanced": { "type": "array", "items": { "type": "string" } }
   },
   "required": ["id", "status", "module_id", "title"],
   "additionalProperties": true,
@@ -60,10 +197,9 @@
       "type": "object",
       "properties": {
         "version": { "type": "string" },
-        "minimal_code": { "type": "string", "description": "最小可运行案例" },
+        "minimal_code": { "type": "string" },
         "semantic_blocks": {
           "type": "array",
-          "description": "语义块（角色 + 行号区间），行号必须不越界",
           "items": {
             "type": "object",
             "required": ["role", "start", "end"],
@@ -75,7 +211,10 @@
           }
         },
         "syntax_notes": { "type": "array", "items": { "type": "string" } },
-        "semantic_notes": { "type": "array", "items": { "type": "string" } }
+        "semantic_notes": { "type": "array", "items": { "type": "string" } },
+        "idioms": { "type": "array", "items": { "type": "string" } },
+        "pitfalls": { "type": "array", "items": { "type": "string" } },
+        "comparison": { "type": "object" }
       },
       "required": ["minimal_code"]
     }
