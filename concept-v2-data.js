@@ -1257,6 +1257,627 @@ window.CODE_ATLAS_V2 = {
         description: "理解异常和错误值的区别后，下一步学习：错误在调用链中如何逐层传播、何时应该包装（添加上下文信息）、何时应该立即处理。这决定了大型系统的错误信息质量。",
         targetId: "error.propagation"
       }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 7：类与对象（对象模型）
+    // ================================================================
+    {
+      id: "model.record-struct-class",
+      estimatedTime: 13,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "一个学生需要姓名、分数、邮箱三个信息，怎么组织？",
+        code: "# Python\nclass Student:\n    def __init__(self, name, score):\n        self.name = name\n        self.score = score\n\ns = Student(\"小明\", 92)\nprint(s.name)",
+        options: [
+          "用三个独立变量 name、score、email 分别存",
+          "把相关数据和方法打包成一个「对象」，通过 s.name 访问",
+          "只能用字典 {'name': ..., 'score': ...}",
+          "报错（class 语法错误）"
+        ],
+        answer: 1,
+        explanation: "类（class）把相关的数据（属性）和行为（方法）打包成一个模板。Student(\"小明\", 92) 根据模板创建了一个具体的学生对象 s，s.name 访问它的属性。这比三个散落的变量更符合现实：学生这个概念天然包含姓名、分数等，还可能有 get_grade() 这样的行为。这是对象模型的核心：数据 + 行为 绑定在一起。"
+      },
+
+      mentalModel: {
+        title: "类是模具，对象是成品",
+        description: "类（class）像模具：定义了一个「学生」应该有什么属性和方法。对象（instance）是模具造出的具体成品：每一个具体的学生有自己的姓名和分数。模具共享（模板定义一次），成品独立（每个对象的数据互不影响）。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:14px;font-family:ui-monospace,Menlo,monospace;font-size:14px">
+  <div style="text-align:center">
+    <div style="padding:8px 20px;border:2px solid var(--accent);border-radius:12px;font-weight:700;color:var(--accent);font-size:15px">class Student（模具/模板）</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px">属性: name, score │ 方法: __init__, get_grade</div>
+  </div>
+  <div style="font-size:22px">↓ 实例化（new / Student(...)）</div>
+  <div style="display:flex;gap:24px">
+    <div style="text-align:center;border:1px solid var(--line);border-radius:10px;padding:8px 16px">
+      <div style="font-weight:700">对象 s1</div>
+      <div style="font-size:12px;color:var(--muted)">name: 小明<br>score: 92</div>
+    </div>
+    <div style="text-align:center;border:1px solid var(--line);border-radius:10px;padding:8px 16px">
+      <div style="font-weight:700">对象 s2</div>
+      <div style="font-size:12px;color:var(--muted)">name: 小红<br>score: 88</div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--muted)">每个对象的数据独立，但都来自同一个类模板</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "定义类 Student：声明了 __init__ 构造函数。此时只创建了模板，还没有任何学生对象",
+          state: { classes: { Student: "defined(name, score)" } }
+        },
+        {
+          line: 2,
+          explanation: "def __init__(self, name, score)：构造函数的定义。self 指代将来创建的那个对象本身",
+          state: { classes: { Student: "defined(name, score)" } }
+        },
+        {
+          line: 6,
+          explanation: "执行 Student(\"小明\", 92)：调用构造函数。Python 自动创建新对象并绑定到 self，把 \"小明\" 赋给 self.name，92 赋给 self.score",
+          state: { classes: { Student: "defined(name, score)" }, objects: [{ id: "s", name: "小明", score: 92 }] }
+        },
+        {
+          line: 6,
+          explanation: "构造完成，返回新对象。变量 s 绑定到这个对象",
+          state: { classes: { Student: "defined(name, score)" }, s: { name: "小明", score: 92 } }
+        },
+        {
+          line: 7,
+          explanation: "print(s.name)：通过对象访问属性，输出 小明",
+          state: { classes: { Student: "defined(name, score)" }, s: { name: "小明", score: 92 }, output: "小明" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "class Student：定义类，创建模板。类名通常大写开头。" },
+        { line: 2, text: "def __init__(self, name, score)：构造函数，在创建对象时自动调用。self 表示新创建的对象本身，self.name = name 把参数存进对象。" },
+        { line: 6, text: "Student(\"小明\", 92)：实例化。Python 创建空对象 → 调用 __init__ 初始化 → 返回对象。" },
+        { line: 7, text: "s.name：点号访问属性，取出对象里存的 '小明' 并输出。" }
+      ],
+
+      realWorldExample: {
+        title: "游戏角色系统",
+        problem: "游戏里每个角色都有血量、攻击力、名字，还有受伤（take_damage）和攻击（attack）的行为。用类组织，每个角色对象自己管自己的数据；用散乱变量，几百个角色会变成灾难。对象模型让「数据 + 行为」天然内聚。",
+        code: "class Character:\n    def __init__(self, name, hp, attack):\n        self.name = name\n        self.hp = hp\n        self.attack = attack\n\n    def take_damage(self, amount):\n        self.hp -= amount\n        if self.hp < 0:\n            self.hp = 0\n        print(f'{self.name} 受到 {amount} 伤害，剩余 HP {self.hp}')\n\n    def is_alive(self):\n        return self.hp > 0\n\nhero = Character('勇者', 100, 15)\ndragon = Character('恶龙', 120, 20)\n\ndragon.take_damage(hero.attack)  # 恶龙 受到 15 伤害\nprint(dragon.is_alive())          # True",
+        language: "python",
+        connections: ["collection.map", "function.lambda"]
+      },
+
+      confusions: [
+        {
+          left: "类（class）",
+          right: "对象（instance）",
+          explanation: "类是模板/蓝图，定义属性和方法；对象是模板的实例，有具体的数据。类只有一个，对象可以有无数个。比如「学生」是类，「小明」是对象。",
+          leftExample: "class Student:  # 类：模板\n    def __init__(self, name):\n        self.name = name",
+          rightExample: "s1 = Student(\"小明\")  # 对象：实例\ns2 = Student(\"小红\")  # 另一个对象\n# s1.name 和 s2.name 互不影响"
+        },
+        {
+          left: "属性（attribute）",
+          right: "局部变量",
+          explanation: "属性存在对象上（通过 self/this 访问），每个对象有自己的副本，对象存活期间一直存在。局部变量存在函数栈帧里，函数结束就销毁。属性描述对象的状态，局部变量只是计算过程中的临时值。",
+          leftExample: "self.name = name\n# 存在对象上，s.name 随时可访问",
+          rightExample: "def f():\n    temp = name * 2  # 局部变量\n    return temp\n# 函数结束 temp 就没了"
+        },
+        {
+          left: "构造方法",
+          right: "普通方法",
+          explanation: "构造方法（__init__/constructor）在对象创建时自动调用，负责初始化属性，不手动调用（Python 中可手动调但很少）。普通方法在对象创建后通过 对象.方法() 调用。",
+          leftExample: "def __init__(self, name):\n    self.name = name\n# 创建时自动调用",
+          rightExample: "def greet(self):\n    print(f'Hi, {self.name}')\ns.greet()  # 手动调用"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\nclass Student:\n    def __init__(self, name):\n        name = name   # 少了 self.\n\ns = Student(\"小明\")\nprint(s.name)",
+          message: "崩溃：AttributeError: 'Student' object has no attribute 'name'",
+          cause: "name = name 只是给局部变量 name 重新赋值，没有存到对象上。必须用 self.name = name 才能成为对象属性。这是初学者写类最常见的错误。",
+          fix: "所有要成为对象属性的变量，都必须用 self.xxx 赋值。",
+          variantCode: "class Student:\n    def __init__(self, name):\n        self.name = name   # 关键：self.name\n\ns = Student(\"小明\")\nprint(s.name)  # 小明"
+        },
+        {
+          code: "// JavaScript\nclass Student {\n    constructor(name) {\n        this.name = name;\n    }\n}\nconst s = Student(\"小明\");  // 忘了 new\nconsole.log(s.name);",
+          message: "崩溃：Cannot read properties of undefined (reading 'name')",
+          cause: "JS 的类必须用 new 调用。Student(\"小明\") 当作普通函数调用，在严格模式下 this 是 undefined，构造函数给 undefined.name 赋值直接报错。",
+          fix: "使用 new Student(\"小明\")。new 会创建新对象并绑定到 this。",
+          variantCode: "const s = new Student(\"小明\");  // 必须 new\nconsole.log(s.name);  // 小明"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "model.record-struct-class.ex01",
+          level: "A",
+          type: "concept",
+          question: "类是____，对象是____。",
+          options: [
+            "成品；模具",
+            "模具；成品",
+            "变量；函数",
+            "数据；方法"
+          ],
+          answer: 1,
+          feedback: "类是模板（模具），定义结构和行为；对象是模板创建的具体实例（成品），有独立的数据。"
+        },
+        {
+          id: "model.record-struct-class.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\nclass Dog:\n    def __init__(self, name):\n        self.name = name\n    def speak(self):\n        print(self.name + \" says woof\")\n\nd = Dog(\"Rex\")\nd.speak()",
+          options: ["Rex says woof", "woof", "speak", "报错"],
+          answer: 0,
+          feedback: "d.speak() 调用方法，self 绑定到 d，self.name 是 'Rex'，输出 'Rex says woof'。"
+        },
+        {
+          id: "model.record-struct-class.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\nclass Counter:\n    def __init__(self):\n        self.count = 0\n    def increment(self):\n        self.count += 1\n\nc = Counter()\nc.increment()\nc.increment()\nprint(c.count)",
+          options: ["0", "1", "2", "报错"],
+          answer: 2,
+          feedback: "increment 每次把对象的 count 加 1，调用两次后 count 是 2。对象的状态在方法调用之间保持。"
+        },
+        {
+          id: "model.record-struct-class.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，让 s.name 能正确访问：",
+          options: [
+            "class Student:\n    def __init__(name):\n        name = name\n\ns = Student(\"小明\")\nprint(s.name)",
+            "class Student:\n    def __init__(self, name):\n        name = name\n\ns = Student(\"小明\")\nprint(s.name)",
+            "class Student:\n    def __init__(self, name):\n        self.name = name\n\ns = Student(\"小明\")\nprint(self.name)",
+            "class Student:\n    def __init__(self, name):\n        self.name = name\n\ns = Student(\"小明\")\nprint(s.name)"
+          ],
+          answer: 3,
+          feedback: "选项 0 正确：self.name = name 存入对象属性，s.name 访问。选项 1 缺 self 参数；选项 2 没有 self.name；选项 3 用 self.name 访问但外部作用域没有 self。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "定义一个类 BankAccount：1. 构造函数接收 owner 和 balance；2. 方法 deposit(amount) 增加余额；3. 方法 show() 打印余额",
+        hints: [
+          "构造函数用 __init__(self, owner, balance)",
+          "属性存到 self 上",
+          "deposit 里 self.balance += amount"
+        ],
+        solution: "class BankAccount:\n    def __init__(self, owner, balance):\n        self.owner = owner\n        self.balance = balance\n    def deposit(self, amount):\n        self.balance += amount\n    def show(self):\n        print(f'{self.owner}: {self.balance}')\n\nacc = BankAccount('Alice', 100)\nacc.deposit(50)\nacc.show()",
+        solutionOutput: "Alice: 150"
+      },
+
+      connections: {
+        current: "对象与类",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">函数</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">类 ── 对象 ── 属性/方法</div>
+  <div>│</div>
+  <div style="color:var(--muted)">值语义 / 泛型</div>
+</div>`,
+        prerequisites: ["function.lambda", "collection.map"],
+        related: ["value.semantics", "generic.functions", "collection.map"],
+        next: ["generic.functions", "value.semantics"]
+      },
+
+      nextStep: {
+        title: "泛型函数",
+        description: "类与对象解决了「如何组织数据」的问题。下一步学习泛型：如何写出对任意类型都适用的类和方法——这是大型库（列表、字典）内部的核心机制。",
+        targetId: "generic.functions"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 8：映射/字典（数据模型）
+    // ================================================================
+    {
+      id: "collection.map",
+      estimatedTime: 10,
+      difficulty: "beginner",
+
+      hook: {
+        question: "如何按名字查分数，而不是按位置？",
+        code: "scores = {\"小明\": 92, \"小红\": 88}\nprint(scores[\"小红\"])",
+        options: [
+          "报错（字典不能用字符串做下标）",
+          "输出 88（按键取值）",
+          "输出 {\"小明\": 92, \"小红\": 88}",
+          "输出 小红"
+        ],
+        answer: 1,
+        explanation: "字典（映射/哈希表）用「键」来查找「值」，而不是用位置（索引）。scores[\"小红\"] 直接在字典里找到 小红 对应的 88。这是映射的核心：键 → 值的关联。相比列表按位置访问，映射按名字访问，更像现实中的查表。"
+      },
+
+      mentalModel: {
+        title: "映射是键值对照表",
+        description: "想象一本词典：你要查「小红的分数」，直接翻到「小红」这个词条，看到 88。不用从头翻到尾。映射就是这种「按键查找」的结构：键唯一、无序、查找快速（哈希表 O(1) 平均）。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:14px;font-family:ui-monospace,Menlo,monospace;font-size:14px">
+  <div style="font-size:12px;color:var(--muted)">scores（字典）</div>
+  <div style="border:2px solid var(--accent);border-radius:12px;overflow:hidden">
+    <div style="display:flex;border-bottom:1px solid var(--line)">
+      <div style="width:110px;padding:8px;text-align:center;font-weight:700;color:var(--accent)">键 (key)</div>
+      <div style="width:110px;padding:8px;text-align:center;font-weight:700;color:var(--muted)">值 (value)</div>
+    </div>
+    <div style="display:flex;border-bottom:1px solid var(--line)">
+      <div style="width:110px;padding:8px;text-align:center">\"小明\"</div>
+      <div style="width:110px;padding:8px;text-align:center;color:var(--success);font-weight:700">92</div>
+    </div>
+    <div style="display:flex">
+      <div style="width:110px;padding:8px;text-align:center">\"小红\"</div>
+      <div style="width:110px;padding:8px;text-align:center;color:var(--success);font-weight:700">88</div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--muted)">scores[\"小红\"] → 直接按键找到 88，无需遍历</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "创建字典 scores：建立两个键值关联，\"小明\"→92，\"小红\"→88",
+          state: { scores: { "小明": 92, "小红": 88 } }
+        },
+        {
+          line: 2,
+          explanation: "执行 scores[\"小红\"]：用键 \"小红\" 在字典中查找，直接命中值 88",
+          state: { scores: { "小明": 92, "小红": 88 }, lookup: "\"小红\" → 88" }
+        },
+        {
+          line: 2,
+          explanation: "print 输出 88。查找完成，字典没有改变",
+          state: { scores: { "小明": 92, "小红": 88 }, output: "88" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "创建字典：{“小明”: 92, “小红”: 88}。冒号左边是键，右边是值。" },
+        { line: 2, text: "scores[\"小红\"]：用键查找。字典直接跳到“小红”这个词条（哈希定位），取出 88。" },
+        { line: 2, text: "输出 88。注意：字典查找按键、不按位置，所以不在乎“小红”在字典里的先后顺序。" }
+      ],
+
+      realWorldExample: {
+        title: "网站访问统计",
+        problem: "统计每个用户访问网站的次数。用户的访问 ID 是字符串，次数是整数——天然适合映射：每次访问 user_counts[user_id] += 1。如果用列表，需要先遍历找这个人，再改次数，慢且啰嗦。",
+        code: "visits = {}\nfor user in [\"alice\", \"bob\", \"alice\", \"alice\", \"bob\"]:\n    if user in visits:\n        visits[user] += 1\n    else:\n        visits[user] = 1\n\nprint(visits)\n# {'alice': 3, 'bob': 2}",
+        language: "python",
+        connections: ["control.conditionals", "collection.iteration"]
+      },
+
+      confusions: [
+        {
+          left: "映射（按键）",
+          right: "列表（按位置）",
+          explanation: "列表用整数索引，第 0、1、2... 个元素，元素有序。映射用任意键（通常字符串），无序，按键快速查找。需要「按名字/ID 找东西」时用映射，需要「按顺序处理一堆东西」时用列表。",
+          leftExample: "scores = {\"小明\": 92}\nprint(scores[\"小明\"])  # 92 按键查",
+          rightExample: "scores = [92, 88]\nprint(scores[0])  # 92 按位置查"
+        },
+        {
+          left: "修改已有键",
+          right: "新增键",
+          explanation: "用已存在的键赋值是更新值；用不存在的键赋值是新增条目。两者语法相同（map[key] = value），但语义不同。检查是否已存在：Python 用 in，JS 用 hasOwnProperty 或 Map.has。",
+          leftExample: "scores = {\"小明\": 92}\nscores[\"小明\"] = 95  # 更新：92 → 95",
+          rightExample: "scores = {\"小明\": 92}\nscores[\"小红\"] = 88  # 新增条目"
+        },
+        {
+          left: "哈希表",
+          right: "有序表（TreeMap）",
+          explanation: "大多数语言的 dict/Map 是哈希表：查找 O(1) 平均，但无序（或按插入序，非排序序）。少数（如 C++ std::map）是有序表：按键排序，查找 O(log n)。需要有序遍历时考虑后者。",
+          leftExample: "// Python dict 是哈希表\n# 查找 O(1)，按键哈希定位",
+          rightExample: "// C++ std::map 是有序树\n// 遍历按键从小到大，查找 O(log n)"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\nscores = {\"小明\": 92}\nprint(scores[\"小红\"])",
+          message: "崩溃：KeyError: '小红'",
+          cause: "用不存在的键访问字典会抛 KeyError。字典不会像列表越界那样返回 undefined——Python 选择直接报错，提醒你键可能拼错了。",
+          fix: "用 get() 提供默认值，或用 in 先检查键是否存在。",
+          variantCode: "scores = {\"小明\": 92}\nprint(scores.get(\"小红\", 0))  # 0，不崩溃\n\n# 或先检查\nif \"小红\" in scores:\n    print(scores[\"小红\"])\nelse:\n    print(\"没有这个人\")"
+        },
+        {
+          code: "// JavaScript\nconst obj = {};\nobj[1] = \"one\";\nobj[\"1\"] = \"uno\";\nconsole.log(Object.keys(obj).length);",
+          message: "输出 1，而不是 2",
+          cause: "普通 JS 对象的键会强制转成字符串，obj[1] 和 obj[\"1\"] 是同一个键。如果需要真正的数字键区分类型，要用 Map。",
+          fix: "使用 Map：new Map()，键可以是任意类型且不做强制转换。",
+          variantCode: "const m = new Map();\nm.set(1, \"one\");\nm.set(\"1\", \"uno\");\nconsole.log(m.size);  // 2，数字键和字符串键不同"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "collection.map.ex01",
+          level: "A",
+          type: "concept",
+          question: "字典（映射）用什么来查找值？",
+          options: [
+            "整数位置",
+            "键（key）",
+            "值的大小",
+            "插入顺序"
+          ],
+          answer: 1,
+          feedback: "映射按「键」查找「值」。键是唯一的标识，值是关联的数据。"
+        },
+        {
+          id: "collection.map.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\nages = {\"a\": 20, \"b\": 30}\nages[\"a\"] = 21\nprint(ages[\"a\"])",
+          options: ["20", "30", "21", "报错"],
+          answer: 2,
+          feedback: "ages[\"a\"] = 21 更新已存在的键 a 的值：20 → 21。输出 21。"
+        },
+        {
+          id: "collection.map.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\ncounts = {}\nfor w in [\"a\", \"b\", \"a\"]:\n    counts[w] = counts.get(w, 0) + 1\nprint(counts[\"a\"])",
+          options: ["1", "3", "报错", "2"],
+          answer: 3,
+          feedback: "a 出现两次：第一次 get 返回 0 + 1 = 1，第二次 get 返回 1 + 1 = 2。counts[\"a\"] = 2。"
+        },
+        {
+          id: "collection.map.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，统计列表中每个数字出现的次数：",
+          options: [
+            "counts = {}\nfor n in nums:\n    counts[n] = counts.get(n, 0) + 1",
+            "counts = {}\nfor n in nums:\n    counts[n] = 1",
+            "counts = []\nfor n in nums:\n    counts[n] = counts.get(n, 0) + 1",
+            "counts = {}\nfor n in nums:\n    counts.get(n, 0) + 1"
+          ],
+          answer: 0,
+          feedback: "选项 0 正确：get(n, 0) 取当前计数（没有则 0），+1 后存回。选项 1 每次覆盖为 1，不累加；选项 2 用列表存数字键会出错；选项 3 没有赋值。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写代码：统计字符串 \"hello\" 中每个字符出现的次数，结果存进字典",
+        hints: [
+          "遍历字符串的每个字符",
+          "用 dict.get(char, 0) + 1 累加",
+          "结果应是 {'h':1, 'e':1, 'l':2, 'o':1}"
+        ],
+        solution: "text = \"hello\"\ncounts = {}\nfor ch in text:\n    counts[ch] = counts.get(ch, 0) + 1\nprint(counts)",
+        solutionOutput: "{'h': 1, 'e': 1, 'l': 2, 'o': 1}"
+      },
+
+      connections: {
+        current: "集合",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">列表（按位置）</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">映射 ── 键值对 ── 哈希表</div>
+  <div>│</div>
+  <div style="color:var(--muted)">集合 Set / 对象</div>
+</div>`,
+        prerequisites: ["collection.array-list", "value.binding"],
+        related: ["collection.set", "collection.iteration", "model.record-struct-class"],
+        next: ["collection.set", "collection.filter-map-reduce"]
+      },
+
+      nextStep: {
+        title: "集合 Set",
+        description: "映射是「键→值」的关联。下一步学习集合 Set——只关心「某个值在不在里面」，不关心值关联什么。Set 和 Map 共享哈希思想，但用途不同：去重、成员判断。",
+        targetId: "collection.set"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 9：闭包（调用模型进阶）
+    // ================================================================
+    {
+      id: "function.closure",
+      estimatedTime: 14,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "函数返回后，它的局部变量还在吗？",
+        code: "def make_counter():\n    count = 0\n    def increment():\n        count += 1\n        return count\n    return increment\n\nc = make_counter()\nprint(c())\nprint(c())",
+        options: [
+          "输出 1 和 1（每次从 0 开始）",
+          "输出 1 和 2（count 被记住了）",
+          "报错（count 不存在了）",
+          "输出 0 和 0"
+        ],
+        answer: 1,
+        explanation: "count 是 make_counter 的局部变量，但 make_counter 返回后 count 并没有消失——内部函数 increment 引用着它，形成了一个「闭包」。闭包把 count 和 increment 捆绑在一起，每次调用 c() 都在同一个 count 上加 1。这就是闭包的本质：函数 + 它捕获的环境。"
+      },
+
+      mentalModel: {
+        title: "闭包是函数 + 随身携带的背包",
+        description: "普通函数是一个「纯机器」：用完就走。闭包是一个「带背包的函数」：它捕获了创建时所在作用域的变量，把变量装进背包随身带走。即使外层函数已经返回，背包里的变量依然活着，而且每次调用共享同一个背包。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:14px;font-family:ui-monospace,Menlo,monospace;font-size:14px">
+  <div style="text-align:center;border:2px solid var(--accent);border-radius:12px;padding:10px 20px">
+    <div style="font-weight:700;color:var(--accent);font-size:15px">increment()</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px">return count</div>
+  </div>
+  <div style="font-size:22px">+</div>
+  <div style="text-align:center;border:1px dashed var(--success);border-radius:12px;padding:10px 20px">
+    <div style="font-size:12px;color:var(--muted)">随身背包（捕获的环境）</div>
+    <div style="font-weight:700;color:var(--success);font-size:15px">count = 2</div>
+    <div style="font-size:12px;color:var(--muted)">每次调用共享，持续累加</div>
+  </div>
+  <div style="font-size:12px;color:var(--muted)">闭包 = 函数 + 捕获的环境（背包）</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "定义外层函数 make_counter。此时只创建函数，未执行",
+          state: { functions: { make_counter: "defined" } }
+        },
+        {
+          line: 2,
+          explanation: "调用 make_counter()：创建栈帧，局部变量 count 绑定到 0",
+          state: { callStack: [{ func: "make_counter", count: 0 }] }
+        },
+        {
+          line: 3,
+          explanation: "定义内部函数 increment，它引用 count（捕获环境）。increment 没有被立即调用",
+          state: { callStack: [{ func: "make_counter", count: 0 }], increment: "defined(captures count)" }
+        },
+        {
+          line: 7,
+          explanation: "make_counter 返回 increment。关键：count 没有随栈帧销毁——increment 的闭包把它留住了",
+          state: { c: "increment (closure, count=0)" }
+        },
+        {
+          line: 8,
+          explanation: "调用 c()：闭包里的 count 从 0 变 1，返回 1",
+          state: { c: "increment (closure, count=1)", output: "1" }
+        },
+        {
+          line: 9,
+          explanation: "再次调用 c()：同一个 count 从 1 变 2，返回 2",
+          state: { c: "increment (closure, count=2)", output: "1\n2" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "定义 make_counter 函数。此时没有执行任何东西。" },
+        { line: 2, text: "count = 0：创建局部变量。" },
+        { line: 3, text: "定义 increment 函数。它内部引用了 count——这个引用就是「捕获」。" },
+        { line: 7, text: "return increment：把内部函数作为返回值。返回时，count 被闭包捕获，不随栈帧销毁。" },
+        { line: 8, text: "c() 第一次调用：闭包中的 count 0 → 1，返回 1。" },
+        { line: 9, text: "c() 第二次调用：同一个 count 1 → 2，返回 2。这就是闭包「记住状态」的能力。" }
+      ],
+
+      realWorldExample: {
+        title: "事件处理器携带参数",
+        problem: "网页上有 3 个按钮，每个按钮点击时要打印自己的编号。如果用循环绑定，循环变量会被共享导致全部打印 3。闭包可以「为每个按钮捕获独立的编号」——这是闭包最经典的实际用途之一。",
+        code: "def make_button_handler(btn_id):\n    def handle_click():\n        print(f'按钮 {btn_id} 被点击')\n    return handle_click\n\n# 模拟 3 个按钮\nhandlers = []\nfor i in range(1, 4):\n    handlers.append(make_button_handler(i))\n\n# 点击三个按钮\nhandlers[0]()  # 按钮 1 被点击\nhandlers[1]()  # 按钮 2 被点击\nhandlers[2]()  # 按钮 3 被点击",
+        language: "python",
+        connections: ["function.lambda", "function.higher-order"]
+      },
+
+      confusions: [
+        {
+          left: "闭包",
+          right: "普通函数",
+          explanation: "普通函数只依赖自己的参数和全局变量。闭包额外捕获了创建时所在作用域的局部变量，把这些变量「随身携带」。闭包是普通函数的超集——很多语言里的 lambda 实际都是闭包。",
+          leftExample: "def outer(x):\n    def inner():\n        return x * 2  # 捕获 x\n    return inner\n\nf = outer(21)\nf()  # 42（x 被记住）",
+          rightExample: "def plain(y):\n    return y * 2  # 只用参数\n\nplain(21)  # 42"
+        },
+        {
+          left: "捕获变量",
+          right: "复制变量",
+          explanation: "闭包捕获的是变量本身（引用），不是值的副本。所以闭包内修改捕获的变量，会影响外层作用域（如果可修改）；不同闭包捕获同一个变量时会互相影响。循环中常见的「全部打印最后一个值」bug 就源于此。",
+          leftExample: "def counter():\n    n = 0\n    def add():\n        nonlocal n  # 引用同一个 n\n        n += 1\n        return n\n    return add\n\nc = counter()\nc()  # 1（n 在变）",
+          rightExample: "def counter():\n    n = 0\n    def add(n=n):  # 默认参数复制值\n        n += 1\n        return n\n    return add\n\nc = counter()\nc()  # 1\nc()  # 1（n 每次都从 0 开始）"
+        },
+        {
+          left: "闭包的状态",
+          right: "类的状态",
+          explanation: "闭包和类都能「记住状态」。闭包用捕获变量 + 函数，轻量、私有（外部无法直接访问 count）。类用属性 + 方法，结构清晰、可扩展。小状态用闭包，复杂对象用类。",
+          leftExample: "def counter():\n    n = 0\n    def inc():\n        nonlocal n\n        n += 1\n        return n\n    return inc\n\nc = counter()  # 轻量计数器",
+          rightExample: "class Counter:\n    def __init__(self):\n        self.n = 0\n    def inc(self):\n        self.n += 1\n        return self.n\n\nc = Counter()  # 完整计数器对象"
+        }
+      ],
+
+      errors: [
+        {
+          code: "// JavaScript 经典 bug\nconst buttons = [];\nfor (var i = 0; i < 3; i++) {\n    buttons.push(function() {\n        console.log(\"按钮 \" + i);\n    });\n}\nbuttons[0]();  // 期望：按钮 0",
+          message: "输出 按钮 3（三个按钮都是 3）",
+          cause: "var 声明的 i 是函数作用域（整个循环共享一个 i）。循环结束后 i = 3，所有闭包捕获的是同一个 i，点击任意按钮都打印 3。",
+          fix: "用 let（块级作用域，每轮循环创建新的 i）或把 i 作为参数传入立即执行的函数。",
+          variantCode: "// 方式 1：let 块级作用域\nfor (let i = 0; i < 3; i++) {\n    buttons.push(function() {\n        console.log(\"按钮 \" + i);\n    });\n}\n\n// 方式 2：参数捕获\nfor (var i = 0; i < 3; i++) {\n    (function(n) {\n        buttons.push(function() { console.log(\"按钮 \" + n); });\n    })(i);\n}"
+        },
+        {
+          code: "# Python\ndef make_functions():\n    funcs = []\n    for i in range(3):\n        def f():\n            return i\n        funcs.append(f)\n    return funcs\n\nfs = make_functions()\nprint(fs[0]())",
+          message: "输出 2，而不是 0",
+          cause: "Python 闭包捕获变量 i 本身。循环结束后 i = 2，所有函数都返回 2。这与 JS var 的经典 bug 同源。",
+          fix: "用默认参数在创建时固定值，或用工厂函数封装。",
+          variantCode: "def make_functions():\n    funcs = []\n    for i in range(3):\n        def f(i=i):  # 默认参数：创建时复制 i 的值\n            return i\n        funcs.append(f)\n    return funcs\n\nfs = make_functions()\nprint(fs[0]())  # 0"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "function.closure.ex01",
+          level: "A",
+          type: "concept",
+          question: "闭包是什么？",
+          options: [
+            "一个只有参数的函数",
+            "函数 + 它捕获的外部变量",
+            "一个类",
+            "一个全局变量"
+          ],
+          answer: 1,
+          feedback: "闭包 = 函数 + 捕获的环境。内部函数引用了外层函数的变量，这些变量被「随身携带」。"
+        },
+        {
+          id: "function.closure.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\ndef make():\n    x = 5\n    def get():\n        return x\n    return get\n\nf = make()\nprint(f())",
+          options: ["5", "报错（x 不存在）", "None", "undefined"],
+          answer: 0,
+          feedback: "闭包捕获了 x=5。即使 make 已返回，get() 仍然能访问 x，输出 5。"
+        },
+        {
+          id: "function.closure.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\ndef make_counter():\n    count = 0\n    def inc():\n        count += 1\n        return count\n    return inc\n\na = make_counter()\nb = make_counter()\na()\na()\nprint(b())",
+          options: ["2", "0", "报错", "1"],
+          answer: 3,
+          feedback: "a 和 b 是两个独立的闭包，各有各的 count。a 调了两次（count=2），b 只调一次（count=1）。输出 1。"
+        },
+        {
+          id: "function.closure.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，创建一个带初始值的计数器（从 10 开始）：",
+          options: [
+            "def make_counter(start):\n    def inc():\n        n = start\n        n += 1\n        return n\n    return inc",
+            "def make_counter(start):\n    return start + 1",
+            "def make_counter(start):\n    n = start\n    def inc():\n        n += 1\n        return n\n    return inc",
+            "def make_counter():\n    n = 10\n    def inc():\n        n += 1\n        return n\n    return inc"
+          ],
+          answer: 2,
+          feedback: "选项 0 正确：n = start 在闭包外初始化，inc 捕获并累加。选项 1 每次调用都重置 n=start。选项 2 不是闭包。选项 3 硬编码 10，无法自定义初始值。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写一个 make_multiplier(factor)，返回一个把参数乘以 factor 的函数（例如乘 2 的函数，输入 4 输出 8）",
+        hints: [
+          "外层函数接收 factor",
+          "内层函数接收 x，返回 x * factor",
+          "返回内层函数"
+        ],
+        solution: "def make_multiplier(factor):\n    def multiply(x):\n        return x * factor\n    return multiply\n\ndouble = make_multiplier(2)\ntriple = make_multiplier(3)\nprint(double(4))\nprint(triple(4))",
+        solutionOutput: "8\n12"
+      },
+
+      connections: {
+        current: "函数",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">函数定义</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">闭包 ── 捕获 ── 高阶函数</div>
+  <div>│</div>
+  <div style="color:var(--muted)">回调 / 迭代器</div>
+</div>`,
+        prerequisites: ["function.lambda", "value.semantics"],
+        related: ["function.higher-order", "value.scope-lifetime", "collection.iteration"],
+        next: ["function.higher-order", "function.recursion"]
+      },
+
+      nextStep: {
+        title: "高阶函数与回调",
+        description: "闭包让函数可以携带状态。下一步学习高阶函数：把函数当作参数传递、当作返回值返回——闭包 + 高阶函数组合出函数式编程的核心能力（map/filter/reduce 都依赖它们）。",
+        targetId: "function.higher-order"
+      }
     }
   ]
 };
