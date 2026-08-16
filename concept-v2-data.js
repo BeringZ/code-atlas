@@ -1878,6 +1878,637 @@ window.CODE_ATLAS_V2 = {
         description: "闭包让函数可以携带状态。下一步学习高阶函数：把函数当作参数传递、当作返回值返回——闭包 + 高阶函数组合出函数式编程的核心能力（map/filter/reduce 都依赖它们）。",
         targetId: "function.higher-order"
       }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 10：值语义 vs 引用语义（对象身份）
+    // ================================================================
+    {
+      id: "value.semantics",
+      estimatedTime: 12,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "把一个变量赋给另一个变量，它们是同一个东西吗？",
+        code: "# Python\na = [1, 2]\nb = a\nb.append(3)\nprint(a)",
+        options: [
+          "输出 [1, 2]（b 是 a 的副本）",
+          "输出 [1, 2, 3]（a 和 b 指向同一个列表）",
+          "报错（列表不能赋值给另一个变量）",
+          "输出 [1, 2, 3]（a 被复制并修改了副本）"
+        ],
+        answer: 1,
+        explanation: "b = a 没有复制列表——它让 b 和 a 指向同一个列表对象。b.append(3) 修改的是这个共享的列表，所以 a 也看到了变化。这就是引用语义：变量存的是「对象的地址」（引用），不是对象本身。而数字、字符串等值类型，b = a 会真正复制值，互不影响。理解值/引用语义是无数 bug 的根源。"
+      },
+
+      mentalModel: {
+        title: "值类型复制内容，引用类型共享对象",
+        description: "值语义（数字、布尔、字符串、结构体）：赋值时复制内容，两个变量完全独立。引用语义（列表、字典、对象）：赋值时复制引用（地址），两个变量指向同一个对象——通过任一变量修改，另一方都看得到。判断依据：变量里存的是「值本身」还是「对象的地址」。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:16px;font-family:ui-monospace,Menlo,monospace;font-size:13px">
+  <div style="display:flex;gap:32px">
+    <div style="text-align:center">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">值语义（数字）</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="padding:4px 10px;border:2px solid var(--accent);border-radius:8px;font-weight:700;color:var(--accent)">a</div>
+        <div style="font-size:20px">→</div>
+        <div style="padding:4px 10px;border:1px solid var(--line);border-radius:8px">5</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+        <div style="padding:4px 10px;border:2px solid var(--accent);border-radius:8px;font-weight:700;color:var(--accent)">b</div>
+        <div style="font-size:20px">→</div>
+        <div style="padding:4px 10px;border:1px solid var(--line);border-radius:8px;color:var(--success)">5（副本）</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">改 b 不影响 a</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">引用语义（列表）</div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="padding:4px 10px;border:2px solid var(--accent);border-radius:8px;font-weight:700;color:var(--accent)">a</div>
+        <div style="font-size:20px">→</div>
+        <div style="padding:4px 10px;border:1px solid var(--line);border-radius:8px">[1,2]</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+        <div style="padding:4px 10px;border:2px solid var(--accent);border-radius:8px;font-weight:700;color:var(--accent)">b</div>
+        <div style="font-size:20px">→</div>
+        <div style="padding:4px 10px;border:1px solid var(--line);border-radius:8px;color:var(--danger)">同一个对象</div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:4px">改 b 会影响 a</div>
+    </div>
+  </div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "创建列表 [1, 2]，变量 a 保存指向该列表的引用",
+          state: { a: "→ [1, 2] (ref#1)" }
+        },
+        {
+          line: 2,
+          explanation: "b = a：复制引用。b 和 a 都指向 ref#1 同一个列表",
+          state: { a: "→ [1, 2] (ref#1)", b: "→ [1, 2] (ref#1)" }
+        },
+        {
+          line: 3,
+          explanation: "b.append(3)：通过 b 修改共享列表内部，ref#1 变成 [1, 2, 3]",
+          state: { a: "→ [1, 2, 3] (ref#1)", b: "→ [1, 2, 3] (ref#1)" }
+        },
+        {
+          line: 4,
+          explanation: "print(a)：a 指向同一个被修改的列表，输出 [1, 2, 3]",
+          state: { a: "→ [1, 2, 3] (ref#1)", b: "→ [1, 2, 3] (ref#1)", output: "[1, 2, 3]" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "a = [1, 2]：创建列表对象，a 保存引用（内存地址）。" },
+        { line: 2, text: "b = a：复制的是引用，不是列表内容。a 和 b 是同一个列表的两个名字。" },
+        { line: 3, text: "b.append(3)：修改共享对象内部。ref#1 从 [1, 2] 变成 [1, 2, 3]。" },
+        { line: 4, text: "print(a)：a 指向的还是 ref#1，所以看到 [1, 2, 3]。" }
+      ],
+
+      realWorldExample: {
+        title: "配置共享与意外污染",
+        problem: "多个函数共享同一个配置字典。如果某个函数修改了配置对象内部，其他函数都会受影响——这可能是特性（全局配置）也可能是 bug（意外污染）。理解引用语义后，需要修改时就应该显式复制（如 dict.copy() / 深拷贝）。",
+        code: "# 共享配置\nconfig = {\"theme\": \"dark\", \"font_size\": 14}\n\n# 某处代码想自定义一个配置\nmy_config = config          # 复制引用，不是内容\nmy_config[\"font_size\"] = 20 # 修改共享对象！\n\nprint(config[\"font_size\"])   # 20 —— 全局配置被意外改了\n\n# 正确做法：复制内容\nmy_config = dict(config)\nmy_config[\"font_size\"] = 20\nprint(config[\"font_size\"])   # 14 —— 原配置不受影响",
+        language: "python",
+        connections: ["value.binding", "collection.copy"]
+      },
+
+      confusions: [
+        {
+          left: "值语义",
+          right: "引用语义",
+          explanation: "值语义：变量直接存值，赋值即复制，修改互不影响（int、float、bool、str、struct）。引用语义：变量存地址，赋值共享对象，修改互相可见（list、dict、object、slice）。",
+          leftExample: "a = 5\nb = a\nb = 10\nprint(a)  # 5（互不影响）",
+          rightExample: "a = [1, 2]\nb = a\nb.append(3)\nprint(a)  # [1, 2, 3]（共享）"
+        },
+        {
+          left: "浅拷贝",
+          right: "深拷贝",
+          explanation: "浅拷贝复制对象本身，但内部嵌套的引用仍共享。深拷贝递归复制所有层，完全独立。修改浅拷贝的一层内容不影响原对象，但修改嵌套层（如列表里的列表）仍然共享。",
+          leftExample: "a = [[1], [2]]\nb = a.copy()\nb[0].append(9)\nprint(a)  # [[1, 9], [2]] 嵌套共享",
+          rightExample: "import copy\na = [[1], [2]]\nb = copy.deepcopy(a)\nb[0].append(9)\nprint(a)  # [[1], [2]] 完全独立"
+        },
+        {
+          left: "== 比较",
+          right: "=== / is 比较",
+          explanation: "==（Python 的 ==、JS 的 ==/===）比较两个对象的内容是否相等。is / ===（JS 严格）比较是否同一个对象（引用相同）。内容相同但引用不同的两个对象，== 为真，is 为假。",
+          leftExample: "a = [1, 2]\nb = [1, 2]\na == b  # True（内容相同）",
+          rightExample: "a = [1, 2]\nb = [1, 2]\na is b  # False（不同对象）\na is a  # True（同一个对象）"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\ndef add_item(lst):\n    lst.append(99)\n\nitems = [1, 2]\nadd_item(items)\nprint(items)  # 期望不受影响",
+          message: "输出 [1, 2, 99]——函数「意外」修改了外部列表",
+          cause: "lst 和 items 指向同一个列表（引用传递）。append 修改共享对象。如果函数不打算修改传入的对象，这会导致意外副作用。",
+          fix: "函数内先复制：lst = list(lst)，或调用方传副本 add_item(items.copy())。",
+          variantCode: "def add_item(lst):\n    lst = list(lst)  # 复制，隔离副作用\n    lst.append(99)\n    return lst\n\nitems = [1, 2]\nresult = add_item(items)\nprint(items)   # [1, 2]\nprint(result)  # [1, 2, 99]"
+        },
+        {
+          code: "// JavaScript\nconst a = { x: 1 };\nconst b = a;\nb.x = 100;\nconsole.log(a.x);  // 期望 1",
+          message: "输出 100——对象被「意外」修改",
+          cause: "JS 对象也是引用语义，const 只禁止重新绑定 a，不禁止修改 a 指向的对象。b = a 复制引用，b.x = 100 修改共享对象。",
+          fix: "复制对象再修改：b = { ...a }（浅拷贝）。注意嵌套对象仍共享。",
+          variantCode: "const a = { x: 1 };\nconst b = { ...a };  // 浅拷贝\nb.x = 100;\nconsole.log(a.x);  // 1"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "value.semantics.ex01",
+          level: "A",
+          type: "concept",
+          question: "以下哪个类型在赋值时是「复制内容」（值语义）？",
+          options: ["列表 list", "字典 dict", "整数 int", "对象 object"],
+          answer: 2,
+          feedback: "Python 的 int 是不可变值类型，赋值复制值。list/dict/object 都是引用类型。"
+        },
+        {
+          id: "value.semantics.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\na = [1, 2]\nb = a\nb.append(3)\nprint(len(a))",
+          options: ["2", "3", "报错", "0"],
+          answer: 1,
+          feedback: "b = a 复制引用，a 和 b 同一个列表。append 后列表有 3 个元素，len(a) = 3。"
+        },
+        {
+          id: "value.semantics.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\na = 5\nb = a\nb = 10\nprint(a)",
+          options: ["10", "报错", "None", "5"],
+          answer: 3,
+          feedback: "int 是值类型，b = a 复制值 5。b = 10 只改 b，a 仍是 5。"
+        },
+        {
+          id: "value.semantics.ex04",
+          level: "C",
+          type: "fill",
+          question: "修改以下代码，让 b 的修改不影响 a：",
+          options: [
+            "a = [1, 2]\nb = a[:]\nb.append(3)\nprint(a)",
+            "a = [1, 2]\nb = a\nb.append(3)\nprint(a)",
+            "a = [1, 2]\nb = a\nb = [1, 2, 3]\nprint(a)",
+            "a = [1, 2]\nb = a.copy\nb.append(3)\nprint(a)"
+          ],
+          answer: 0,
+          feedback: "a[:] 创建副本，b 指向新列表，append 不影响 a。选项 2 的 b = [1,2,3] 是重新绑定，确实不影响 a，但没展示副本。选项 3 a.copy 缺少括号调用。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写代码：创建列表 original = [1, 2]，复制一份为 copy_list（内容独立），在 copy_list 里加 3，打印 original 和 copy_list",
+        hints: [
+          "用切片 original[:] 或 list(original) 复制",
+          "复制后 append 不影响原列表",
+          "验证 original 仍是 [1, 2]"
+        ],
+        solution: "original = [1, 2]\ncopy_list = original[:]\ncopy_list.append(3)\nprint(original)   # [1, 2]\nprint(copy_list)  # [1, 2, 3]",
+        solutionOutput: "[1, 2]\n[1, 2, 3]"
+      },
+
+      connections: {
+        current: "值语义",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">变量绑定</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">值类型 ── 引用类型 ── 拷贝</div>
+  <div>│</div>
+  <div style="color:var(--muted)">可变性 / 参数传递</div>
+</div>`,
+        prerequisites: ["value.binding", "function.parameter-passing"],
+        related: ["value.mutability", "collection.copy", "model.record-struct-class"],
+        next: ["value.mutability", "collection.copy"]
+      },
+
+      nextStep: {
+        title: "可变与不可变",
+        description: "值/引用语义和「可变性」紧密相关：不可变类型天然安全（复制即独立），可变类型共享时需要小心。下一步学习可变与不可变的区别，以及不可变设计为何更安全。",
+        targetId: "value.mutability"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 11：递归（调用模型）
+    // ================================================================
+    {
+      id: "function.recursion",
+      estimatedTime: 14,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "一个函数能调用自己吗？",
+        code: "def factorial(n):\n    if n <= 1:\n        return 1\n    return n * factorial(n - 1)\n\nprint(factorial(5))",
+        options: [
+          "报错（函数不能调用自己）",
+          "输出 120（5! = 5×4×3×2×1）",
+          "输出 15（5+4+3+2+1）",
+          "无限循环直到崩溃"
+        ],
+        answer: 1,
+        explanation: "函数当然可以调用自己——这叫递归。factorial(5) = 5 × factorial(4) = 5 × 4 × factorial(3) ... 直到 factorial(1) 返回 1（基线条件），然后逐层返回：1 → 2 → 6 → 24 → 120。递归的两个关键：基线条件（停止递归）和递推关系（把大问题缩小）。"
+      },
+
+      mentalModel: {
+        title: "递归是俄罗斯套娃",
+        description: "递归把大问题分解成「更小的同一个问题」。factorial(5) 打开一个套娃，里面是 factorial(4)，再里面是 factorial(3)……最小的那个（factorial(1)）直接有答案，然后一层层往回组装。每层调用都在调用栈上有自己的帧，栈帧展开直到基线条件，再逐层返回。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;font-family:ui-monospace,Menlo,monospace;font-size:14px">
+  <div style="font-weight:700;color:var(--accent)">factorial(5)</div>
+  <div style="color:var(--muted)">= 5 ×</div>
+  <div style="font-weight:700;color:var(--accent)">factorial(4)</div>
+  <div style="color:var(--muted)">= 4 ×</div>
+  <div style="font-weight:700;color:var(--accent)">factorial(3)</div>
+  <div style="color:var(--muted)">= 3 ×</div>
+  <div style="font-weight:700;color:var(--accent)">factorial(2)</div>
+  <div style="color:var(--muted)">= 2 ×</div>
+  <div style="font-weight:700;color:var(--success)">factorial(1) = 1 ← 基线</div>
+  <div style="width:2px;height:10px;background:var(--line)"></div>
+  <div style="font-size:12px;color:var(--muted)">逐层返回：1 → 2 → 6 → 24 → 120</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 5,
+          explanation: "调用 factorial(5)：创建栈帧，n=5。n <= 1 为假，计算 5 * factorial(4)",
+          state: { callStack: [{ f: "factorial", n: 5 }] }
+        },
+        {
+          line: 5,
+          explanation: "调用 factorial(4)：新栈帧压栈。n=4，继续展开",
+          state: { callStack: [{ f: "factorial", n: 5 }, { f: "factorial", n: 4 }] }
+        },
+        {
+          line: 5,
+          explanation: "继续展开：factorial(3) → factorial(2)",
+          state: { callStack: [{ f: "factorial", n: 5 }, { f: "factorial", n: 4 }, { f: "factorial", n: 3 }, { f: "factorial", n: 2 }] }
+        },
+        {
+          line: 2,
+          explanation: "调用 factorial(1)：n <= 1 为真，命中基线条件，返回 1（不再递归）",
+          state: { callStack: [{ f: "factorial", n: 5 }, { f: "factorial", n: 4 }, { f: "factorial", n: 3 }, { f: "factorial", n: 2 }, { f: "factorial", n: 1 }], result: 1 }
+        },
+        {
+          line: 5,
+          explanation: "栈帧逐层弹出：2×1=2 → 3×2=6 → 4×6=24 → 5×24=120",
+          state: { callStack: [], result: 120 }
+        },
+        {
+          line: 6,
+          explanation: "print(factorial(5)) 输出 120",
+          state: { result: 120, output: "120" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "定义 factorial 函数，参数 n。" },
+        { line: 2, text: "if n <= 1: return 1 —— 基线条件。n 为 0 或 1 时直接给答案，不再递归。这是递归的终止保证。" },
+        { line: 5, text: "return n * factorial(n - 1) —— 递推关系：把 n! 变成 n × (n-1)!。问题规模每次减 1。" },
+        { line: 5, text: "调用 factorial(5) 时逐层展开到 factorial(1)，命中基线。" },
+        { line: 6, text: "返回值逐层相乘组装：1 → 2 → 6 → 24 → 120，最终输出 120。" }
+      ],
+
+      realWorldExample: {
+        title: "遍历目录树",
+        problem: "文件系统的目录结构是树形：目录里有文件也有子目录。统计一个目录下所有文件的数量，天然适合递归——「统计当前目录」可以分解为「统计每个子目录」。任何树形结构（文件系统、DOM、JSON、组织架构）都适合递归处理。",
+        code: "import os\n\ndef count_files(path):\n    total = 0\n    for entry in os.listdir(path):\n        full = os.path.join(path, entry)\n        if os.path.isdir(full):\n            total += count_files(full)  # 递归处理子目录\n        else:\n            total += 1\n    return total\n\nprint(count_files(\"/tmp/my_project\"))",
+        language: "python",
+        connections: ["function.parameter-passing", "collection.iteration"]
+      },
+
+      confusions: [
+        {
+          left: "递归",
+          right: "迭代（循环）",
+          explanation: "递归用函数自调用分解问题，代码简洁但每层有函数调用开销。迭代用循环显式管理状态，性能通常更好。任何递归都能改写成迭代（用显式栈），反之亦然。选择标准：树形/嵌套结构用递归，线性遍历用迭代。",
+          leftExample: "def fact(n):\n    if n <= 1:\n        return 1\n    return n * fact(n - 1)",
+          rightExample: "def fact(n):\n    result = 1\n    for i in range(2, n + 1):\n        result *= i\n    return result"
+        },
+        {
+          left: "基线条件",
+          right: "递推关系",
+          explanation: "基线条件（base case）是递归停止的出口，必须直接返回答案。递推关系（recursive case）把问题缩小后再次调用自己。缺了基线 = 无限递归（栈溢出）；递推关系不缩小问题 = 永远达不到基线。两个都必须正确。",
+          leftExample: "if n <= 1:\n    return 1  # 基线",
+          rightExample: "return n * fact(n - 1)  # 递推：缩小规模"
+        },
+        {
+          left: "栈溢出",
+          right: "死循环",
+          explanation: "递归没有基线会无限压栈，最终 RecursionError / StackOverflow（内存耗尽）。循环没有终止条件会无限循环（CPU 打满但内存不涨）。两者都是「程序跑不完」，但崩溃方式不同：递归爆栈，循环挂死。",
+          leftExample: "def f(n):\n    return f(n + 1)  # 无基线\nf(0)  # RecursionError",
+          rightExample: "while True:\n    pass  # 死循环\n# CPU 100%，不崩溃但挂死"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\ndef factorial(n):\n    return n * factorial(n - 1)  # 没有基线条件\n\nprint(factorial(5))",
+          message: "崩溃：RecursionError: maximum recursion depth exceeded",
+          cause: "缺少基线条件。factorial 永远递归调用自己，栈帧无限增长，直到 Python 的递归深度限制（约 1000 层）被触发。",
+          fix: "添加基线条件 if n <= 1: return 1，确保递归能终止。",
+          variantCode: "def factorial(n):\n    if n <= 1:  # 基线条件\n        return 1\n    return n * factorial(n - 1)\n\nprint(factorial(5))  # 120"
+        },
+        {
+          code: "# Python\ndef fibonacci(n):\n    if n <= 1:\n        return n\n    return fibonacci(n - 1) + fibonacci(n - 2)\n\nprint(fibonacci(40))",
+          message: "运行极慢（可能几十秒），而不是瞬间出结果",
+          cause: "朴素的斐波那契递归有大量重复计算：fib(40) 会重复计算 fib(38) 两次、fib(37) 三次……总调用次数约 2^40，指数爆炸。递归正确但不高效。",
+          fix: "使用记忆化（缓存已算结果）或改为迭代。记忆化后 O(n)。",
+          variantCode: "cache = {}\ndef fibonacci(n):\n    if n in cache:\n        return cache[n]\n    if n <= 1:\n        result = n\n    else:\n        result = fibonacci(n - 1) + fibonacci(n - 2)\n    cache[n] = result\n    return result\n\nprint(fibonacci(40))  # 102334155，瞬间"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "function.recursion.ex01",
+          level: "A",
+          type: "concept",
+          question: "递归必须包含哪两个要素？",
+          options: [
+            "参数和返回值",
+            "基线条件和递推关系",
+            "循环和条件",
+            "全局变量和局部变量"
+          ],
+          answer: 1,
+          feedback: "基线条件停止递归并返回答案，递推关系把问题缩小后再次调用自己。缺一不可。"
+        },
+        {
+          id: "function.recursion.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\ndef f(n):\n    if n == 0:\n        return 0\n    return n + f(n - 1)\n\nprint(f(3))",
+          options: ["3", "0", "6", "报错"],
+          answer: 2,
+          feedback: "f(3) = 3 + f(2) = 3 + 2 + f(1) = 3 + 2 + 1 + f(0) = 6。输出 6。"
+        },
+        {
+          id: "function.recursion.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码会怎样？\n\ndef g(n):\n    return g(n + 1)\n\nprint(g(0))",
+          options: [
+            "无限运行直到内存耗尽（栈溢出）",
+            "正常输出 0",
+            "输出 1",
+            "立即崩溃但不报错"
+          ],
+          answer: 0,
+          feedback: "没有基线条件，g 无限递归调用自己，栈帧不断增长，最终 RecursionError（栈溢出）。"
+        },
+        {
+          id: "function.recursion.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，递归计算 1 到 n 的和：",
+          options: [
+            "def sum_to(n):\n    if n == 0:\n        return 0\n    return sum_to(n + 1)",
+            "def sum_to(n):\n    return n + sum_to(n - 1)",
+            "def sum_to(n):\n    total = 0\n    for i in range(n + 1):\n        total += i\n    return total",
+            "def sum_to(n):\n    if n == 0:\n        return 0\n    return n + sum_to(n - 1)"
+          ],
+          answer: 3,
+          feedback: "选项 0 正确：基线 n==0 返回 0，递推 n + sum_to(n-1)。选项 1 是 n+1 越来越大，永不终止。选项 2 缺基线。选项 3 是迭代（也正确但非递归）。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写一个递归函数 power(base, exp)，计算 base 的 exp 次方（如 power(2, 3) = 8）",
+        hints: [
+          "基线：exp == 0 时返回 1",
+          "递推：base * power(base, exp - 1)",
+          "验证 power(2, 3) = 2×2×2 = 8"
+        ],
+        solution: "def power(base, exp):\n    if exp == 0:\n        return 1\n    return base * power(base, exp - 1)\n\nprint(power(2, 3))\nprint(power(5, 0))",
+        solutionOutput: "8\n1"
+      },
+
+      connections: {
+        current: "递归",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">函数调用</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">递归 ── 基线/递推 ── 调用栈</div>
+  <div>│</div>
+  <div style="color:var(--muted)">树遍历 / 分治</div>
+</div>`,
+        prerequisites: ["function.lambda", "control.conditionals"],
+        related: ["function.parameter-passing", "function.higher-order", "collection.iteration"],
+        next: ["function.higher-order", "collection.sort-search"]
+      },
+
+      nextStep: {
+        title: "高阶函数与回调",
+        description: "递归展示了函数自调用。下一步学习高阶函数——把函数作为参数传递、作为返回值返回。递归 + 高阶函数是函数式编程的两大基石，也是 map/filter/reduce 的基础。",
+        targetId: "function.higher-order"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 12：集合 Set（数据模型）
+    // ================================================================
+    {
+      id: "collection.set",
+      estimatedTime: 9,
+      difficulty: "beginner",
+
+      hook: {
+        question: "如何快速判断「这个用户是否已经登录过」？",
+        code: "users = {\"alice\", \"bob\"}\nprint(\"alice\" in users)\nprint(\"carol\" in users)",
+        options: [
+          "报错（集合不支持 in 判断）",
+          "输出 True 和 False（集合按成员查找）",
+          "输出 True 和 True",
+          "输出 False 和 False"
+        ],
+        answer: 1,
+        explanation: "集合（Set）只关心「成员在不在」，不关心顺序、不存重复值。\"alice\" in users 直接判断 alice 是否是集合成员：是 → True；\"carol\" 不在 → False。查找是哈希定位，平均 O(1)，比在列表里遍历查找（O(n)）快得多。"
+      },
+
+      mentalModel: {
+        title: "集合是「成员名单」，不是清单",
+        description: "集合像一张会员名单：只记录「谁在里面」，没有顺序、没有重复。你想知道的只有一件事：某某在不在名单上？往名单加人（add）和问某某在不在（in）都是瞬间完成。与列表不同，集合不关心第几个，只关心有没有。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:14px;font-family:ui-monospace,Menlo,monospace;font-size:14px">
+  <div style="font-size:12px;color:var(--muted)">集合 users（成员名单）</div>
+  <div style="display:flex;gap:10px">
+    <div style="padding:8px 16px;border:2px solid var(--accent);border-radius:10px;font-weight:700;color:var(--accent)">alice</div>
+    <div style="padding:8px 16px;border:2px solid var(--accent);border-radius:10px;font-weight:700;color:var(--accent)">bob</div>
+  </div>
+  <div style="font-size:20px;color:var(--muted)">"alice" in users → ✅ True</div>
+  <div style="font-size:20px;color:var(--danger)">"carol" in users → ❌ False</div>
+  <div style="font-size:12px;color:var(--muted)">无序、无重复、哈希查找 O(1)</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "创建集合 users：包含 alice 和 bob 两个成员（无序、去重）",
+          state: { users: Set["alice", "bob"] }
+        },
+        {
+          line: 2,
+          explanation: "执行 \"alice\" in users：哈希定位，alice 在集合中，结果为 True",
+          state: { users: Set["alice", "bob"], lookup: "alice → True" }
+        },
+        {
+          line: 2,
+          explanation: "输出 True",
+          state: { users: Set["alice", "bob"], output: "True" }
+        },
+        {
+          line: 3,
+          explanation: "执行 \"carol\" in users：carol 不在集合中，结果为 False",
+          state: { users: Set["alice", "bob"], lookup: "carol → False" }
+        },
+        {
+          line: 3,
+          explanation: "输出 False",
+          state: { users: Set["alice", "bob"], output: "True\nFalse" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "创建集合：{“alice”, “bob”}。集合自动去重、不保证顺序。" },
+        { line: 2, text: "“alice” in users：哈希定位成员，命中，结果 True，输出 True。" },
+        { line: 3, text: "“carol” in users：不在集合中，结果 False，输出 False。" }
+      ],
+
+      realWorldExample: {
+        title: "网站访客去重",
+        problem: "统计今天有多少独立访客。用列表需要每次先遍历检查是否已存在（O(n)），数据量大时很慢；用集合自动去重，add 就是 O(1)，最后 len(visitors) 就是独立访客数。去重是集合最典型的应用。",
+        code: "visitors = set()\nlogs = [\"alice\", \"bob\", \"alice\", \"carol\", \"bob\"]\n\nfor user in logs:\n    visitors.add(user)\n\nprint(visitors)\nprint(f\"独立访客: {len(visitors)}\")\n\n# 判断某人是否来过\nprint(\"bob\" in visitors)   # True\nprint(\"dave\" in visitors)  # False",
+        language: "python",
+        connections: ["collection.iteration", "collection.map"]
+      },
+
+      confusions: [
+        {
+          left: "集合 Set",
+          right: "列表 List",
+          explanation: "集合无序、无重复、哈希查找 O(1)，适合成员判断和去重。列表有序、允许重复、按索引访问，适合保存顺序和位置。选择依据：只关心「在不在」用集合，关心「第几个/顺序」用列表。",
+          leftExample: "s = {1, 2, 3}\n1 in s  # True，O(1)",
+          rightExample: "l = [1, 2, 3]\nl[0]  # 1，按位置\n1 in l  # O(n) 遍历"
+        },
+        {
+          left: "集合 Set",
+          right: "字典 Dict",
+          explanation: "两者都是哈希结构，但集合只存「键」（成员），字典存「键值对」。集合的 add 对应字典的 d[k]=v；集合的 in 对应字典的 in（查键）。需要关联数据用字典，只需存在性用集合。",
+          leftExample: "s = {\"a\", \"b\"}\n\"a\" in s  # True",
+          rightExample: "d = {\"a\": 1}\n\"a\" in d  # True（查键）\nd[\"a\"]   # 1（取值）"
+        },
+        {
+          left: "add（加成员）",
+          right: "update（批量加）",
+          explanation: "add 加单个元素；update（或 | 运算符）批量合并多个元素。重复添加相同元素不会报错也不会重复（集合天然去重）。",
+          leftExample: "s = {1}\ns.add(2)\nprint(s)  # {1, 2}",
+          rightExample: "s = {1}\ns.update([2, 3])\nprint(s)  # {1, 2, 3}"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\ns = {1, 2, 3}\nprint(s[0])",
+          message: "崩溃：TypeError: 'set' object is not subscriptable",
+          cause: "集合没有顺序，不支持下标访问。你不能问「集合的第 0 个元素」——集合不保证任何顺序。",
+          fix: "要按位置访问就用列表；只判断成员用 in；需要遍历所有成员用 for x in s。",
+          variantCode: "s = {1, 2, 3}\n# 判断成员\nprint(2 in s)        # True\n# 遍历\nfor x in s:\n    print(x)          # 1 2 3（顺序不保证）\n# 要顺序？转列表排序\nprint(sorted(s))      # [1, 2, 3]"
+        },
+        {
+          code: "# Python\ns = {1, 2}\ns.add([3, 4])",
+          message: "崩溃：TypeError: unhashable type: 'list'",
+          cause: "集合的成员必须是可哈希的（不可变类型）。列表可变，哈希值会变化，不能作为集合成员。",
+          fix: "用不可变类型（元组 tuple）代替列表作为集合成员。",
+          variantCode: "s = {1, 2}\ns.add((3, 4))  # 元组可哈希\nprint(s)  # {1, 2, (3, 4)}"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "collection.set.ex01",
+          level: "A",
+          type: "concept",
+          question: "集合（Set）最适合解决什么问题？",
+          options: [
+            "按索引访问元素",
+            "成员判断和去重",
+            "保存有序数据",
+            "键值关联"
+          ],
+          answer: 1,
+          feedback: "集合的核心用途：快速判断「某成员在不在」和自动去重。按索引是列表，键值关联是字典。"
+        },
+        {
+          id: "collection.set.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\ns = {1, 2, 2, 3, 3, 3}\nprint(len(s))",
+          options: ["6", "2", "3", "报错"],
+          answer: 2,
+          feedback: "集合自动去重，{1, 2, 2, 3, 3, 3} 实际是 {1, 2, 3}，len = 3。"
+        },
+        {
+          id: "collection.set.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\ns = {\"a\", \"b\", \"c\"}\nprint(\"b\" in s)\nprint(\"z\" in s)",
+          options: ["True\\nTrue", "False\\nFalse", "报错", "True\\nFalse"],
+          answer: 3,
+          feedback: "\"b\" 在集合中返回 True，\"z\" 不在返回 False。"
+        },
+        {
+          id: "collection.set.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，删除列表中的重复元素（保持结果无序即可）：",
+          options: [
+            "unique = list(set(nums))",
+            "unique = set(nums)\nunique = sorted(unique)",
+            "unique = []\nfor n in nums:\n    if n not in unique:\n        unique.append(n)",
+            "unique = nums.copy()"
+          ],
+          answer: 0,
+          feedback: "选项 0 最简单：set(nums) 自动去重，再转回列表。选项 2 也正确（手动去重）但更繁琐。选项 1 排序了（题目不要求）。选项 3 没有去重。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写代码：找出两个列表的公共元素（交集）。例如 [1, 2, 3] 和 [2, 3, 4] 的公共元素是 {2, 3}",
+        hints: [
+          "把两个列表转成集合",
+          "用 & 运算符求交集",
+          "结果转回列表打印"
+        ],
+        solution: "a = [1, 2, 3]\nb = [2, 3, 4]\ncommon = list(set(a) & set(b))\nprint(common)",
+        solutionOutput: "[2, 3]"
+      },
+
+      connections: {
+        current: "集合",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">列表（有序）</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">集合 ── 去重 ── 哈希表</div>
+  <div>│</div>
+  <div style="color:var(--muted)">映射 / 位运算</div>
+</div>`,
+        prerequisites: ["collection.array-list", "value.binding"],
+        related: ["collection.map", "collection.iteration", "collection.filter-map-reduce"],
+        next: ["collection.filter-map-reduce", "collection.sort-search"]
+      },
+
+      nextStep: {
+        title: "过滤、映射与归约",
+        description: "集合解决了「在不在」的问题。下一步学习三个更强大的集合操作：过滤（留下满足条件的）、映射（变换每个元素）、归约（合并成一个值）——它们组合起来能优雅地处理大部分数据任务。",
+        targetId: "collection.filter-map-reduce"
+      }
     }
   ]
 };
