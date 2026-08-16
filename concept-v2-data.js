@@ -3141,6 +3141,1077 @@ window.CODE_ATLAS_V2 = {
         description: "try/except 能处理内置异常。下一步学习自定义异常：如何定义自己的异常类型，携带业务上下文信息（如订单号、错误码），让错误处理更精确、错误信息更有价值。",
         targetId: "error.custom-types"
       }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 16：复制与深浅拷贝（对象模型）
+    // ================================================================
+    {
+      id: "collection.copy",
+      estimatedTime: 11,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "复制列表时，里面的列表也会被复制吗？",
+        code: "a = [[1, 2], [3, 4]]\nb = a.copy()\nb[0].append(99)\nprint(a)",
+        options: [
+          "输出 [[1, 2], [3, 4]]（完全独立）",
+          "输出 [[1, 2, 99], [3, 4]]（内层共享）",
+          "报错（copy 方法不存在）",
+          "输出 [[99], [99]]"
+        ],
+        answer: 1,
+        explanation: "a.copy() 是浅拷贝：复制外层列表，但内层列表仍然共享。所以 b[0] 和 a[0] 指向同一个内层列表，b[0].append(99) 会让 a 也看到变化。这是深浅拷贝的核心区别：浅拷贝只复制一层，深拷贝递归复制所有层。"
+      },
+
+      mentalModel: {
+        title: "浅拷贝复制外壳，深拷贝复制全部",
+        description: "列表嵌套时，浅拷贝（copy/[:]）复制外层容器，但容器里的引用仍指向原对象；深拷贝（deepcopy）递归复制每一层，得到完全独立的结构。判断标准：修改「复制品」的嵌套内容，原对象会不会变——会变就是浅拷贝，不变就是深拷贝。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:12px;font-family:ui-monospace,Menlo,monospace;font-size:13px">
+  <div style="display:flex;gap:32px">
+    <div style="text-align:center">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">浅拷贝 a.copy()</div>
+      <div style="border:1px solid var(--accent);border-radius:8px;padding:8px 12px;display:inline-block">
+        <div style="color:var(--accent);font-weight:700">b（新外壳）</div>
+        <div style="font-size:11px;color:var(--muted)">→ [1,2]（共享！）</div>
+        <div style="font-size:11px;color:var(--muted)">→ [3,4]（共享！）</div>
+      </div>
+      <div style="font-size:11px;color:var(--danger);margin-top:4px">改内层会影响原对象</div>
+    </div>
+    <div style="text-align:center">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:6px">深拷贝 deepcopy()</div>
+      <div style="border:1px solid var(--success);border-radius:8px;padding:8px 12px;display:inline-block">
+        <div style="color:var(--success);font-weight:700">b（新外壳）</div>
+        <div style="font-size:11px;color:var(--muted)">→ [1,2]（复制）</div>
+        <div style="font-size:11px;color:var(--muted)">→ [3,4]（复制）</div>
+      </div>
+      <div style="font-size:11px;color:var(--success);margin-top:4px">完全独立</div>
+    </div>
+  </div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "创建嵌套列表 a：外层包含两个内层列表 ref#1=[1,2] 和 ref#2=[3,4]",
+          state: { a: "→ [ref#1, ref#2]", ref1: [1, 2], ref2: [3, 4] }
+        },
+        {
+          line: 2,
+          explanation: "b = a.copy()：浅拷贝。创建新外层列表，但里面的元素仍是 ref#1 和 ref#2（引用共享）",
+          state: { a: "→ [ref#1, ref#2]", b: "→ [ref#1, ref#2]", ref1: [1, 2], ref2: [3, 4] }
+        },
+        {
+          line: 3,
+          explanation: "b[0].append(99)：b[0] 是 ref#1，修改 ref#1 内部 → [1, 2, 99]",
+          state: { a: "→ [ref#1, ref#2]", b: "→ [ref#1, ref#2]", ref1: [1, 2, 99], ref2: [3, 4] }
+        },
+        {
+          line: 4,
+          explanation: "print(a)：a[0] 也是 ref#1，输出 [[1, 2, 99], [3, 4]]",
+          state: { a: "→ [ref#1, ref#2]", output: "[[1, 2, 99], [3, 4]]" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "创建嵌套列表：a 的外层保存两个内层列表的引用。" },
+        { line: 2, text: "a.copy() 浅拷贝：复制外层壳，但内层引用原样复制——b[0] 和 a[0] 指向同一个内层列表。" },
+        { line: 3, text: "b[0].append(99)：通过 b 修改共享的内层列表，ref#1 变成 [1, 2, 99]。" },
+        { line: 4, text: "a[0] 也指向 ref#1，所以 a 显示 [1, 2, 99]——浅拷贝的「陷阱」。" }
+      ],
+
+      realWorldExample: {
+        title: "备份配置但保留部分引用",
+        problem: "系统配置含嵌套结构（主题选项、模块开关）。备份时如果用浅拷贝，修改备份的嵌套配置会污染原配置；全深拷贝又可能复制不该复制的对象（如共享连接）。真实系统需要按需选择：一层数据用浅拷贝，完全独立的快照用深拷贝。",
+        code: "import copy\n\nconfig = {\n    \"theme\": {\"mode\": \"dark\", \"accent\": \"blue\"},\n    \"features\": [\"search\", \"export\"],\n}\n\nsnapshot = copy.deepcopy(config)  # 完全独立快照\nsnapshot[\"theme\"][\"mode\"] = \"light\"  # 改快照\n\nprint(config[\"theme\"][\"mode\"])  # dark（原配置不变）\n\nshallow = config.copy()          # 浅拷贝\nshallow[\"theme\"][\"mode\"] = \"light\"\nprint(config[\"theme\"][\"mode\"])  # light（被污染了！）",
+        language: "python",
+        connections: ["value.semantics", "model.record-struct-class"]
+      },
+
+      confusions: [
+        {
+          left: "浅拷贝",
+          right: "深拷贝",
+          explanation: "浅拷贝复制一层：外层是新对象，内层引用共享。深拷贝递归复制所有层：完全独立。修改浅拷贝的嵌套内容会影响原对象，深拷贝不会。",
+          leftExample: "b = a.copy()\nb[0].append(9)  # 影响 a",
+          rightExample: "b = copy.deepcopy(a)\nb[0].append(9)  # 不影响 a"
+        },
+        {
+          left: "不可变对象",
+          right: "可变对象",
+          explanation: "不可变对象（int、str、tuple）赋值/拷贝总是「安全」的——任何修改都产生新对象，旧对象不变。可变对象（list、dict、set、对象）复制时才需要考虑深浅。不可变 + 引用共享没有风险，可变 + 引用共享才有意外修改风险。",
+          leftExample: "a = \"hello\"\nb = a  # 共享引用也安全\nb += \"!\"  # 创建新字符串\na  # 仍是 hello",
+          rightExample: "a = [1, 2]\nb = a  # 共享引用\nb.append(3)\na  # [1, 2, 3] 被改了"
+        },
+        {
+          left: "复制引用（赋值）",
+          right: "复制内容（拷贝）",
+          explanation: "b = a 复制引用：两个变量指向同一个对象，完全共享。b = a.copy() 复制内容：新对象，但内容可能共享内层。复制引用永远不产生独立数据；复制内容至少一层独立。",
+          leftExample: "b = a  # 同一个对象\nb.append(1)  # a 也变",
+          rightExample: "b = a.copy()  # 新对象\nb.append(1)  # a 不变（一层内）"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\noriginal = [[1, 2], [3, 4]]\nbackup = original.copy()\nbackup[0][0] = 999\nprint(original)",
+          message: "输出 [[999, 2], [3, 4]]——备份修改污染了原数据",
+          cause: "copy() 是浅拷贝。backup[0] 和 original[0] 指向同一个内层列表，修改内层元素直接改到原数据。期望「备份后随便改」的想法落空。",
+          fix: "需要完全独立时用 copy.deepcopy()。",
+          variantCode: "import copy\noriginal = [[1, 2], [3, 4]]\nbackup = copy.deepcopy(original)\nbackup[0][0] = 999\nprint(original)  # [[1, 2], [3, 4]] 安全"
+        },
+        {
+          code: "// JavaScript\nconst original = { a: 1, nested: { b: 2 } };\nconst copy = { ...original };\ncopy.nested.b = 999;\nconsole.log(original.nested.b);",
+          message: "输出 999——展开运算符复制后嵌套对象仍共享",
+          cause: "{ ...original } 是浅拷贝。展开运算符只复制一层，nested 对象仍共享。这是 JS 中最常见的拷贝误区之一。",
+          fix: "需要深拷贝用 JSON.parse(JSON.stringify(x))（有限制）或 structuredClone(x)。",
+          variantCode: "const original = { a: 1, nested: { b: 2 } };\nconst copy = structuredClone(original);  // 深拷贝\ncopy.nested.b = 999;\nconsole.log(original.nested.b);  // 2"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "collection.copy.ex01",
+          level: "A",
+          type: "concept",
+          question: "浅拷贝（shallow copy）复制了什么？",
+          options: [
+            "所有层的内容",
+            "只复制引用",
+            "什么都不复制",
+            "只复制一层，内层引用共享"
+          ],
+          answer: 3,
+          feedback: "浅拷贝复制外层容器，内层元素仍共享引用。深拷贝才递归复制所有层。"
+        },
+        {
+          id: "collection.copy.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\na = [1, 2]\nb = a.copy()\nb.append(3)\nprint(a)",
+          options: ["[1, 2, 3]", "[1, 2]", "[3]", "报错"],
+          answer: 1,
+          feedback: "copy() 浅拷贝外层，b 是独立列表。b.append(3) 只改 b，a 仍是 [1, 2]。"
+        },
+        {
+          id: "collection.copy.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\na = [[1], [2]]\nb = a.copy()\nb[0].append(9)\nprint(a)",
+          options: ["[[1], [2]]", "[[9], [9]]", "[[1, 9], [2]]", "报错"],
+          answer: 2,
+          feedback: "浅拷贝后 b[0] 和 a[0] 共享同一个内层列表 [1]，append(9) 使其变成 [1, 9]，a 也看到变化。"
+        },
+        {
+          id: "collection.copy.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，让 backup 与原列表完全独立（包括内层）：",
+          options: [
+            "import copy\nbackup = copy.deepcopy(original)",
+            "backup = original.copy()",
+            "backup = original[:]",
+            "backup = original"
+          ],
+          answer: 0,
+          feedback: "deepcopy 递归复制所有层，完全独立。copy() 和 [:] 都是浅拷贝，嵌套仍共享；backup = original 连外层都共享。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写代码：创建嵌套列表 data = [[1, 2], [3, 4]]，用深拷贝复制为 clone，修改 clone[0] 的第一个元素为 99，验证 data 不变",
+        hints: [
+          "import copy",
+          "copy.deepcopy(data)",
+          "打印 data 验证仍是 [[1, 2], [3, 4]]"
+        ],
+        solution: "import copy\ndata = [[1, 2], [3, 4]]\nclone = copy.deepcopy(data)\nclone[0][0] = 99\nprint(data)   # [[1, 2], [3, 4]]\nprint(clone)  # [[99, 2], [3, 4]]",
+        solutionOutput: "[[1, 2], [3, 4]]\n[[99, 2], [3, 4]]"
+      },
+
+      connections: {
+        current: "复制与引用",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">值语义 / 引用语义</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">赋值 ── 浅拷贝 ── 深拷贝</div>
+  <div>│</div>
+  <div style="color:var(--muted)">可变性 / 对象</div>
+</div>`,
+        prerequisites: ["value.semantics", "collection.array-list"],
+        related: ["value.semantics", "value.mutability", "model.record-struct-class"],
+        next: ["value.semantics", "collection.sort-search"]
+      },
+
+      nextStep: {
+        title: "排序、查找与去重",
+        description: "理解复制后，下一步学习数据整理三件套：排序（按规则排列）、查找（快速定位元素）、去重（消除重复）。它们与复制/引用一起构成处理可变集合的完整工具箱。",
+        targetId: "collection.sort-search"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 17：排序/查找/去重（数据整理模型）
+    // ================================================================
+    {
+      id: "collection.sort-search",
+      estimatedTime: 11,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "如何在 100 万个数里快速找到某个值？",
+        code: "numbers = [34, 7, 23, 89, 12]\nnumbers.sort()\nprint(numbers)",
+        options: [
+          "输出 [34, 7, 23, 89, 12]（sort 不改变原列表）",
+          "输出 [7, 12, 23, 34, 89]（原列表被排序）",
+          "报错（sort 方法不存在）",
+          "输出 None"
+        ],
+        answer: 1,
+        explanation: "list.sort() 是原地排序：直接修改原列表，按升序排列。排序之后，查找就能用二分法（O(log n)）而不是线性扫描（O(n)）——这就是「排序为查找加速」的核心价值。注意区分：list.sort() 原地排序返回 None，sorted(list) 返回新列表。"
+      },
+
+      mentalModel: {
+        title: "排序让查找变快",
+        description: "想象一本无序的电话簿：找一个人要翻整本（线性 O(n)）。排好序的电话簿：每次翻中间，比大小决定往前还是往后，几页就定位（二分 O(log n)）。排序本身有成本（O(n log n)），但一次排序换来无数次快速查找——频繁查询时非常划算。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;font-family:ui-monospace,Menlo,monospace;font-size:13px">
+  <div style="font-size:12px;color:var(--muted)">查找 23：线性扫描（未排序）</div>
+  <div style="display:flex;gap:4px">
+    <div style="padding:4px 8px;border:1px solid var(--line);border-radius:6px">34</div>
+    <div style="padding:4px 8px;border:1px solid var(--line);border-radius:6px">7</div>
+    <div style="padding:4px 8px;border:1px solid var(--line);border-radius:6px">23</div>
+    <div style="padding:4px 8px;border:1px solid var(--line);border-radius:6px">89</div>
+    <div style="padding:4px 8px;border:1px solid var(--line);border-radius:6px">12</div>
+  </div>
+  <div style="font-size:11px;color:var(--danger)">最坏情况要找 5 次（O(n)）</div>
+  <div style="font-size:18px">↓ sort()</div>
+  <div style="display:flex;gap:4px">
+    <div style="padding:4px 8px;border:1px solid var(--success);border-radius:6px;color:var(--success)">7</div>
+    <div style="padding:4px 8px;border:1px solid var(--success);border-radius:6px;color:var(--success)">12</div>
+    <div style="padding:4px 8px;border:1px solid var(--accent);border-radius:6px;background:rgba(99,102,241,.1);color:var(--accent);font-weight:700">23</div>
+    <div style="padding:4px 8px;border:1px solid var(--success);border-radius:6px;color:var(--success)">34</div>
+    <div style="padding:4px 8px;border:1px solid var(--success);border-radius:6px;color:var(--success)">89</div>
+  </div>
+  <div style="font-size:11px;color:var(--success)">二分查找：2-3 次定位（O(log n)）</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "创建列表 numbers：五个乱序数字",
+          state: { numbers: [34, 7, 23, 89, 12] }
+        },
+        {
+          line: 2,
+          explanation: "numbers.sort()：原地排序，直接修改列表，变为升序 [7, 12, 23, 34, 89]",
+          state: { numbers: [7, 12, 23, 34, 89] }
+        },
+        {
+          line: 3,
+          explanation: "print(numbers) 输出排序后的列表",
+          state: { numbers: [7, 12, 23, 34, 89], output: "[7, 12, 23, 34, 89]" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "创建乱序列表。" },
+        { line: 2, text: "numbers.sort()：原地升序排序。注意 sort() 修改原列表并返回 None——不要写成 print(numbers.sort())（会输出 None）。" },
+        { line: 3, text: "print(numbers)：显示排序后的列表 [7, 12, 23, 34, 89]。" }
+      ],
+
+      realWorldExample: {
+        title: "排行榜 Top K",
+        problem: "游戏需要展示「本月得分最高的 10 名玩家」。先按分数排序，取前 10 个。排序 + 切片是数据展示的标准组合。大列表还可以用 heapq.nlargest 更高效，但理解排序是基础。",
+        code: "players = [\n    (\"alice\", 3200),\n    (\"bob\", 2100),\n    (\"carol\", 4500),\n    (\"dave\", 1500),\n    (\"eve\", 3800),\n]\n\n# 按分数降序排序\nplayers.sort(key=lambda p: p[1], reverse=True)\n\nprint(\"排行榜前 3:\")\nfor name, score in players[:3]:\n    print(f\"  {name}: {score}\")",
+        language: "python",
+        connections: ["function.higher-order", "collection.filter-map-reduce"]
+      },
+
+      confusions: [
+        {
+          left: "list.sort()",
+          right: "sorted()",
+          explanation: "list.sort() 原地排序，修改原列表，返回 None。sorted() 返回新列表，原列表不变。需要保留原数据用 sorted，不在意原数据被改（省内存）用 sort。",
+          leftExample: "nums = [3, 1, 2]\nnums.sort()\nprint(nums)  # [1, 2, 3] 原列表被改",
+          rightExample: "nums = [3, 1, 2]\nnew = sorted(nums)\nprint(nums)  # [3, 1, 2] 不变\nprint(new)   # [1, 2, 3]"
+        },
+        {
+          left: "线性查找",
+          right: "二分查找",
+          explanation: "线性查找逐个比较 O(n)，适用于未排序数据。二分查找每次砍一半 O(log n)，要求数据已排序。二分需要维护有序性（插入成本高），线性插入便宜但查找慢——数据结构选择是时间成本的权衡。",
+          leftExample: "if x in nums:  # 未排序：O(n)\n    ...",
+          rightExample: "import bisect\ni = bisect.bisect_left(nums, x)  # 已排序：O(log n)"
+        },
+        {
+          left: "原地修改",
+          right: "返回新值",
+          explanation: "原地修改（sort、append、remove）改变对象本身、返回 None。返回新值（sorted、列表推导式）不改变原对象、返回新结果。搞混会导致 bug：result = nums.sort() 得到 None。",
+          leftExample: "nums.sort()  # 修改原列表，返回 None",
+          rightExample: "nums = sorted(nums)  # 返回新列表，需重新赋值"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\nnums = [34, 7, 23]\nresult = nums.sort()\nprint(result)  # 期望排序后的列表",
+          message: "输出 None",
+          cause: "list.sort() 是原地排序，返回 None。result 拿到的是 None 而不是排序后的列表。想得到新列表应该用 sorted(nums)。",
+          fix: "用 sorted(nums) 获取新列表，或先 sort() 再打印原列表。",
+          variantCode: "nums = [34, 7, 23]\nresult = sorted(nums)  # 新列表\nprint(result)  # [7, 23, 34]\nprint(nums)   # [34, 7, 23] 原列表不变"
+        },
+        {
+          code: "# Python\nwords = [\"banana\", \"apple\", \"Cherry\"]\nwords.sort()\nprint(words)",
+          message: "输出 ['Cherry', 'apple', 'banana']——大小写混合排序不符合直觉",
+          cause: "默认按 Unicode 码点排序，大写字母（65-90）在小写（97-122）之前，所以 'Cherry' 排最前。期望按字母顺序需要统一大小写比较。",
+          fix: "用 key=str.lower 忽略大小写排序。",
+          variantCode: "words = [\"banana\", \"apple\", \"Cherry\"]\nwords.sort(key=str.lower)\nprint(words)  # ['apple', 'banana', 'Cherry']"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "collection.sort-search.ex01",
+          level: "A",
+          type: "concept",
+          question: "list.sort() 与 sorted() 的主要区别是什么？",
+          options: [
+            "sort 只能排数字，sorted 只能排字符串",
+            "两者完全一样",
+            "sort 返回新列表，sorted 原地修改",
+            "sort 原地修改返回 None，sorted 返回新列表"
+          ],
+          answer: 3,
+          feedback: "sort() 原地排序返回 None；sorted() 返回新列表不修改原数据。"
+        },
+        {
+          id: "collection.sort-search.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\nnums = [3, 1, 2]\nresult = nums.sort()\nprint(result)",
+          options: ["[1, 2, 3]", "None", "3", "报错"],
+          answer: 1,
+          feedback: "list.sort() 返回 None（原地修改），result 是 None。"
+        },
+        {
+          id: "collection.sort-search.ex03",
+          level: "B",
+          type: "read",
+          question: "二分查找（binary search）需要什么前提条件？",
+          options: [
+            "数据量小",
+            "数据无重复",
+            "数据已排序",
+            "数据是数字"
+          ],
+          answer: 2,
+          feedback: "二分查找每次与中间元素比较，要求数据有序，否则无法判断该往哪边找。"
+        },
+        {
+          id: "collection.sort-search.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，按分数降序排列 players（不修改原列表）：",
+          options: [
+            "ranked = sorted(players, key=lambda p: p[\"score\"], reverse=True)",
+            "ranked = players.sort(key=lambda p: p[\"score\"])",
+            "ranked = sorted(players, key=lambda p: p[\"score\"])",
+            "players.sort(reverse=True)\nranked = players"
+          ],
+          answer: 0,
+          feedback: "选项 0 正确：sorted 返回新列表，key 指定按 score，reverse=True 降序。选项 1 返回 None 且修改原列表。选项 3 是升序。选项 4 排序的是整个字典没有按 key。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写代码：把字符串列表 [\"pear\", \"apple\", \"banana\"] 按长度从短到长排序",
+        hints: [
+          "sorted 的 key 参数接收函数",
+          "len 函数返回字符串长度",
+          "结果是 ['pear', 'apple', 'banana']？不对，['apple'(5), 'pear'(4), 'banana'(6)] → 按长度是 ['pear', 'apple', 'banana']"
+        ],
+        solution: "fruits = [\"pear\", \"apple\", \"banana\"]\nresult = sorted(fruits, key=len)\nprint(result)",
+        solutionOutput: "['pear', 'apple', 'banana']"
+      },
+
+      connections: {
+        current: "排序与查找",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">集合 / 过滤映射归约</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">排序 ── 查找 ── 去重</div>
+  <div>│</div>
+  <div style="color:var(--muted)">时间复杂度 / 算法</div>
+</div>`,
+        prerequisites: ["collection.set", "function.higher-order"],
+        related: ["collection.filter-map-reduce", "collection.copy", "collection.set"],
+        next: ["collection.filter-map-reduce", "string.index-slice"]
+      },
+
+      nextStep: {
+        title: "字符串索引与切片",
+        description: "排序与查找处理的是集合。下一步学习字符串这个特殊的「字符集合」：如何用索引访问单个字符、用切片截取子串。字符串在多数语言中不可变，行为与列表有重要区别。",
+        targetId: "string.index-slice"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 18：字符串索引与切片（数据模型）
+    // ================================================================
+    {
+      id: "string.index-slice",
+      estimatedTime: 10,
+      difficulty: "beginner",
+
+      hook: {
+        question: "如何从字符串中取出一部分？",
+        code: "text = \"hello world\"\nprint(text[0:5])\nprint(text[-5:])",
+        options: [
+          "报错（字符串不支持切片）",
+          "输出 hello 和 world",
+          "输出 h 和 d",
+          "输出 hello world 和 hello"
+        ],
+        answer: 1,
+        explanation: "字符串切片 text[开始:结束] 提取子串：text[0:5] 取索引 0 到 4 的字符（hello），text[-5:] 从倒数第 5 个取到末尾（world）。切片遵循「含头不含尾」：包含开始索引，不包含结束索引。负索引从末尾倒数，是 Python 的独门便利。"
+      },
+
+      mentalModel: {
+        title: "字符串是字符序列，索引定位每个字符",
+        description: "字符串本质上是一个有序的字符序列，每个字符有一个位置（索引）。索引从 0 开始；负索引从 -1（最后一个）向前数。切片是「从 A 到 B 的一段」——像切蛋糕，含头不含尾。不同语言索引规则有差异（JS 的 substring、Rust 的 UTF-8 字节切片），理解「位置」的概念是关键。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;font-family:ui-monospace,Menlo,monospace;font-size:13px">
+  <div style="font-size:12px;color:var(--muted)">text = \"hello world\"</div>
+  <div style="display:flex;gap:2px">
+    <div style="text-align:center">
+      <div style="padding:6px 8px;border:1px solid var(--accent);border-radius:6px;background:rgba(99,102,241,.1);color:var(--accent);font-weight:700">h</div>
+      <div style="font-size:10px;color:var(--accent)">[0]</div>
+    </div>
+    <div style="text-align:center">
+      <div style="padding:6px 8px;border:1px solid var(--accent);border-radius:6px;background:rgba(99,102,241,.1);color:var(--accent);font-weight:700">e</div>
+      <div style="font-size:10px;color:var(--accent)">[1]</div>
+    </div>
+    <div style="text-align:center">
+      <div style="padding:6px 8px;border:1px solid var(--accent);border-radius:6px;background:rgba(99,102,241,.1);color:var(--accent);font-weight:700">l</div>
+      <div style="font-size:10px;color:var(--accent)">[2]</div>
+    </div>
+    <div style="text-align:center">
+      <div style="padding:6px 8px;border:1px solid var(--accent);border-radius:6px;background:rgba(99,102,241,.1);color:var(--accent);font-weight:700">l</div>
+      <div style="font-size:10px;color:var(--accent)">[3]</div>
+    </div>
+    <div style="text-align:center">
+      <div style="padding:6px 8px;border:1px solid var(--accent);border-radius:6px;background:rgba(99,102,241,.1);color:var(--accent);font-weight:700">o</div>
+      <div style="font-size:10px;color:var(--accent)">[4]</div>
+    </div>
+    <div style="text-align:center">
+      <div style="padding:6px 8px;border:1px solid var(--line);border-radius:6px"> </div>
+      <div style="font-size:10px;color:var(--muted)">[5]</div>
+    </div>
+    <div style="text-align:center">
+      <div style="padding:6px 8px;border:1px solid var(--success);border-radius:6px;color:var(--success)">w</div>
+      <div style="font-size:10px;color:var(--success)">[6]</div>
+    </div>
+    <div style="text-align:center">
+      <div style="padding:6px 8px;border:1px solid var(--success);border-radius:6px;color:var(--success)">o</div>
+      <div style="font-size:10px;color:var(--success)">[7]</div>
+    </div>
+    <div style="text-align:center">
+      <div style="padding:6px 8px;border:1px solid var(--success);border-radius:6px;color:var(--success)">r</div>
+      <div style="font-size:10px;color:var(--success)">[8]</div>
+    </div>
+    <div style="text-align:center">
+      <div style="padding:6px 8px;border:1px solid var(--success);border-radius:6px;color:var(--success)">l</div>
+      <div style="font-size:10px;color:var(--success)">[9]</div>
+    </div>
+    <div style="text-align:center">
+      <div style="padding:6px 8px;border:1px solid var(--success);border-radius:6px;color:var(--success)">d</div>
+      <div style="font-size:10px;color:var(--success)">[-1]</div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--muted)">text[0:5] → \"hello\" │ text[-5:] → \"world\"</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "创建字符串 text = \"hello world\"（11 个字符，索引 0-10）",
+          state: { text: "hello world" }
+        },
+        {
+          line: 2,
+          explanation: "text[0:5]：取索引 0 到 4（含头不含尾），得到 \"hello\"",
+          state: { text: "hello world", slice1: "hello" }
+        },
+        {
+          line: 2,
+          explanation: "print(text[0:5]) 输出 hello",
+          state: { text: "hello world", output: "hello" }
+        },
+        {
+          line: 3,
+          explanation: "text[-5:]：从倒数第 5 个字符（索引 6）到末尾，得到 \"world\"",
+          state: { text: "hello world", slice2: "world" }
+        },
+        {
+          line: 3,
+          explanation: "print(text[-5:]) 输出 world",
+          state: { text: "hello world", output: "hello\nworld" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "创建字符串。Python 字符串不可变，所有索引/切片操作都返回新字符串。" },
+        { line: 2, text: "text[0:5]：从索引 0 开始，取到索引 5 之前（即 0、1、2、3、4）。结果是 hello。" },
+        { line: 3, text: "text[-5:]：负索引从末尾数，-5 对应 w；省略结束索引表示取到末尾。结果是 world。" }
+      ],
+
+      realWorldExample: {
+        title: "解析文件名与扩展名",
+        problem: "用户上传文件，需要提取文件名和扩展名做安全校验。切片、索引、查找方法组合使用是字符串处理的标准套路。",
+        code: "filename = \"report_final_v3.pdf\"\n\n# 找最后一个点\ndot = filename.rfind(\".\")\n\n# 切片：名字和扩展名\nname = filename[:dot]\next_name = filename[dot+1:]\n\nprint(f\"文件名: {name}\")\nprint(f\"扩展名: {ext_name}\")\n\n# 更多常用操作\nprint(filename.upper())          # REPORT_FINAL_V3.PDF\nprint(filename.split(\"_\"))       # ['report', 'final', 'v3.pdf']",
+        language: "python",
+        connections: ["string.search-replace", "collection.iteration"]
+      },
+
+      confusions: [
+        {
+          left: "索引（单字符）",
+          right: "切片（子串）",
+          explanation: "text[i] 取单个字符（索引可以是负的），text[a:b] 取一段子串。单个字符是长度为 1 的字符串，切片可能为空。切片越界不会报错（自动截断），索引越界会报错（IndexError）。",
+          leftExample: "text = \"hello\"\ntext[1]  # 'e'\ntext[-1] # 'o'（最后一个）",
+          rightExample: "text[1:3]   # 'el'\ntext[1:99] # 'ello'（越界截断）"
+        },
+        {
+          left: "含头不含尾",
+          right: "含头含尾",
+          explanation: "Python/JS 等多数语言的切片 text[a:b] 包含 a 不包含 b——所以 text[0:len(text)] 恰好是全文，text[a:a] 是空串。这是设计上的便利：长度 = 结束 - 开始。",
+          leftExample: "text[0:5]  # 包含 0，不含 5\n# \"hello\"（5 个字符）",
+          rightExample: "// 有些语言/API 含尾\n// 如部分语言 substring(a, b+1)"
+        },
+        {
+          left: "字符串（不可变）",
+          right: "列表（可变）",
+          explanation: "字符串索引/切片与列表语法几乎相同，但字符串不可变：text[0] = 'x' 会报错，任何修改都生成新字符串。列表可以原地改元素。处理大量拼接时用列表/构建器，不要反复 + 拼接。",
+          leftExample: "text[0] = 'X'  # TypeError 不可变",
+          rightExample: "lst = ['a', 'b']\nlst[0] = 'X'  # OK 可变"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\ntext = \"hello\"\nprint(text[5])",
+          message: "崩溃：IndexError: string index out of range",
+          cause: "hello 有 5 个字符，索引 0-4。text[5] 越界。注意：切片 text[5:10] 不会报错（返回空串），但索引会。",
+          fix: "先检查长度 len(text)，或使用安全的切片。",
+          variantCode: "text = \"hello\"\nprint(len(text))  # 5\nprint(text[4])    # 'o'（最后一个索引）\nprint(text[-1])   # 'o'（负索引更安全）\nprint(text[5:99]) # ''（切片越界自动截断）"
+        },
+        {
+          code: "// JavaScript\nconst emoji = \"🙂\";\nconsole.log(emoji.length);",
+          message: "输出 2，而不是 1",
+          cause: "JS 的 length 按 UTF-16 码元计算，emoji 占 2 个码元。字符串「长度」在 Unicode 时代不简单——中文占 1 码元但有些 emoji 占 2 甚至更多。Rust 甚至禁止直接按索引取字符。",
+          fix: "需要按「用户感知字符」（grapheme）计数时使用专用库（如 Intl.Segmenter）。",
+          variantCode: "const emoji = \"🙂\";\nconsole.log(emoji.length);         // 2（码元数）\n// 用迭代器按字符遍历\nconsole.log([...emoji].length);   // 1（迭代单位）\n// 或 Intl.Segmenter 按字素\nconst seg = new Intl.Segmenter().segment(emoji);\nconsole.log([...seg].length);     // 1（用户感知字符）"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "string.index-slice.ex01",
+          level: "A",
+          type: "concept",
+          question: "Python 中 text[0:5] 包含哪些字符？",
+          options: [
+            "索引 0 到 5（6 个字符）",
+            "索引 0 到 4（5 个字符，含头不含尾）",
+            "索引 1 到 5（5 个字符）",
+            "只有索引 0"
+          ],
+          answer: 1,
+          feedback: "切片含头不含尾：text[0:5] 包含索引 0、1、2、3、4 共 5 个字符。"
+        },
+        {
+          id: "string.index-slice.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\ntext = \"hello world\"\nprint(text[-5:])",
+          options: ["hello", "d", "报错", "world"],
+          answer: 3,
+          feedback: "text[-5:] 从倒数第 5 个字符取到末尾，得到 world。"
+        },
+        {
+          id: "string.index-slice.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\ntext = \"abcdef\"\nprint(text[1:4])",
+          options: ["abcd", "bcde", "bcd", "abc"],
+          answer: 2,
+          feedback: "text[1:4] 包含索引 1、2、3，即 b、c、d。结果是 bcd。"
+        },
+        {
+          id: "string.index-slice.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，提取字符串的中间三个字符（如 \"abcdefgh\" → \"def\"，即索引 3、4、5）：",
+          options: [
+            "text[3:6]",
+            "text[3:5]",
+            "text[2:5]",
+            "text[4:7]"
+          ],
+          answer: 0,
+          feedback: "索引 3、4、5 对应切片 text[3:6]（含头 3 不含尾 6）。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写代码：反转字符串 \"hello\" 得到 \"olleh\"",
+        hints: [
+          "切片支持步长参数 text[::step]",
+          "步长 -1 表示从后往前",
+          "text[::-1] 即反转"
+        ],
+        solution: "text = \"hello\"\nreversed_text = text[::-1]\nprint(reversed_text)",
+        solutionOutput: "olleh"
+      },
+
+      connections: {
+        current: "字符串",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">字符 / Unicode</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">索引 ── 切片 ── 查找替换</div>
+  <div>│</div>
+  <div style="color:var(--muted)">不可变性 / 构建器</div>
+</div>`,
+        prerequisites: ["collection.array-list", "value.binding"],
+        related: ["string.search-replace", "string.builder", "string.unicode"],
+        next: ["string.search-replace", "string.builder"]
+      },
+
+      nextStep: {
+        title: "查找、替换、拆分与连接",
+        description: "掌握了索引和切片，下一步学习字符串的更高层操作：find（查找子串）、replace（替换）、split（拆分）、join（连接）——它们让你不用手动管理索引，用声明式的方式处理文本。",
+        targetId: "string.search-replace"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 19：自定义错误类型（异常模型）
+    // ================================================================
+    {
+      id: "error.custom-types",
+      estimatedTime: 12,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "如何区分「余额不足」和「账号不存在」这两种错误？",
+        code: "class InsufficientFundsError(Exception):\n    pass\n\ndef withdraw(account, amount):\n    if account.balance < amount:\n        raise InsufficientFundsError(\"余额不足\")\n\nprint(\"转账失败\" if False else \"处理中\")",
+        options: [
+          "只能用一种通用 Exception，无法区分",
+          "继承 Exception 定义自定义异常，按类型分别捕获",
+          "报错（自定义异常语法错误）",
+          "用 return -1 表示所有错误"
+        ],
+        answer: 1,
+        explanation: "自定义异常：继承内置 Exception 类创建自己的错误类型。这样调用方可以精确捕获：except InsufficientFundsError 处理余额问题，except AccountNotFoundError 处理账号问题——按错误类型分流，比一个通用异常 + 字符串判断清晰得多。"
+      },
+
+      mentalModel: {
+        title: "自定义异常是「带名字的错误信号」",
+        description: "内置异常（ValueError、TypeError）是通用信号；自定义异常像定制信号灯：每种业务错误一个专属类型，携带自己的上下文数据（错误码、余额、订单号）。捕获方按类型精确响应，而不是猜字符串内容。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;font-family:ui-monospace,Menlo,monospace;font-size:13px">
+  <div style="padding:6px 14px;border:2px solid var(--line);border-radius:8px;color:var(--muted)">Exception（基类）</div>
+  <div style="font-size:18px">↓ 继承</div>
+  <div style="display:flex;gap:16px">
+    <div style="padding:8px 16px;border:2px solid var(--danger);border-radius:10px;text-align:center;background:rgba(239,68,68,.08)">
+      <div style="font-weight:700;color:var(--danger)">InsufficientFundsError</div>
+      <div style="font-size:11px;color:var(--muted)">余额不足</div>
+    </div>
+    <div style="padding:8px 16px;border:2px solid var(--accent);border-radius:10px;text-align:center;background:rgba(99,102,241,.08)">
+      <div style="font-weight:700;color:var(--accent)">AccountNotFoundError</div>
+      <div style="font-size:11px;color:var(--muted)">账号不存在</div>
+    </div>
+  </div>
+  <div style="font-size:18px">↓ 分别捕获</div>
+  <div style="font-size:12px;color:var(--muted)">except InsufficientFundsError → 提示充值<br>except AccountNotFoundError → 提示注册</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "定义 InsufficientFundsError，继承 Exception。此时只是创建了新类型",
+          state: { types: { InsufficientFundsError: "defined" } }
+        },
+        {
+          line: 5,
+          explanation: "定义 withdraw 函数。account.balance(50) < amount(100)，条件成立",
+          state: { account: { balance: 50 }, amount: 100 }
+        },
+        {
+          line: 6,
+          explanation: "raise InsufficientFundsError(\"余额不足\")：抛出带消息的自定义异常",
+          state: { exception: "InsufficientFundsError: 余额不足" }
+        },
+        {
+          line: 8,
+          explanation: "异常向上传播。如果调用方捕获 InsufficientFundsError，则进入对应处理分支",
+          state: { exception: "InsufficientFundsError: 余额不足", handler: "except InsufficientFundsError" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "class InsufficientFundsError(Exception)：继承内置 Exception。pass 表示不添加新成员（可以加属性）。" },
+        { line: 5, text: "withdraw 检查余额。balance(50) < amount(100)，触发错误条件。" },
+        { line: 6, text: "raise InsufficientFundsError(\"余额不足\")：抛出异常，消息是「余额不足」。raise 之后的代码不执行。" },
+        { line: 8, text: "异常向上传播，由调用方的 except InsufficientFundsError 精确捕获处理。" }
+      ],
+
+      realWorldExample: {
+        title: "银行转账系统",
+        problem: "转账有多个失败原因：余额不足、账号不存在、单笔超限。每个都是独立的业务错误，需要不同的用户提示和重试策略。自定义异常让每个错误类型携带业务数据，捕获逻辑精确可控。",
+        code: "class InsufficientFundsError(Exception):\n    def __init__(self, balance, amount):\n        super().__init__(f\"余额不足：需 {amount}，现有 {balance}\")\n        self.balance = balance\n        self.amount = amount\n\nclass AccountNotFoundError(Exception):\n    pass\n\ndef transfer(from_acc, to_id, amount):\n    if not from_acc:\n        raise AccountNotFoundError(\"源账号不存在\")\n    if from_acc.balance < amount:\n        raise InsufficientFundsError(from_acc.balance, amount)\n    from_acc.balance -= amount\n    return \"转账成功\"\n\n# 调用方精确捕获\ntry:\n    transfer(None, \"u2\", 100)\nexcept AccountNotFoundError:\n    print(\"请先创建账号\")\nexcept InsufficientFundsError as e:\n    print(f\"余额不足，当前余额 {e.balance}\")",
+        language: "python",
+        connections: ["error.exception-vs-result", "model.record-struct-class"]
+      },
+
+      confusions: [
+        {
+          left: "自定义异常",
+          right: "内置异常",
+          explanation: "内置异常（ValueError 等）覆盖通用错误，语义固定。自定义异常继承 Exception 表达业务错误（余额不足、订单已取消），可以带业务字段。规则：能用内置表达就用内置，业务语义用自定义。",
+          leftExample: "class OrderCancelledError(Exception):\n    pass\n\nraise OrderCancelledError(\"订单已取消\")",
+          rightExample: "raise ValueError(\"参数不合法\")  # 通用错误"
+        },
+        {
+          left: "异常类型",
+          right: "异常消息",
+          explanation: "类型决定「捕获逻辑」（except 按类型匹配），消息决定「展示内容」（给用户看）。不要用消息字符串做分支判断（脆弱），要用类型做分支，消息只是补充信息。",
+          leftExample: "except InsufficientFundsError:\n    # 按类型捕获，可靠",
+          rightExample: "except Exception as e:\n    if \"余额\" in str(e):  # 脆弱\n        ..."
+        },
+        {
+          left: "抛异常（raise）",
+          right: "返回错误值（return）",
+          explanation: "异常打断流程、强制处理（否则崩溃），适合「无法继续执行」的错误。错误值不打断流程、调用方可能忘记检查，适合「可降级处理」的错误。自定义异常让业务错误能精确表达。",
+          leftExample: "raise InsufficientFundsError(...)\n# 必须被捕获或传播",
+          rightExample: "return Err(\"余额不足\")\n# 调用方自行决定是否检查"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\nclass MyError:\n    pass\n\ntry:\n    raise MyError(\"出错\")\nexcept MyError:\n    print(\"捕获成功\")",
+          message: "崩溃：TypeError: exceptions must derive from BaseException",
+          cause: "自定义异常必须继承 Exception（或 BaseException）。直接 class MyError: pass 定义的是普通类，不能作为异常抛出。",
+          fix: "继承 Exception：class MyError(Exception): pass。",
+          variantCode: "class MyError(Exception):  # 必须继承 Exception\n    pass\n\ntry:\n    raise MyError(\"出错\")\nexcept MyError:\n    print(\"捕获成功\")  # 正常"
+        },
+        {
+          code: "# Python\ntry:\n    withdraw(acc, 500)\nexcept Exception:\n    print(\"出错了\")",
+          message: "捕获到了异常，但无法区分具体错误类型",
+          cause: "捕获 Exception 把所有错误混在一起处理。用户余额不足提示「出错了」而不是「请充值」，体验差且掩盖了其他 bug（如 AttributeError）。",
+          fix: "按具体异常类型分开捕获，最后才用 Exception 兜底。",
+          variantCode: "try:\n    withdraw(acc, 500)\nexcept InsufficientFundsError:\n    print(\"余额不足，请充值\")\nexcept AccountNotFoundError:\n    print(\"账号不存在\")\nexcept Exception as e:\n    print(f\"未知错误: {e}\")  # 兜底"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "error.custom-types.ex01",
+          level: "A",
+          type: "concept",
+          question: "自定义异常应该继承什么？",
+          options: [
+            "object",
+            "任何普通类",
+            "不需要继承",
+            "Exception"
+          ],
+          answer: 3,
+          feedback: "自定义异常必须继承 Exception（或它的子类），才能被 raise 和 except 机制识别。"
+        },
+        {
+          id: "error.custom-types.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\nclass OrderError(Exception):\n    pass\n\ntry:\n    raise OrderError(\"订单不存在\")\nexcept OrderError as e:\n    print(str(e))",
+          options: ["OrderError", "Exception", "订单不存在", "报错"],
+          answer: 2,
+          feedback: "raise OrderError(\"订单不存在\") 传入的消息，str(e) 返回该消息，输出「订单不存在」。"
+        },
+        {
+          id: "error.custom-types.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码会怎样？\n\nclass BadError:\n    pass\n\ntry:\n    raise BadError()\nexcept BadError:\n    print(\"ok\")",
+          options: [
+            "输出 ok",
+            "崩溃：TypeError（异常必须继承 Exception）",
+            "崩溃：NameError",
+            "无输出"
+          ],
+          answer: 1,
+          feedback: "BadError 没有继承 Exception，raise 时抛 TypeError: exceptions must derive from BaseException。"
+        },
+        {
+          id: "error.custom-types.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码：定义带错误码的自定义异常，让调用方能拿到 code：",
+          options: [
+            "class ApiError(Exception):\n    def __init__(self, code, msg):\n        super().__init__(msg)\n        self.code = code",
+            "class ApiError(Exception):\n    def __init__(self, code, msg):\n        self.code = code",
+            "class ApiError:\n    def __init__(self, code, msg):\n        self.code = code",
+            "class ApiError(Exception):\n    code = 404"
+          ],
+          answer: 0,
+          feedback: "选项 0 正确：调用 super().__init__(msg) 保留消息，同时加 self.code 属性。选项 1 没调用 super，str(e) 为空。选项 2 不是异常。选项 3 是类属性不是实例属性。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写代码：定义 NegativeValueError（继承 Exception），写函数 check_age(age)：age < 0 时抛出该异常",
+        hints: [
+          "class NegativeValueError(Exception): pass",
+          "if age < 0: raise NegativeValueError(\"年龄不能为负\")",
+          "函数正常时返回 age"
+        ],
+        solution: "class NegativeValueError(Exception):\n    pass\n\ndef check_age(age):\n    if age < 0:\n        raise NegativeValueError(\"年龄不能为负\")\n    return age\n\ntry:\n    check_age(-5)\nexcept NegativeValueError as e:\n    print(e)",
+        solutionOutput: "年龄不能为负"
+      },
+
+      connections: {
+        current: "错误处理",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">异常模型 / 类</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">自定义异常 ── 业务错误 ── 精确捕获</div>
+  <div>│</div>
+  <div style="color:var(--muted)">错误传播 / 资源释放</div>
+</div>`,
+        prerequisites: ["error.exception-vs-result", "model.record-struct-class"],
+        related: ["error.try-catch", "error.propagation", "error.resource-release"],
+        next: ["error.propagation", "test.assertions"]
+      },
+
+      nextStep: {
+        title: "断言与测试用例设计",
+        description: "自定义异常让代码能精确表达错误。下一步学习测试：用 assert 验证代码行为、设计测试用例。测试是「代码正确性的证据」——异常定义了什么时候失败，测试定义了什么时候算成功。",
+        targetId: "test.assertions"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 20：断言与测试（验证模型）
+    // ================================================================
+    {
+      id: "test.assertions",
+      estimatedTime: 11,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "如何证明你的函数是对的？",
+        code: "def add(a, b):\n    return a + b\n\nassert add(2, 3) == 5\nassert add(-1, 1) == 0\nprint(\"全部通过\")",
+        options: [
+          "报错（assert 不是 Python 语法）",
+          "assert 检查条件，条件为真继续，为假抛 AssertionError",
+          "assert 只是注释，不执行",
+          "输出 add(2, 3)"
+        ],
+        answer: 1,
+        explanation: "assert 语句检查条件：条件为 True 时静默通过（继续执行），为 False 时抛出 AssertionError 立即失败。测试的本质就是「写断言证明行为符合预期」——assert add(2, 3) == 5 验证加法正确。测试框架（pytest、JUnit）在此基础上提供收集、报告和隔离。"
+      },
+
+      mentalModel: {
+        title: "断言是代码的承诺书",
+        description: "断言表达「这里必须成立」的承诺：add(2,3) 必须等于 5。程序运行到这里，承诺成立就放行，承诺破裂就立即报警（AssertionError）。测试就是大量这样的承诺组成的「正确性证明」，每次改动代码后跑一遍，确保没破坏任何承诺。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;font-family:ui-monospace,Menlo,monospace;font-size:13px">
+  <div style="padding:6px 14px;border:2px solid var(--accent);border-radius:8px;color:var(--accent);font-weight:700">测试用例</div>
+  <div style="font-size:18px">↓ 断言</div>
+  <div style="display:flex;gap:16px">
+    <div style="padding:8px 16px;border:2px solid var(--success);border-radius:10px;background:rgba(34,197,94,.08);text-align:center">
+      <div style="color:var(--success);font-weight:700">✅ 通过</div>
+      <div style="font-size:11px;color:var(--muted)">assert add(2,3) == 5<br>条件为真，继续</div>
+    </div>
+    <div style="padding:8px 16px;border:2px solid var(--danger);border-radius:10px;background:rgba(239,68,68,.08);text-align:center">
+      <div style="color:var(--danger);font-weight:700">❌ 失败</div>
+      <div style="font-size:11px;color:var(--muted)">assert add(2,2) == 5<br>AssertionError</div>
+    </div>
+  </div>
+  <div style="font-size:12px;color:var(--muted)">测试 = 一组断言 + 自动检查</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "定义 add 函数",
+          state: { functions: { add: "defined(a, b) → a + b" } }
+        },
+        {
+          line: 4,
+          explanation: "执行 assert add(2, 3) == 5：计算 add(2,3)=5，5 == 5 为 True，断言通过，继续执行",
+          state: { functions: { add: "defined(a, b) → a + b" }, assertion1: "passed" }
+        },
+        {
+          line: 5,
+          explanation: "执行 assert add(-1, 1) == 0：计算 add(-1,1)=0，0 == 0 为 True，断言通过",
+          state: { functions: { add: "defined(a, b) → a + b" }, assertion2: "passed" }
+        },
+        {
+          line: 6,
+          explanation: "所有断言通过，输出「全部通过」",
+          state: { output: "全部通过" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "定义 add 函数。" },
+        { line: 4, text: "assert add(2, 3) == 5：断言函数行为。add(2,3) 返回 5，与 5 相等，条件为真，断言通过。" },
+        { line: 5, text: "第二个断言同样通过（边界情况 -1 和 1）。" },
+        { line: 6, text: "所有断言通过，输出「全部通过」。如果任一断言为假，会立即抛 AssertionError 停止。" }
+      ],
+
+      realWorldExample: {
+        title: "账户扣款逻辑的测试",
+        problem: "银行账户扣款是核心逻辑，必须覆盖各种场景：正常扣款、余额不足、扣到零。测试把这些场景写成一堆断言，每次改代码后自动运行——回归测试防止「修了一个 bug 引出另一个」。",
+        code: "class Account:\n    def __init__(self, balance):\n        self.balance = balance\n\n    def withdraw(self, amount):\n        if amount > self.balance:\n            raise ValueError(\"余额不足\")\n        self.balance -= amount\n        return self.balance\n\n# 测试用例\ndef test_withdraw():\n    acc = Account(100)\n    assert acc.withdraw(30) == 70     # 正常扣款\n    assert acc.balance == 70          # 余额更新\n    assert acc.withdraw(70) == 0      # 扣到零\n\ndef test_withdraw_insufficient():\n    acc = Account(10)\n    try:\n        acc.withdraw(100)\n        assert False, \"应该抛异常但没有\"\n    except ValueError:\n        pass  # 期望的异常，测试通过\n\n# 运行\nfor name, fn in [(\"test_withdraw\", test_withdraw), (\"test_withdraw_insufficient\", test_withdraw_insufficient)]:\n    fn()\n    print(f\"{name}: 通过\")",
+        language: "python",
+        connections: ["error.custom-types", "model.record-struct-class"]
+      },
+
+      confusions: [
+        {
+          left: "assert（断言）",
+          right: "if + raise",
+          explanation: "assert 用于开发期验证「不该发生的情况」，条件失败抛 AssertionError，且可被 -O 优化移除。if + raise 用于运行时防御真正的错误，永远生效。生产代码的参数校验用 if+raise，测试和开发期不变量用 assert。",
+          leftExample: "assert len(x) > 0  # 开发期检查\n# python -O 会移除",
+          rightExample: "if not x:\n    raise ValueError(\"x 不能为空\")  # 永远生效"
+        },
+        {
+          left: "单元测试",
+          right: "集成测试",
+          explanation: "单元测试测单个函数/类（隔离、快速、数量多）。集成测试测多个组件协作（真实环境、慢、数量少）。先单元后集成：单元测试定位精确，集成测试验证协作。",
+          leftExample: "test_add()  # 只测 add 函数",
+          rightExample: "test_api_flow()  # 请求 → 业务 → 数据库"
+        },
+        {
+          left: "测试通过",
+          right: "代码正确",
+          explanation: "测试通过只说明「已覆盖的场景符合预期」，不能证明没有 bug——没覆盖到的路径可能有错。测试是降低错误概率的证据，不是绝对保证。覆盖率 100% 也不能证明逻辑正确。",
+          leftExample: "assert add(2,3) == 5  # 通过\n# 但 add(\"2\", 3) 呢？没测",
+          rightExample: "add(2, 3) == 5\nadd(-1, 1) == 0\nadd(0, 0) == 0\nadd(999, 1) == 1000\n# 边界测得多，信心才强"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\ndef divide(a, b):\n    assert b != 0, \"除数不能为 0\"\n    return a / b\n\n# 生产环境运行：\nresult = divide(10, 0)",
+          message: "生产环境崩溃：AssertionError: 除数不能为 0（或 -O 模式下静默除零崩溃）",
+          cause: "用 assert 做运行时防御不合适：python -O 会移除所有 assert（断言变空操作），生产部署常用 -O 优化。应改用 if + raise 保证永远生效。",
+          fix: "运行时错误检查用 if + raise，assert 只用于测试和开发期不变量。",
+          variantCode: "def divide(a, b):\n    if b == 0:\n        raise ValueError(\"除数不能为 0\")  # 永远生效\n    return a / b\n\n# 测试里才用 assert\nassert divide(10, 2) == 5"
+        },
+        {
+          code: "# Python\n# 比较浮点数\nassert 0.1 + 0.2 == 0.3",
+          message: "崩溃：AssertionError——0.1 + 0.2 不等于 0.3",
+          cause: "浮点数二进制表示有精度误差：0.1 + 0.2 = 0.30000000000000004，不等于 0.3。直接 == 比较浮点运算结果是经典测试陷阱。",
+          fix: "用容差比较：abs(x - y) < 1e-9，或使用 decimal 模块。",
+          variantCode: "result = 0.1 + 0.2\nassert abs(result - 0.3) < 1e-9  # 容差比较\n\n# 或\nimport math\nassert math.isclose(0.1 + 0.2, 0.3)"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "test.assertions.ex01",
+          level: "A",
+          type: "concept",
+          question: "assert 条件为假时会发生什么？",
+          options: [
+            "继续执行",
+            "返回 False",
+            "抛出 AssertionError",
+            "打印警告"
+          ],
+          answer: 2,
+          feedback: "断言失败抛 AssertionError，程序停止（测试框架则记录该用例失败）。"
+        },
+        {
+          id: "test.assertions.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\nassert 1 + 1 == 2\nprint(\"A\")\nassert 1 + 1 == 3\nprint(\"B\")",
+          options: ["A\\nB", "A", "B", "无输出"],
+          answer: 1,
+          feedback: "第一个断言通过输出 A；第二个断言失败抛 AssertionError，print(\"B\") 不会执行。"
+        },
+        {
+          id: "test.assertions.ex03",
+          level: "B",
+          type: "read",
+          question: "为什么生产代码应该用 if + raise 而不是 assert 做参数校验？",
+          options: [
+            "assert 语法更慢",
+            "assert 只能用在测试文件",
+            "if + raise 更简短",
+            "python -O 会移除 assert，校验失效"
+          ],
+          answer: 3,
+          feedback: "python -O 优化模式移除所有 assert 语句，生产部署常用 -O，运行时校验会静默失效。"
+        },
+        {
+          id: "test.assertions.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全测试，验证 max_of 返回两个数中的较大值（含相等情况）：",
+          options: [
+            "assert max_of(3, 5) == 5\nassert max_of(5, 3) == 5\nassert max_of(4, 4) == 4",
+            "assert max_of(3, 5) == 5\nassert max_of(5, 3) == 3",
+            "assert max_of(3, 5)\nassert max_of(4, 4)",
+            "max_of(3, 5) == 5"
+          ],
+          answer: 0,
+          feedback: "选项 0 覆盖三个场景：大数在右、大数在左、相等。选项 1 第二个断言错了（5 > 3 应返回 5）。选项 2/3 没有具体断言值。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写 3 条断言，验证函数 is_even(n)（判断偶数）：偶数返回 True，奇数返回 False",
+        hints: [
+          "assert is_even(4) is True",
+          "assert is_even(7) is False",
+          "边界：assert is_even(0) is True"
+        ],
+        solution: "def is_even(n):\n    return n % 2 == 0\n\nassert is_even(4) is True\nassert is_even(7) is False\nassert is_even(0) is True\nprint(\"全部通过\")",
+        solutionOutput: "全部通过"
+      },
+
+      connections: {
+        current: "测试",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">函数 / 错误处理</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">断言 ── 测试用例 ── 回归</div>
+  <div>│</div>
+  <div style="color:var(--muted)">调试 / 质量保障</div>
+</div>`,
+        prerequisites: ["function.lambda", "error.try-catch"],
+        related: ["error.custom-types", "error.exception-vs-result", "function.higher-order"],
+        next: ["error.propagation", "function.higher-order"]
+      },
+
+      nextStep: {
+        title: "错误传播与包装",
+        description: "断言验证了「代码是否符合预期」。最后一步学习错误传播：异常如何在调用链中逐层传递、何时包装添加上下文、何时立即处理——这决定了大型系统错误信息的质量，也是你完成微课程后的下一站。",
+        targetId: "error.propagation"
+      }
     }
   ]
 };
