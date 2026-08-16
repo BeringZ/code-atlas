@@ -2509,6 +2509,638 @@ window.CODE_ATLAS_V2 = {
         description: "集合解决了「在不在」的问题。下一步学习三个更强大的集合操作：过滤（留下满足条件的）、映射（变换每个元素）、归约（合并成一个值）——它们组合起来能优雅地处理大部分数据任务。",
         targetId: "collection.filter-map-reduce"
       }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 13：高阶函数（函数式模型）
+    // ================================================================
+    {
+      id: "function.higher-order",
+      estimatedTime: 13,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "函数可以作为参数传给另一个函数吗？",
+        code: "# Python\ndef apply_twice(f, x):\n    return f(f(x))\n\ndef double(n):\n    return n * 2\n\nprint(apply_twice(double, 5))",
+        options: [
+          "报错（函数不能作为参数）",
+          "输出 10（double(5)）",
+          "输出 20（double(double(5))）",
+          "输出 25（5×5）"
+        ],
+        answer: 2,
+        explanation: "函数是「一等公民」：可以像普通值一样作为参数传递。apply_twice(double, 5) 把 double 函数传给 apply_twice，apply_twice 内部调用 f(f(x)) = double(double(5)) = double(10) = 20。接收函数作为参数或返回函数的函数叫高阶函数——map/filter/reduce、回调、装饰器都是它的应用。"
+      },
+
+      mentalModel: {
+        title: "高阶函数是「函数的函数」",
+        description: "普通函数操作数据（数字、字符串）；高阶函数操作函数本身——接收函数、返回函数，或两者兼有。就像一台「处理机器的机器」：你把一台小机器（函数）放进大机器（高阶函数），大机器用小机器加工数据。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:12px;font-family:ui-monospace,Menlo,monospace;font-size:14px">
+  <div style="font-size:12px;color:var(--muted)">把函数当参数传入</div>
+  <div style="display:flex;align-items:center;gap:12px">
+    <div style="padding:6px 14px;border:2px solid var(--accent);border-radius:10px;font-weight:700;color:var(--accent)">double</div>
+    <div style="font-size:20px">→</div>
+    <div style="padding:10px 20px;border:2px solid var(--success);border-radius:12px;text-align:center">
+      <div style="font-weight:700;color:var(--success)">apply_twice</div>
+      <div style="font-size:12px;color:var(--muted)">f(f(x))</div>
+    </div>
+    <div style="font-size:20px">→</div>
+    <div style="padding:6px 14px;border:1px solid var(--line);border-radius:10px">结果</div>
+  </div>
+  <div style="font-size:12px;color:var(--muted)">double(5)=10 → double(10)=20</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "定义 apply_twice 函数：参数 f（函数）和 x（值），返回 f(f(x))",
+          state: { functions: { apply_twice: "defined(f, x) → f(f(x))", double: "defined(n) → n*2" } }
+        },
+        {
+          line: 7,
+          explanation: "调用 apply_twice(double, 5)：把函数 double 和值 5 传给参数 f 和 x",
+          state: { callStack: [{ func: "apply_twice", f: "double", x: 5 }] }
+        },
+        {
+          line: 2,
+          explanation: "执行 f(f(x))：先算内层 f(x) = double(5) = 10",
+          state: { callStack: [{ func: "apply_twice", f: "double", x: 5 }, { func: "double", n: 5 }], inner: 10 }
+        },
+        {
+          line: 2,
+          explanation: "再算外层 f(10) = double(10) = 20，返回 20",
+          state: { callStack: [{ func: "apply_twice", f: "double", x: 5 }, { func: "double", n: 10 }], result: 20 }
+        },
+        {
+          line: 7,
+          explanation: "print 输出 20",
+          state: { result: 20, output: "20" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "定义 apply_twice(f, x)：第一个参数是函数 f，第二个是值 x。函数体是 f(f(x))。" },
+        { line: 4, text: "定义 double(n)：一个普通函数，返回 n*2。" },
+        { line: 7, text: "apply_twice(double, 5)：把 double 当作值传入。此时 f=double, x=5。" },
+        { line: 2, text: "f(f(x))：先算 f(5)=double(5)=10，再算 f(10)=double(10)=20。返回 20。" },
+        { line: 7, text: "输出 20。函数作为参数的机制：高阶函数内部通过参数名调用传入的函数。" }
+      ],
+
+      realWorldExample: {
+        title: "排序时的自定义比较器",
+        problem: "给一组学生按分数排序。排序函数本身不知道「按什么排序」，它接收一个比较函数（或键函数）作为参数——这就是高阶函数。同样的 sort，传入不同的 key 函数就能按分数、姓名或年龄排序，排序逻辑本身不用重写。",
+        code: "students = [\n    {\"name\": \"小明\", \"score\": 92},\n    {\"name\": \"小红\", \"score\": 88},\n    {\"name\": \"小刚\", \"score\": 95},\n]\n\n# 把 key 函数传给 sorted（高阶函数）\nby_score = sorted(students, key=lambda s: s[\"score\"])\nby_name = sorted(students, key=lambda s: s[\"name\"])\n\nprint([s[\"name\"] for s in by_score])  # 按分数升序\nprint([s[\"name\"] for s in by_name])   # 按姓名排序",
+        language: "python",
+        connections: ["function.closure", "collection.sort-search"]
+      },
+
+      confusions: [
+        {
+          left: "高阶函数",
+          right: "普通函数",
+          explanation: "普通函数操作数据（接收数据、返回数据）。高阶函数操作函数：接收函数作为参数、返回函数，或两者兼有。map/sorted/sorted 的 key、回调函数都是高阶函数的例子。",
+          leftExample: "def double(n):\n    return n * 2  # 普通函数",
+          rightExample: "def apply_twice(f, x):\n    return f(f(x))  # 高阶：f 是函数\n\nsorted(students, key=lambda s: s[\"score\"])"
+        },
+        {
+          left: "函数作为参数",
+          right: "函数调用作为参数",
+          explanation: "传「函数本身」不给括号（double），传「调用结果」给括号（double(5)）。前者是值传递（函数对象），后者先执行再传结果。搞混会导致把结果当函数调用或把函数当结果使用。",
+          leftExample: "apply_twice(double, 5)  # 传函数 double 本身",
+          rightExample: "apply_twice(double(5), x)  # 传结果 10（语义错误）"
+        },
+        {
+          left: "回调",
+          right: "同步调用",
+          explanation: "回调是把函数传给另一个函数，由对方在适当时候调用（如事件触发时）。同步调用是自己直接调用。回调的核心是「控制反转」：调用时机由接收方决定。",
+          leftExample: "button.onclick = handle_click\n# 点击时才调用 handle_click",
+          rightExample: "handle_click()  # 立即调用"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\nnumbers = [1, 2, 3, 4]\nresult = map(lambda n: n * 2, numbers)\nprint(result)",
+          message: "输出 <map object at 0x...>，而不是 [2, 4, 6, 8]",
+          cause: "Python 3 的 map 返回惰性迭代器，不会立即计算结果。直接 print 打印的是对象本身，需要转成列表（list(map(...))）或用 for 循环消费。",
+          fix: "用 list() 包裹 map/filter 的结果，或直接用列表推导式。",
+          variantCode: "numbers = [1, 2, 3, 4]\nresult = list(map(lambda n: n * 2, numbers))\nprint(result)  # [2, 4, 6, 8]\n\n# 或更地道的列表推导式\nresult = [n * 2 for n in numbers]"
+        },
+        {
+          code: "// JavaScript\nfunction process(fn, x) {\n    return fn(x);\n}\nconsole.log(process(double(5), 3));",
+          message: "崩溃：fn is not a function",
+          cause: "double(5) 是函数调用，传入的是结果 10 而不是函数 double。process 把 10 当作函数调用 fn(x) → 报错。传函数时不能加括号。",
+          fix: "process(double, 3)——传函数本身，不带括号。",
+          variantCode: "function process(fn, x) {\n    return fn(x);\n}\nconsole.log(process(double, 3));  // 6\n// 若要传 double(5) 的结果，process 应接收值而非函数"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "function.higher-order.ex01",
+          level: "A",
+          type: "concept",
+          question: "以下哪个是高阶函数？",
+          options: [
+            "def double(n): return n * 2",
+            "def apply(f, x): return f(x)",
+            "def add(a, b): return a + b",
+            "x = 5"
+          ],
+          answer: 1,
+          feedback: "apply(f, x) 接收函数 f 作为参数，是高阶函数。double 和 add 只操作普通值。"
+        },
+        {
+          id: "function.higher-order.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\ndef apply(f, x):\n    return f(x)\n\ndef square(n):\n    return n * n\n\nprint(apply(square, 4))",
+          options: ["4", "8", "16", "报错"],
+          answer: 2,
+          feedback: "apply(square, 4) 把 square 传给 f，执行 f(4) = square(4) = 16。"
+        },
+        {
+          id: "function.higher-order.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\nnums = [1, 2, 3]\nresult = list(map(lambda n: n + 10, nums))\nprint(result)",
+          options: ["[1, 2, 3]", "<map object>", "报错", "[11, 12, 13]"],
+          answer: 3,
+          feedback: "map 把 lambda 应用到每个元素：1+10=11, 2+10=12, 3+10=13。list() 消耗迭代器得到 [11, 12, 13]。"
+        },
+        {
+          id: "function.higher-order.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，让 repeat(f, n, x) 返回把 f 应用 n 次的结果（如 repeat(double, 2, 5) = 20）：",
+          options: [
+            "def repeat(f, n, x):\n    result = x\n    for _ in range(n):\n        result = f(result)\n    return result",
+            "def repeat(f, n, x):\n    return f(x)",
+            "def repeat(f, n, x):\n    for _ in range(n):\n        x = f(x)\n    return f(x)",
+            "def repeat(f, n, x):\n    return f(f(f(x)))"
+          ],
+          answer: 0,
+          feedback: "选项 0 正确：循环 n 次，每次把结果再应用 f。选项 1 只应用一次。选项 2 应用了 n 次但最后又多一次 f。选项 3 固定 3 次。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写一个高阶函数 make_adder(n)，返回一个把参数加上 n 的函数（如 add5 = make_adder(5)，add5(3) = 8）",
+        hints: [
+          "make_adder 返回一个函数",
+          "返回的函数接收 x，返回 x + n",
+          "这同时用到了闭包"
+        ],
+        solution: "def make_adder(n):\n    def adder(x):\n        return x + n\n    return adder\n\nadd5 = make_adder(5)\nprint(add5(3))\nprint(add5(10))",
+        solutionOutput: "8\n15"
+      },
+
+      connections: {
+        current: "高阶函数",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">闭包 / 一等函数</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">高阶函数 ── 回调 ── map/filter/reduce</div>
+  <div>│</div>
+  <div style="color:var(--muted)">装饰器 / 事件驱动</div>
+</div>`,
+        prerequisites: ["function.lambda", "function.closure"],
+        related: ["function.parameter-passing", "collection.filter-map-reduce", "function.recursion"],
+        next: ["collection.filter-map-reduce", "function.recursion"]
+      },
+
+      nextStep: {
+        title: "过滤、映射与归约",
+        description: "高阶函数最有名的应用就是集合三件套。下一步学习 filter（按条件筛选）、map（逐元素变换）、reduce（归约合并）——用函数式的方式优雅处理数据，替代手写循环。",
+        targetId: "collection.filter-map-reduce"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 14：过滤/映射/归约（数据流水线）
+    // ================================================================
+    {
+      id: "collection.filter-map-reduce",
+      estimatedTime: 12,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "如何优雅地处理一个数据列表？",
+        code: "scores = [82, 47, 91, 55, 68]\npassed = [s for s in scores if s >= 60]\nprint(passed)",
+        options: [
+          "报错（列表推导式不合法）",
+          "输出 [82, 47, 91, 55, 68]（全部保留）",
+          "输出 [82, 91, 68]（只留 >= 60 的）",
+          "输出 [47, 55]（只留 < 60 的）"
+        ],
+        answer: 2,
+        explanation: "列表推导式/高阶函数让集合处理变成一行：for 遍历每个元素，if 过滤条件，前面的表达式决定保留什么。这本质是 filter（过滤）：[s for s in scores if s >= 60] 留下所有 >= 60 的元素。加上变换（map）和归约（reduce），就能用声明式风格处理数据，比手写循环更清晰、更少出错。"
+      },
+
+      mentalModel: {
+        title: "数据流水线：过滤 → 变换 → 归约",
+        description: "想象一条工厂流水线：原料（原始集合）先过筛子（filter 按条件留下），再进加工机（map 变换每个元素），最后进打包机（reduce 合并成单个结果）。每一步都是独立的、可组合的，数据从一端流入，结果从另一端出来。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:10px;font-family:ui-monospace,Menlo,monospace;font-size:13px">
+  <div style="font-size:12px;color:var(--muted)">原始数据</div>
+  <div style="display:flex;gap:6px">
+    <div style="padding:4px 10px;border:1px solid var(--line);border-radius:6px">82</div>
+    <div style="padding:4px 10px;border:1px solid var(--line);border-radius:6px">47</div>
+    <div style="padding:4px 10px;border:1px solid var(--line);border-radius:6px">91</div>
+    <div style="padding:4px 10px;border:1px solid var(--line);border-radius:6px">55</div>
+    <div style="padding:4px 10px;border:1px solid var(--line);border-radius:6px">68</div>
+  </div>
+  <div style="font-size:18px">↓ filter: s >= 60</div>
+  <div style="display:flex;gap:6px">
+    <div style="padding:4px 10px;border:1px solid var(--success);border-radius:6px;color:var(--success)">82</div>
+    <div style="padding:4px 10px;border:1px solid var(--success);border-radius:6px;color:var(--success)">91</div>
+    <div style="padding:4px 10px;border:1px solid var(--success);border-radius:6px;color:var(--success)">68</div>
+  </div>
+  <div style="font-size:18px">↓ map: s + 5（加分）</div>
+  <div style="display:flex;gap:6px">
+    <div style="padding:4px 10px;border:1px solid var(--accent);border-radius:6px;color:var(--accent)">87</div>
+    <div style="padding:4px 10px;border:1px solid var(--accent);border-radius:6px;color:var(--accent)">96</div>
+    <div style="padding:4px 10px;border:1px solid var(--accent);border-radius:6px;color:var(--accent)">73</div>
+  </div>
+  <div style="font-size:18px">↓ reduce: 求和</div>
+  <div style="padding:6px 16px;border:2px solid var(--accent);border-radius:8px;font-weight:700;color:var(--accent)">256</div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "创建列表 scores：五个分数",
+          state: { scores: [82, 47, 91, 55, 68] }
+        },
+        {
+          line: 2,
+          explanation: "列表推导式开始：遍历 scores。s=82 满足 s>=60，保留",
+          state: { scores: [82, 47, 91, 55, 68], passing: [82] }
+        },
+        {
+          line: 2,
+          explanation: "s=47 不满足 s>=60，丢弃；s=91 满足，保留；s=55 丢弃；s=68 保留",
+          state: { scores: [82, 47, 91, 55, 68], passing: [82, 91, 68] }
+        },
+        {
+          line: 2,
+          explanation: "推导式完成，passing 绑定到 [82, 91, 68]",
+          state: { scores: [82, 47, 91, 55, 68], passing: [82, 91, 68] }
+        },
+        {
+          line: 3,
+          explanation: "print(passed) 输出 [82, 91, 68]",
+          state: { passing: [82, 91, 68], output: "[82, 91, 68]" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "创建分数列表。" },
+        { line: 2, text: "[s for s in scores if s >= 60]：推导式结构 = [表达式 for 变量 in 集合 if 条件]。依次检查每个 s：82、91、68 满足条件保留，47、55 丢弃。" },
+        { line: 2, text: "推导式结果绑定到 passed：[82, 91, 68]。" },
+        { line: 3, text: "print(passed) 输出结果。" }
+      ],
+
+      realWorldExample: {
+        title: "订单数据处理流水线",
+        problem: "电商后台需要处理订单列表：筛出已支付订单 → 提取金额 → 计算总额和平均额。用 filter + map + reduce 组合成一条清晰的流水线，每一阶段独立可读，比一个巨大的手写循环容易维护得多。",
+        code: "orders = [\n    {\"id\": 1, \"paid\": True,  \"amount\": 199},\n    {\"id\": 2, \"paid\": False, \"amount\": 59},\n    {\"id\": 3, \"paid\": True,  \"amount\": 350},\n    {\"id\": 4, \"paid\": True,  \"amount\": 89},\n]\n\npaid_amounts = [o[\"amount\"] for o in orders if o[\"paid\"]]\ntotal = sum(paid_amounts)\naverage = total / len(paid_amounts)\n\nprint(f\"已支付订单 {len(paid_amounts)} 笔，总额 ¥{total}，平均 ¥{average:.1f}\")",
+        language: "python",
+        connections: ["collection.iteration", "function.higher-order"]
+      },
+
+      confusions: [
+        {
+          left: "filter（过滤）",
+          right: "map（映射）",
+          explanation: "filter 按条件筛选元素，集合长度可能变短，元素本身不变。map 对每个元素做变换，长度不变，元素内容改变。filter 的返回值和条件相关，map 的返回值和变换函数相关。",
+          leftExample: "passed = [s for s in scores if s >= 60]\n# [82, 91, 68]（变短）",
+          rightExample: "doubled = [s * 2 for s in scores]\n# [164, 94, ...]（长度不变）"
+        },
+        {
+          left: "reduce（归约）",
+          right: "map/filter",
+          explanation: "map 和 filter 返回新集合，reduce 把集合合并成单个值（求和、求积、拼接）。reduce 是「集合 → 单值」，map/filter 是「集合 → 集合」。Python 的 sum()、max()、min() 都是内置的归约。",
+          leftExample: "total = sum(scores)  # 归约：列表 → 单值",
+          rightExample: "passed = filter(...)  # 集合 → 集合\ndoubled = map(...)   # 集合 → 集合"
+        },
+        {
+          left: "列表推导式",
+          right: "生成器表达式",
+          explanation: "列表推导式 [x for x in ...] 立即生成完整列表（占用内存）。生成器表达式 (x for x in ...) 惰性逐个产出（省内存，适合大数据）。两者语法只差括号，但求值时机不同。",
+          leftExample: "[n * 2 for n in range(10)]\n# 立即生成 10 个元素的列表",
+          rightExample: "(n * 2 for n in range(10))\n# 惰性：用的时候才逐个算"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\nscores = [82, 47, 91]\nresult = [s for s in scores if s >= 60 else s * 10]",
+          message: "崩溃：SyntaxError: invalid syntax",
+          cause: "列表推导式的 if 是过滤条件，不是三目表达式。想「满足保留、不满足变换」应该把条件放进表达式部分：s if s >= 60 else s * 10（三目）放在 for 之前。",
+          fix: "三目表达式放前面：[(s if s >= 60 else s * 10) for s in scores]。",
+          variantCode: "scores = [82, 47, 91]\n# 过滤 + 变换混合\nresult = [s if s >= 60 else s * 10 for s in scores]\nprint(result)  # [82, 470, 91]\n\n# 或分开写更清晰\nresult = [s * 10 for s in scores if s < 60] + [s for s in scores if s >= 60]"
+        },
+        {
+          code: "# Python\nwords = [\"apple\", \"banana\", \"cherry\"]\nlengths = [len(w) for w in words]\nprint(sum(lengths))  # 18\n# 但有人写成：\nprint(len([len(w) for w in words]))",
+          message: "输出 3（单词个数），而不是 18（字符总数）",
+          cause: "len(列表) 计算的是元素个数，不是元素内容之和。lengths 是 [5, 6, 6]，sum 是 18，len 是 3。混淆 sum 和 len 是常见错误——先想清楚要「求和」还是「计数」。",
+          fix: "要总字符数用 sum(len(w) for w in words)；要单词数用 len(words)。",
+          variantCode: "words = [\"apple\", \"banana\", \"cherry\"]\ntotal_chars = sum(len(w) for w in words)\nword_count = len(words)\nprint(total_chars)  # 18\nprint(word_count)   # 3"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "collection.filter-map-reduce.ex01",
+          level: "A",
+          type: "concept",
+          question: "filter（过滤）操作会改变集合的什么？",
+          options: [
+            "元素内容",
+            "集合类型",
+            "什么都不改变",
+            "元素个数（可能减少）"
+          ],
+          answer: 3,
+          feedback: "filter 按条件筛选，可能减少元素个数，但不会改变保留元素的本身内容。"
+        },
+        {
+          id: "collection.filter-map-reduce.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\nnums = [1, 2, 3, 4, 5]\nresult = [n * n for n in nums if n % 2 == 0]\nprint(result)",
+          options: ["[1, 4, 9, 16, 25]", "[2, 4]", "[4, 16]", "[1, 9, 25]"],
+          answer: 2,
+          feedback: "先过滤偶数（2, 4），再平方：2²=4, 4²=16。结果是 [4, 16]。"
+        },
+        {
+          id: "collection.filter-map-reduce.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\nnums = [3, 1, 4, 1, 5]\nprint(sum(nums))",
+          options: ["5", "14", "15", "报错"],
+          answer: 1,
+          feedback: "sum 是归约操作：3+1+4+1+5 = 14。"
+        },
+        {
+          id: "collection.filter-map-reduce.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码：计算列表中所有正数的平方和（如 [1, -2, 3] → 1²+3² = 10）：",
+          options: [
+            "total = sum(n * n for n in nums if n > 0)",
+            "total = sum(n for n in nums if n > 0)",
+            "total = [n * n for n in nums if n > 0]",
+            "total = sum(n * n for n in nums)"
+          ],
+          answer: 0,
+          feedback: "选项 0 正确：过滤正数 → 平方 → 求和，一条表达式。选项 1 只求和没平方。选项 2 结果是列表不是和。选项 3 没过滤负数。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "用一行代码：从字符串列表 words 中选出长度 >= 4 的单词，转成大写，拼接成逗号分隔字符串（如 [\"hi\", \"hello\"] → \"HELLO\"）",
+        hints: [
+          "先过滤 len(w) >= 4",
+          "再变换 w.upper()",
+          "最后用 join 拼接"
+        ],
+        solution: "words = [\"hi\", \"hello\", \"world\", \"ok\"]\nresult = \", \".join(w.upper() for w in words if len(w) >= 4)\nprint(result)",
+        solutionOutput: "HELLO, WORLD"
+      },
+
+      connections: {
+        current: "集合处理",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">遍历 / 高阶函数</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">filter ── map ── reduce</div>
+  <div>│</div>
+  <div style="color:var(--muted)">推导式 / 排序查找</div>
+</div>`,
+        prerequisites: ["collection.iteration", "function.higher-order"],
+        related: ["function.higher-order", "collection.sort-search", "collection.map"],
+        next: ["collection.sort-search", "collection.copy"]
+      },
+
+      nextStep: {
+        title: "排序、查找与去重",
+        description: "filter/map/reduce 解决「怎么处理」的问题。下一步学习排序（order）、查找（search）与去重（unique）——数据整理三件套，与过滤/映射/归约组合成完整的数据处理工具箱。",
+        targetId: "collection.sort-search"
+      }
+    },
+
+    // ================================================================
+    // 黄金样板扩展 15：try/catch/finally（异常处理模型）
+    // ================================================================
+    {
+      id: "error.try-catch",
+      estimatedTime: 12,
+      difficulty: "intermediate",
+
+      hook: {
+        question: "程序可能出错，怎么保证资源一定会被释放？",
+        code: "try:\n    file = open(\"data.txt\")\n    data = file.read()\nexcept FileNotFoundError:\n    print(\"文件不存在\")\nfinally:\n    print(\"清理完成\")",
+        options: [
+          "finally 只会在没出错时执行",
+          "无论成功还是出错，finally 都会执行",
+          "finally 和 except 不能同时使用",
+          "finally 会在 except 之前执行"
+        ],
+        answer: 1,
+        explanation: "try/except/finally 是异常处理的完整结构：try 放可能出错的代码，except 处理特定异常，finally 放「无论发生什么都必须执行」的清理代码。即使 try 中抛异常、except 处理了，finally 依然会执行——这是释放文件、关闭连接等资源清理的标准机制。"
+      },
+
+      mentalModel: {
+        title: "try 是安全区，finally 是最后防线",
+        description: "把 try 块想象成高风险作业区：出错时系统抛出红色信号球（异常）。except 是接球手，按异常类型接住并处理。finally 是「无论如何都会执行」的收尾程序——即使没有异常、即使异常没被接住、即使有 return，finally 都保证执行。它专门用来清理资源。",
+        diagram: `<div style="display:flex;flex-direction:column;align-items:center;gap:12px;font-family:ui-monospace,Menlo,monospace;font-size:13px">
+  <div style="text-align:center">
+    <div style="padding:8px 20px;border:2px solid var(--accent);border-radius:10px;font-weight:700;color:var(--accent)">try 块</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px">可能出错的代码</div>
+  </div>
+  <div style="font-size:18px">出错时 ↓</div>
+  <div style="text-align:center">
+    <div style="padding:8px 20px;border:2px solid var(--success);border-radius:10px;font-weight:700;color:var(--success)">except 块</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px">处理特定异常</div>
+  </div>
+  <div style="font-size:18px">无论是否出错 ↓</div>
+  <div style="text-align:center">
+    <div style="padding:8px 20px;border:2px solid var(--danger);border-radius:10px;font-weight:700;color:var(--danger)">finally 块</div>
+    <div style="font-size:12px;color:var(--muted);margin-top:4px">清理资源，保证执行</div>
+  </div>
+</div>`
+      },
+
+      executionSteps: [
+        {
+          line: 1,
+          explanation: "进入 try 块，尝试打开文件 data.txt",
+          state: { file: undefined }
+        },
+        {
+          line: 2,
+          explanation: "文件不存在，open() 抛出 FileNotFoundError",
+          state: { file: undefined, exception: "FileNotFoundError" }
+        },
+        {
+          line: 3,
+          explanation: "except FileNotFoundError 捕获异常，进入处理分支",
+          state: { file: undefined, handler: "except FileNotFoundError" }
+        },
+        {
+          line: 4,
+          explanation: "print(\"文件不存在\") 执行，异常处理完成",
+          state: { output: "文件不存在" }
+        },
+        {
+          line: 6,
+          explanation: "finally 块执行：print(\"清理完成\")。无论异常与否，finally 保证执行",
+          state: { output: "文件不存在\n清理完成" }
+        }
+      ],
+
+      walkthrough: [
+        { line: 1, text: "try: 开始监控块。open(\"data.txt\") 尝试打开文件。" },
+        { line: 2, text: "文件不存在 → open() 抛出 FileNotFoundError。异常对象沿调用链抛出。" },
+        { line: 3, text: "except FileNotFoundError: 捕获匹配类型的异常，进入处理块。" },
+        { line: 4, text: "输出「文件不存在」。except 块结束，异常处理完成。" },
+        { line: 6, text: "finally: 无论 try 成功、except 处理、还是异常未捕获，finally 都执行。输出「清理完成」。" }
+      ],
+
+      realWorldExample: {
+        title: "数据库连接释放",
+        problem: "数据库连接是稀缺资源，用完必须释放，否则连接池耗尽导致系统崩溃。try/finally 保证：即使查询出错，连接也一定归还给连接池。这是所有后端系统的标准资源管理模式。",
+        code: "def query_user(db, user_id):\n    conn = db.connect()\n    try:\n        return conn.query(f\"SELECT * FROM users WHERE id = {user_id}\")\n    finally:\n        conn.close()  # 无论查询成败都释放连接\n    # return 之前会先执行 finally\n\n# 更现代的写法：with 语句自动管理\nwith db.connect() as conn:\n    result = conn.query(\"SELECT 1\")\nprint(result)",
+        language: "python",
+        connections: ["error.exception-vs-result", "function.parameter-passing"]
+      },
+
+      confusions: [
+        {
+          left: "except",
+          right: "finally",
+          explanation: "except 处理异常（根据类型决定如何响应），finally 无条件执行清理（不处理异常，只保证资源释放）。except 可能被跳过（没异常时），finally 永远执行。",
+          leftExample: "try:\n    risky()\nexcept ValueError:\n    print(\"处理异常\")  # 有异常才执行",
+          rightExample: "try:\n    risky()\nfinally:\n    cleanup()  # 永远执行"
+        },
+        {
+          left: "捕获所有异常",
+          right: "捕获特定异常",
+          explanation: "except Exception 捕获所有异常，但会掩盖未知错误（把 bug 当正常情况处理）。except ValueError 只捕获特定类型，让意外错误继续向上传播。生产代码应优先捕获特定异常。",
+          leftExample: "try:\n    int(s)\nexcept Exception:\n    print(\"出错\")  # 掩盖所有错误",
+          rightExample: "try:\n    int(s)\nexcept ValueError:\n    print(\"不是数字\")  # 只处理转换错误"
+        },
+        {
+          left: "try/finally",
+          right: "with（上下文管理器）",
+          explanation: "try/finally 手动释放资源；with 语句自动调用资源的 __enter__/__exit__，无论异常与否都自动清理。with 是 try/finally 的语法糖，更简洁更不容易漏。",
+          leftExample: "conn = db.connect()\ntry:\n    conn.query(\"...\")\nfinally:\n    conn.close()",
+          rightExample: "with db.connect() as conn:\n    conn.query(\"...\")  # 自动 close"
+        }
+      ],
+
+      errors: [
+        {
+          code: "# Python\ntry:\n    x = int(\"abc\")\nexcept ValueError:\n    print(\"转换失败\")\nfinally:\n    print(\"清理\")",
+          message: "输出「转换失败」和「清理」——顺序对吗？",
+          cause: "顺序是：异常抛出 → except 处理 → finally 执行。所以先输出「转换失败」，再输出「清理」。finally 在 except 之后执行，不是之前。",
+          fix: "理解执行顺序：try → (异常? except) → finally。若 except 中有 return，finally 仍在 return 之前执行。",
+          variantCode: "def f():\n    try:\n        return \"正常\"\n    finally:\n        print(\"清理先执行\")\n\nprint(f())\n# 输出：清理先执行 → 正常"
+        },
+        {
+          code: "# Python\nfile = open(\"data.txt\", \"w\")\ntry:\n    file.write(\"hello\")\nexcept:\n    pass\n# 忘记 close！",
+          message: "文件句柄泄漏——程序长时间运行可能耗尽文件描述符",
+          cause: "写文件后忘记 close。try/except 处理了异常但没释放资源。文件可能没被保存（缓冲未刷新）或句柄泄漏。",
+          fix: "用 finally 保证 close，或用 with 语句自动管理。",
+          variantCode: "# 方式 1：try/finally\nfile = open(\"data.txt\", \"w\")\ntry:\n    file.write(\"hello\")\nfinally:\n    file.close()\n\n# 方式 2：with（推荐）\nwith open(\"data.txt\", \"w\") as file:\n    file.write(\"hello\")"
+        }
+      ],
+
+      exercises: [
+        {
+          id: "error.try-catch.ex01",
+          level: "A",
+          type: "concept",
+          question: "finally 块中的代码什么时候执行？",
+          options: [
+            "只在没有异常时",
+            "只在有异常时",
+            "无论是否发生异常都执行",
+            "只在 return 时"
+          ],
+          answer: 2,
+          feedback: "finally 保证执行：无异常、有异常、有 return 三种情况都会先执行 finally。"
+        },
+        {
+          id: "error.try-catch.ex02",
+          level: "B",
+          type: "output",
+          question: "以下代码输出什么？\n\ntry:\n    x = int(\"abc\")\nexcept ValueError:\n    print(\"A\")\nfinally:\n    print(\"B\")\nprint(\"C\")",
+          options: ["B\\nA\\nC", "A\\nC\\nB", "A\\nB", "A\\nB\\nC"],
+          answer: 3,
+          feedback: "异常 → except 输出 A → finally 输出 B → 程序继续输出 C。顺序是 A、B、C。"
+        },
+        {
+          id: "error.try-catch.ex03",
+          level: "B",
+          type: "read",
+          question: "以下代码输出什么？\n\ndef f():\n    try:\n        return \"ok\"\n    finally:\n        print(\"cleanup\")\n\nprint(f())",
+          options: ["ok\\ncleanup", "cleanup\\nok", "ok", "cleanup"],
+          answer: 1,
+          feedback: "return \"ok\" 先被求值，但 return 之前会先执行 finally 输出「cleanup」，然后才返回 ok 输出「ok」。"
+        },
+        {
+          id: "error.try-catch.ex04",
+          level: "C",
+          type: "fill",
+          question: "补全代码，读取文件时保证无论是否出错都关闭文件：",
+          options: [
+            "file = open(\"data.txt\")\ntry:\n    data = file.read()\nfinally:\n    file.close()",
+            "file = open(\"data.txt\")\nfile.read()\nfile.close()",
+            "try:\n    file = open(\"data.txt\")\n    data = file.read()\nexcept:\n    file.close()",
+            "file = open(\"data.txt\")\ntry:\n    data = file.read()\nexcept:\n    file.close()"
+          ],
+          answer: 0,
+          feedback: "选项 0 正确：try 读文件，finally 无条件关闭。选项 2/3 只在异常时关闭，正常路径泄漏；选项 1 出错时不会执行 close。"
+        }
+      ],
+
+      challenge: {
+        title: "30 秒挑战",
+        prompt: "写代码：尝试把 input_str 转成整数，成功输出「转换成功: 值」，失败输出「不是数字」，最后无论成败都输出「完成」",
+        hints: [
+          "try 里 int(input_str)",
+          "except ValueError 输出提示",
+          "finally 输出「完成」"
+        ],
+        solution: "input_str = \"42\"\ntry:\n    n = int(input_str)\n    print(f\"转换成功: {n}\")\nexcept ValueError:\n    print(\"不是数字\")\nfinally:\n    print(\"完成\")",
+        solutionOutput: "转换成功: 42\n完成"
+      },
+
+      connections: {
+        current: "错误处理",
+        diagram: `<div style="text-align:center;font-family:ui-monospace,Menlo,monospace;font-size:14px;line-height:2.2">
+  <div style="color:var(--muted)">异常模型</div>
+  <div>│</div>
+  <div style="font-weight:700;color:var(--accent);font-size:16px">try ── except ── finally</div>
+  <div>│</div>
+  <div style="color:var(--muted)">资源释放 / 自定义异常</div>
+</div>`,
+        prerequisites: ["error.exception-vs-result", "function.lambda"],
+        related: ["error.custom-types", "error.propagation", "error.resource-release"],
+        next: ["error.custom-types", "error.propagation"]
+      },
+
+      nextStep: {
+        title: "自定义错误类型",
+        description: "try/except 能处理内置异常。下一步学习自定义异常：如何定义自己的异常类型，携带业务上下文信息（如订单号、错误码），让错误处理更精确、错误信息更有价值。",
+        targetId: "error.custom-types"
+      }
     }
   ]
 };
